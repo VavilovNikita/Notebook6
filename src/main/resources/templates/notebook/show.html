@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Show</title>
+</head>
+<body>
+<p th:text="${notebook.getHead()}">VALUE</p>
+<p th:text="${notebook.getText()}">VALUE</p>
+<a href="/notebook">Go back</a>
+<br/>
+<hr/>
+
+<form th:method="GET" th:action="@{/notebook/{id}/edit(id=${notebook.getId()})}">
+  <input TYPE="submit" value="Edit">
+</form>
+<form th:method="DELETE" th:action="@{/notebook/{id}(id=${notebook.getId()})}">
+  <input TYPE="submit" value="Delete">
+</form>
+</body>
+</html>
