@@ -5,17 +5,17 @@
   <title>Show</title>
 </head>
 <body>
-<p th:text="${notebook.getHead()}">VALUE</p>
-<p th:text="${notebook.getText()}">VALUE</p>
-<a href="/notebook">Go back</a>
+<p th:text="${notebook.get().head}">qwe</p>
+<p th:text="${notebook.get().text}">qwe</p>
+<a href="/notebook">Назад</a>
 <br/>
 <hr/>
 
-<form th:method="GET" th:action="@{/notebook/{id}/edit(id=${notebook.getId()})}">
-  <input TYPE="submit" value="Edit">
+<form th:method="GET" th:action="@{/notebook/{id}/edit(id=${notebook.get().id})}">
+  <input TYPE="submit" value="Изменить">
 </form>
-<form th:method="DELETE" th:action="@{/notebook/{id}(id=${notebook.getId()})}">
-  <input TYPE="submit" value="Delete">
+<form th:method="DELETE" th:action="@{/notebook/{id}(id=${notebook.get().id})}">
+  <input TYPE="submit" value="Удалить">
 </form>
 </body>
 </html>

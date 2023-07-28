@@ -5,11 +5,11 @@
     <title>Title</title>
 </head>
 <body>
-<form th:method="PATCH" th:action="@{/notebook/{id}(id=${notebook.getId()})}" th:object="${notebook}">
-  <label for="head">Enter head: </label>
+<form th:method="PATCH" th:action="@{/notebook/{id}(id=${notebook.get().id})}" th:object="${notebook}">
+  <label for="head">Введите заголовок: </label>
   <input type="text" th:field="*{head}" id="head"/>
     <br/>
-    <label for="text">Enter text: </label>
+    <label for="text">Введите текст: </label>
   <input type="text" th:field="*{text}" id="text"/>
   <br/>
   <input type="submit" value="Update!"/>

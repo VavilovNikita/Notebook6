@@ -7,13 +7,13 @@
 <body>
 
 <form th:method="POST" th:action="@{/notebook}" th:object="${notebook}">
-  <label for="head">Enter head: </label>
+  <label for="head">Введите заголовок: </label>
   <input type="text" th:field="*{head}" id="head"/>
   <br/>
-  <label for="text">Enter text: </label>
+  <label for="text">Введите текст: </label>
   <input type="text" th:field="*{text}" id="text"/>
   <br/>
-  <input type="submit" value="Create!"/>
+  <input type="submit" value="Создать!"/>
 </form>
 
 </body>

@@ -1,6 +1,12 @@
 package ru.vavilov.notebook6.entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "notebook")
 public class Notebook {
+    @Id
+    @GeneratedValue
     private int id;
     private String head;
     private String text;
@@ -36,5 +42,14 @@ public class Notebook {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return "notebook{" +
+                "id=" + id +
+                ", head='" + head + '\'' +
+                ", text='" + text + '\'' +
+                '}';
     }
 }
