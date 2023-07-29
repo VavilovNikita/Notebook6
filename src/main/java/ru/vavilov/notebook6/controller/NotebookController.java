@@ -5,10 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.Notebook;
-import ru.vavilov.notebook6.repository.NotebookDAO;
 import ru.vavilov.notebook6.repository.NotebookRepository;
-
-import java.util.Collections;
 
 @Controller
 @RequestMapping("/notebook")

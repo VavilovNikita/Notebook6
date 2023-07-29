@@ -1,0 +1,17 @@
+version: '3.1'
+
+volumes:
+  pg_project:
+
+services:
+  pg_db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=SpringMVC
+    volumes:
+      - pg_project:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
