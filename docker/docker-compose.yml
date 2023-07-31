@@ -1,7 +1,7 @@
 version: '3.1'
 
 volumes:
-  pg_project:
+  pg_project_notebook:
 
 services:
   pg_db:
@@ -10,8 +10,8 @@ services:
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=SpringMVC
+      - POSTGRES_DB=notebook
     volumes:
-      - pg_project:/var/lib/postgresql/data
+      - pg_project_notebook:/var/lib/postgresql/data
     ports:
       - "5432:5432"
