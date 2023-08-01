@@ -10,7 +10,9 @@
 <div align="middle">
   <form th:method="POST" th:action="@{/notebook}" th:object="${notebook}">
     <a class="nav-link">Введите заголовок</a>
-    <textarea cols="100%" rows="2%" th:field="*{title}"></textarea>
+    <label>
+      <textarea cols="100%" rows="2%" th:field="*{title}"></textarea>
+    </label>
     <br/>
     <a class="nav-link">Введите текст</a>
     <textarea cols="100%" rows="7%" th:field="*{text}"></textarea>

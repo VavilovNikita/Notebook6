@@ -13,11 +13,15 @@
     <table class="table">
         <tr>
             <a class="nav-link">Заголовок</a>
-            <textarea readonly cols="100%" rows="2%" wrap="soft" th:text="${notebook.title}">qwe</textarea>
+            <label>
+                <textarea readonly cols="100%" rows="2%" wrap="soft" th:text="${notebook.title}">qwe</textarea>
+            </label>
         </tr>
         <tr>
             <a class="nav-link">Текст</a>
-            <textarea readonly cols="100%" rows="7%" wrap="hard" th:text="${notebook.text}"></textarea>
+            <label>
+                <textarea readonly cols="100%" rows="7%" wrap="hard" th:text="${notebook.text}"></textarea>
+            </label>
         </tr>
         <hr/>
         <form th:method="GET" th:action="@{/notebook/{id}/edit(id=${notebook.id})}">
