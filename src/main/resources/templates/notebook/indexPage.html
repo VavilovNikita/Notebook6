@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>index</title>
+    <!--/*/ <th:block th:insert="~{notebook/headers/header.html :: navbar}">
+      </th:block> /*/-->
+</head>
+<body>
+<table class="table">
+    <tr th:each="notebook : ${notebook}">
+            <td><a class="nav-link" th:href="@{/notebook/{id}(id=${notebook.id})}" th:text="${notebook.title}">user</a></td>
+            <td>
+                <a class="nav-link" href="/notebook">скопировать</a>
+            </td>
+    </tr>
+</table>
+</body>
+</html>

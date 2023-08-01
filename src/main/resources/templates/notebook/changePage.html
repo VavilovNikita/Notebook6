@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>header</title>
+    <!--/*/ <th:block th:insert="~{notebook/headers/header.html :: navbar}">
+      </th:block> /*/-->
+</head>
+<body>
+<!--TODO центровка через css не работает-->
+<div align="middle">
+    <form th:method="PATCH" th:action="@{/notebook/{id}(id=${notebook.id})}" th:object="${notebook}">
+        <a class="nav-link">Введите заголовок</a>
+        <label>
+            <textarea cols="100%" rows="2%" th:field="*{title}"></textarea>
+        </label>
+        <br/>
+        <a class="nav-link">Введите текст</a>
+        <label>
+            <textarea cols="100%" rows="7%" th:field="*{text}"></textarea>
+        </label>
+        <br/>
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+    </form>
+</div>
+</body>
+</html>
