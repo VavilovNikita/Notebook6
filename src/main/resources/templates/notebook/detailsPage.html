@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>header</title>
+    <!--/*/ <th:block th:insert="~{notebook/headers/header.html :: navbar}">
+      </th:block> /*/-->
+</head>
+<body>
+
+<div align="middle">
+    <!--    TODO при добавлении ячеек в таблицу все сьезжает-->
+    <table class="table">
+        <tr>
+            <a class="nav-link">Заголовок</a>
+            <textarea readonly cols="100%" rows="2%" wrap="soft" th:text="${notebook.title}">qwe</textarea>
+        </tr>
+        <tr>
+            <a class="nav-link">Текст</a>
+            <textarea readonly cols="100%" rows="7%" wrap="hard" th:text="${notebook.text}"></textarea>
+        </tr>
+        <hr/>
+        <form th:method="GET" th:action="@{/notebook/{id}/edit(id=${notebook.id})}">
+            <button type="submit" class="btn btn-primary">Изменить</button>
+        </form>
+        <form th:method="DELETE" th:action="@{/notebook/{id}(id=${notebook.id})}">
+            <button type="submit" class="btn btn-primary">Удалить</button>
+        </form>
+    </table>
+</div>
+</body>
+</html>

@@ -8,12 +8,12 @@ public class Notebook {
     @Id
     @GeneratedValue
     private int id;
-    private String head;
+    private String title;
     private String text;
 
     public Notebook(int id, String head, String text) {
         this.id = id;
-        this.head = head;
+        this.title = head;
         this.text = text;
     }
 
@@ -28,12 +28,12 @@ public class Notebook {
         this.id = id;
     }
 
-    public String getHead() {
-        return head;
+    public String getTitle() {
+        return title;
     }
 
-    public void setHead(String head) {
-        this.head = head;
+    public void setTitle(String head) {
+        this.title = head;
     }
 
     public String getText() {
@@ -48,7 +48,7 @@ public class Notebook {
     public String toString() {
         return "notebook{" +
                 "id=" + id +
-                ", head='" + head + '\'' +
+                ", head='" + title + '\'' +
                 ", text='" + text + '\'' +
                 '}';
     }

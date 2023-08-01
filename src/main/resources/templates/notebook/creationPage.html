@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>header</title>
+  <!--/*/ <th:block th:insert="~{notebook/headers/header.html :: navbar}">
+      </th:block> /*/-->
+</head>
+<body>
+<div align="middle">
+  <form th:method="POST" th:action="@{/notebook}" th:object="${notebook}">
+    <a class="nav-link">Введите заголовок</a>
+    <textarea cols="100%" rows="2%" th:field="*{title}"></textarea>
+    <br/>
+    <a class="nav-link">Введите текст</a>
+    <textarea cols="100%" rows="7%" th:field="*{text}"></textarea>
+    <br/>
+    <button type="submit" class="btn btn-primary">Создать</button>
+  </form>
+</div>
+</body>
+</html>

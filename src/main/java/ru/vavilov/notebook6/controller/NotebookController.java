@@ -20,18 +20,18 @@ public class NotebookController {
     @GetMapping()
     public String index(Model model) {
         model.addAttribute("notebook", repository.findAll());
-        return "notebook/index";
+        return "notebook/indexPage";
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id, Model model) {
-        model.addAttribute("notebook", repository.findById(id));
-        return "notebook/show";
+    public String details(@PathVariable("id") int id, Model model) {
+        model.addAttribute("notebook", repository.findById(id).orElse(null));
+        return "notebook/detailsPage";
     }
 
     @GetMapping("/new")
     public String newNotebook(@ModelAttribute("notebook") Notebook notebook) {
-        return "notebook/new";
+        return "notebook/creationPage";
     }
 
     @PostMapping()
@@ -42,8 +42,8 @@ public class NotebookController {
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("notebook", repository.findById(id));
-        return "notebook/edit";
+        model.addAttribute("notebook", repository.findById(id).orElse(null));
+        return "notebook/changePage";
     }
 
     @PatchMapping("/{id}")
