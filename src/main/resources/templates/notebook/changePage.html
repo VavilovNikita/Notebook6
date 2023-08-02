@@ -12,8 +12,8 @@
     <form th:method="PATCH" th:action="@{/notebook/{id}(id=${notebook.id})}" th:object="${notebook}">
         <a class="nav-link">Введите заголовок</a>
         <label>
-            <textarea cols="100%" rows="2%" th:field="*{title}"></textarea>
-        </label>
+        <textarea cols="100%" rows="2%" th:field="*{title}"></textarea>
+    </label>
         <br/>
         <a class="nav-link">Введите текст</a>
         <label>
