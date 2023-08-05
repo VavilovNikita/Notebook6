@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>header</title>
+    <!--/*/ <th:block th:insert="~{person/headers/header.html :: navbar}">
+      </th:block> /*/-->
+</head>
+<body>
+<!--TODO центровка через css не работает-->
+<div align="middle">
+    <form th:method="PATCH" th:action="@{/person/{id}(id=${person.id})}" th:object="${person}">
+        <a class="nav-link">Введите имя</a>
+        <label>
+            <textarea cols="40%" rows="2%" th:field="*{firstName}"></textarea>
+        </label>
+        <br/>
+        <a class="nav-link">Введите фамилию</a>
+        <label>
+            <textarea cols="40%" rows="2%" th:field="*{secondName}"></textarea>
+        </label>
+        <br/>
+        <a class="nav-link">Введите email</a>
+        <label>
+            <textarea cols="40%" rows="2%" th:field="*{email}"></textarea>
+        </label>
+        <br/>
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+    </form>
+</div>
+</body>
+</html>

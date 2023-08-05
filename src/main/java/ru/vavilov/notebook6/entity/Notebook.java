@@ -7,8 +7,15 @@ import jakarta.persistence.*;
 public class Notebook {
     @Id
     @GeneratedValue
+    @Column(name = "id")
     private int id;
+
+    @ManyToOne
+    @JoinColumn(name = "person_id", referencedColumnName = "id")
+    private Person person;
+    @Column(name = "title")
     private String title;
+    @Column(name = "text")
     private String text;
 
     public Notebook(int id, String head, String text) {
@@ -42,6 +49,14 @@ public class Notebook {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     @Override

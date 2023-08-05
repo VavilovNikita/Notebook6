@@ -7,30 +7,32 @@
       </th:block> /*/-->
 </head>
 <body>
-
-<div align="middle">
-    <!--    TODO при добавлении ячеек в таблицу все сьезжает-->
-    <table class="table">
-        <tr>
-            <a class="nav-link">Заголовок</a>
-            <label>
-                <textarea readonly cols="100%" rows="2%" wrap="soft" th:text="${notebook.title}">qwe</textarea>
-            </label>
-        </tr>
-        <tr>
-            <a class="nav-link">Текст</a>
-            <label>
-                <textarea readonly cols="100%" rows="7%" wrap="hard" th:text="${notebook.text}"></textarea>
-            </label>
-        </tr>
-        <hr/>
-        <form th:method="GET" th:action="@{/notebook/{id}/edit(id=${notebook.id})}">
-            <button type="submit" class="btn btn-primary">Изменить</button>
-        </form>
-        <form th:method="DELETE" th:action="@{/notebook/{id}(id=${notebook.id})}">
-            <button type="submit" class="btn btn-primary">Удалить</button>
-        </form>
-    </table>
-</div>
+<table class="table">
+    <tr>
+        <th><label for="author_name">Автор записи:</label>
+            <a class="nav-link" th:href="@{/person/{id}(id=${person.id})}"
+               th:text="${person.firstName} + ${person.secondName}" id="author_name"></a></th>
+    </tr>
+    <tr>
+        <td><label for="title">Заголовок:</label>
+            <a th:text="${notebook.title}" id="title">qwe</a></td>
+    </tr>
+    <tr>
+        <td><label for="text">Текст:</label>
+            <a th:text="${notebook.text}" id="text"></a></td>
+    </tr>
+    <hr/>
+    <tr>
+        <td>
+            <form th:method="GET" th:action="@{/notebook/{id}/edit(id=${notebook.id})}">
+                <button type="submit" class="btn btn-primary">Изменить</button>
+            </form>
+            <hr/>
+            <form th:method="DELETE" th:action="@{/notebook/{id}(id=${notebook.id})}">
+                <button type="submit" class="btn btn-primary">Удалить</button>
+            </form>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

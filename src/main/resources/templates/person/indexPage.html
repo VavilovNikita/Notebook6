@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
     <title>index</title>
-    <!--/*/ <th:block th:insert="~{notebook/headers/header.html :: navbar}">
+    <!--/*/ <th:block th:insert="~{person/headers/header.html :: navbar}">
       </th:block> /*/-->
 </head>
 <body>
 <table class="table">
-    <tr th:each="notebook : ${notebook}">
-        <td><a class="nav-link" th:href="@{/notebook/{id}(id=${notebook.id})}" th:text="${notebook.title}" id="text">user</a>
+    <tr th:each="person : ${person}">
+        <td><a class="nav-link" th:href="@{/person/{id}(id=${person.id})}" th:text="${person.firstName}"
+               id="text">user</a>
         </td>
         <td>
-            <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id}">
-            <button class="btn btn-primary" th:onclick="'myFunction(\'' + ${notebook.id} + '\')'">Скопировать</button>
+            <input type="hidden" th:value="*{person.email}" th:id="${person.id}">
+            <button class="btn btn-primary" th:onclick="'myFunction(\'' + ${person.id} + '\')'">Скопировать</button>
             <script th:inline="javascript">
                 function myFunction(id) {
                     const copyText = document.getElementById(id);
