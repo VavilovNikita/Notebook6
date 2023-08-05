@@ -12,15 +12,18 @@
     <form th:method="PATCH" th:action="@{/notebook/{id}(id=${notebook.id})}" th:object="${notebook}">
         <a class="nav-link">Введите заголовок</a>
         <label>
-        <textarea cols="100%" rows="2%" th:field="*{title}"></textarea>
-    </label>
-        <br/>
-        <a class="nav-link">Введите текст</a>
-        <label>
-            <textarea cols="100%" rows="7%" th:field="*{text}"></textarea>
+            <textarea cols="100%" rows="2%" th:field="*{title}"></textarea>
         </label>
         <br/>
-        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        <a class="nav-link">Введите текст</a>
+        <textarea cols="100%" rows="7%" th:field="*{text}"></textarea>
+        <br/>
+        <label for="person_id">Выбери пользователя:</label>
+        <select id="person_id" th:field="*{person}">
+            <option th:each="person : ${person}" th:value="${person.id}"
+                    th:utext="${person.firstName} + ${person.secondName}"></option>
+        </select>
+        <button type="submit" class="btn btn-primary">Создать</button>
     </form>
 </div>
 </body>

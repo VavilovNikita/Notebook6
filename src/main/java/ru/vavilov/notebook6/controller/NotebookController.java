@@ -49,6 +49,7 @@ public class NotebookController {
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
         model.addAttribute("notebook", notebookRepository.findById(id).orElse(null));
+        model.addAttribute("person",personRepository.findAll());
         return "notebook/changePage";
     }
 
