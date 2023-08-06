@@ -1,6 +1,9 @@
 package ru.vavilov.notebook6.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -13,15 +16,20 @@ public class Person {
     @GeneratedValue
     @Column(name = "id")
     private int id;
+    @NotEmpty(message = "Поле Имя не должно быть пустым")
     @Column(name = "firstName")
     private String firstName;
+    @NotEmpty(message = "Поле Фамилия не должно быть пустым")
     @Column(name = "secondName")
     private String secondName;
     @Column(name = "email")
+    @Email(message = "Неверный формат Email")
+    @NotEmpty(message = "Поле email не должно быть пустым")
     private String email;
     @Column(name = "date_of_birth")
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "dd/MM/yyyy") // дд/мм/гггг
+    @DateTimeFormat(pattern = "dd-MM-yyyy") // дд/мм/гггг
+    @NotNull(message = "Поле email не должно быть пустым")
     private Date dateOfBirth;
     @OneToMany(mappedBy = "person")
     private List<Notebook> notes;

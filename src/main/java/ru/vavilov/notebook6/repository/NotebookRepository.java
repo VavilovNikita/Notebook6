@@ -4,6 +4,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import ru.vavilov.notebook6.entity.Notebook;
 
+import java.util.Optional;
+
 @Repository
 public interface NotebookRepository extends CrudRepository<Notebook,Integer> {
+    Optional<Notebook> findByText(String text);
+    Optional<Notebook> findByTitle(String title);
 }

@@ -1,6 +1,8 @@
 package ru.vavilov.notebook6.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.Date;
 
@@ -16,8 +18,10 @@ public class Notebook {
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     private Person person;
     @Column(name = "title")
+    @NotEmpty(message = "Поле заголовок не может быть пустым")
     private String title;
     @Column(name = "text")
+    @NotEmpty(message = "Поле текст не может быть пустым")
     private String text;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

@@ -1,22 +1,25 @@
 package ru.vavilov.notebook6.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.service.PersonService;
+import ru.vavilov.notebook6.util.PersonValidator;
 
 @Controller
 @RequestMapping("/person")
 public class PersonController {
     private final PersonService personService;
+    private final PersonValidator personValidator;
 
     @Autowired
-    public PersonController(PersonService personService) {
+    public PersonController(PersonService personService, PersonValidator personValidator) {
         this.personService = personService;
+        this.personValidator = personValidator;
     }
 
     @GetMapping()
@@ -38,10 +41,11 @@ public class PersonController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("person") @Validated Person person,
-                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            return "person/new";
+    public String create(@ModelAttribute("person")@Valid  Person person, BindingResult bindingResult) {
+        personValidator.validate(person,bindingResult);
+        if (bindingResult.hasErrors()){
+            return "person/creationPage";
+        }
 
         personService.savePerson(person);
         return "redirect:/person";
@@ -54,7 +58,11 @@ public class PersonController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("person") Person person) {
+    public String update(@ModelAttribute("person")@Valid  Person person, BindingResult bindingResult) {
+        personValidator.validate(person,bindingResult);
+        if (bindingResult.hasErrors()){
+            return "person/changePage";
+        }
         personService.savePerson(person);
         return "redirect:/person";
     }

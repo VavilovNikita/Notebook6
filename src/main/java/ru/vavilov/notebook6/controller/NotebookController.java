@@ -1,23 +1,25 @@
 package ru.vavilov.notebook6.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.Notebook;
-import ru.vavilov.notebook6.entity.Person;
-import ru.vavilov.notebook6.repository.NotebookRepository;
-import ru.vavilov.notebook6.repository.PersonRepository;
 import ru.vavilov.notebook6.service.NotebookService;
+import ru.vavilov.notebook6.util.NotebookValidator;
 
 @Controller
 @RequestMapping("/notebook")
 public class NotebookController {
     private final NotebookService notebookService;
+    private final NotebookValidator notebookValidator;
 
     @Autowired
-    public NotebookController(NotebookService notebookService) {
+    public NotebookController(NotebookService notebookService, NotebookValidator notebookValidator) {
         this.notebookService = notebookService;
+        this.notebookValidator = notebookValidator;
     }
 
     @GetMapping()
@@ -40,7 +42,11 @@ public class NotebookController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("notebook") Notebook notebook) {
+    public String create(@ModelAttribute("notebook")@Valid Notebook notebook, BindingResult bindingResult) {
+        notebookValidator.validate(notebook,bindingResult);
+        if (bindingResult.hasErrors()){
+            return "notebook/creationPage";
+        }
         notebookService.saveNotebook(notebook);
         return "redirect:/notebook";
     }
@@ -53,7 +59,10 @@ public class NotebookController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("notebook") Notebook notebook) {
+    public String update(@ModelAttribute("notebook")@Valid Notebook notebook,BindingResult bindingResult) {
+        if (bindingResult.hasErrors()){
+            return "notebook/changePage";
+        }
         notebookService.saveNotebook(notebook);
         return "redirect:/notebook";
     }

@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.repository.PersonRepository;
+import ru.vavilov.notebook6.util.PersonValidator;
+
+import java.util.Optional;
 
 @Service
 public class PersonService {
@@ -30,4 +33,9 @@ public class PersonService {
     public void deletePerson(int id) {
         personRepository.deleteById(id);
     }
+    public Optional<Person> findByEmail(String email) {
+        return personRepository.findByEmail(email);
+    }
+
+
 }
