@@ -5,28 +5,28 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.Person;
-import ru.vavilov.notebook6.repository.PersonRepository;
+import ru.vavilov.notebook6.service.PersonService;
 
 @Controller
 @RequestMapping("/person")
 public class PersonController {
-    private final PersonRepository repository;
+    private final PersonService personService;
 
     @Autowired
-    public PersonController(PersonRepository repository) {
-        this.repository = repository;
+    public PersonController(PersonService personService) {
+        this.personService = personService;
     }
 
     @GetMapping()
     public String index(Model model) {
-        model.addAttribute("person", repository.findAll());
+        model.addAttribute("person", personService.findAll());
         return "person/indexPage";
     }
 
     @GetMapping("/{id}")
     public String details(@PathVariable("id") int id, Model model) {
-        model.addAttribute("person", repository.findById(id).orElse(null));
-        model.addAttribute("notes", repository.findById(id).orElse(null).getNotes());
+        model.addAttribute("person", personService.findOne(id));
+        model.addAttribute("notes", personService.findOne(id).getNotes());
         return "person/detailsPage";
     }
 
@@ -37,25 +37,25 @@ public class PersonController {
 
     @PostMapping()
     public String create(@ModelAttribute("person") Person person) {
-        repository.save(person);
+        personService.savePerson(person);
         return "redirect:/person";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("person", repository.findById(id).orElse(null));
+        model.addAttribute("person", personService.findOne(id));
         return "person/changePage";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("person") Person person) {
-        repository.save(person);
+        personService.savePerson(person);
         return "redirect:/person";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        repository.deleteById(id);
+        personService.deletePerson(id);
         return "redirect:/person";
     }
 }
