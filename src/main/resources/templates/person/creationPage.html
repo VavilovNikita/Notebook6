@@ -7,25 +7,22 @@
         </th:block> /*/-->
 </head>
 <body>
-<div align="middle">
-    <form th:method="POST" th:action="@{/person}" th:object="${person}">
-        <a class="nav-link">Введите имя</a>
-        <label>
-            <textarea cols="40%" rows="2%" th:field="*{firstName}"></textarea>
-        </label>
-        <br/>
-        <a class="nav-link">Введите фамилию</a>
-        <label>
-            <textarea cols="40%" rows="2%" th:field="*{secondName}"></textarea>
-        </label>
-        <br/>
-        <a class="nav-link">Введите email</a>
-        <label>
-            <textarea cols="40%" rows="2%" th:field="*{email}"></textarea>
-        </label>
-        <br/>
-        <button type="submit" class="btn btn-primary">Создать</button>
-    </form>
-</div>
+<form th:method="POST" th:action="@{/person}" th:object="${person}">
+    <label for="name">Enter name: </label>
+    <input type="text" th:field="*{firstName}" id="name"/>
+    <br/>
+    <label for="secondName">Enter age: </label>
+    <input type="text" th:field="*{secondName}" id="secondName"/>
+    <br/>
+    <label for="email">Enter email: </label>
+    <input type="text" th:field="*{email}" id="email"/>
+    <br/>
+    <label for="date_of_birth">Enter date of birth (dd/mm/yyyy): </label>
+    <input type="text" th:field="*{dateOfBirth}" id="date_of_birth"/>
+    <div style="color:red" th:if="${#fields.hasErrors('dateOfBirth')}"
+         th:errors="*{dateOfBirth}">Date of birth Error</div>
+    <br/>
+    <input type="submit" value="Create!"/>
+</form>
 </body>
 </html>

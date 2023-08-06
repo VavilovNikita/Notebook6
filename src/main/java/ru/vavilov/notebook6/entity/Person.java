@@ -1,7 +1,9 @@
 package ru.vavilov.notebook6.entity;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -12,22 +14,27 @@ public class Person {
     @Column(name = "id")
     private int id;
     @Column(name = "firstName")
-
     private String firstName;
     @Column(name = "secondName")
     private String secondName;
     @Column(name = "email")
     private String email;
+    @Column(name = "date_of_birth")
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd/MM/yyyy") // дд/мм/гггг
+    private Date dateOfBirth;
     @OneToMany(mappedBy = "person")
     private List<Notebook> notes;
 
-    public Person(int id, String firstName, String secondName, String email, List<Notebook> notes) {
+    public Person(int id, String firstName, String secondName, String email, Date dateOfBirth, List<Notebook> notes) {
         this.id = id;
         this.firstName = firstName;
         this.secondName = secondName;
         this.email = email;
+        this.dateOfBirth = dateOfBirth;
         this.notes = notes;
     }
+
     public Person() {
     }
 
@@ -69,5 +76,13 @@ public class Person {
 
     public void setNotes(List<Notebook> notes) {
         this.notes = notes;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 }

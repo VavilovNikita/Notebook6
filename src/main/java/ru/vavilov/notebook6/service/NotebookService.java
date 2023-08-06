@@ -7,6 +7,8 @@ import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.repository.NotebookRepository;
 import ru.vavilov.notebook6.repository.PersonRepository;
 
+import java.util.Date;
+
 @Service
 public class NotebookService {
 
@@ -36,6 +38,7 @@ public class NotebookService {
     }
 
     public void saveNotebook(Notebook notebook) {
+        notebook.setCreatedAt(new Date());
         notebookRepository.save(notebook);
     }
 

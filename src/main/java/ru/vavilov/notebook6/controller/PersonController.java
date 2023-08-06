@@ -3,6 +3,8 @@ package ru.vavilov.notebook6.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.service.PersonService;
@@ -36,7 +38,11 @@ public class PersonController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("person") Person person) {
+    public String create(@ModelAttribute("person") @Validated Person person,
+                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return "person/new";
+
         personService.savePerson(person);
         return "redirect:/person";
     }

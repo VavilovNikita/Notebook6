@@ -2,6 +2,8 @@ package ru.vavilov.notebook6.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "notebook")
 public class Notebook {
@@ -17,6 +19,9 @@ public class Notebook {
     private String title;
     @Column(name = "text")
     private String text;
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
 
     public Notebook(int id, String head, String text) {
         this.id = id;
@@ -57,6 +62,14 @@ public class Notebook {
 
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     @Override
