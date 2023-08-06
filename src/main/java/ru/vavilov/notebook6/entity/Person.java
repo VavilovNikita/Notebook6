@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "Person")
+@Table(name = "person")
 public class Person {
     @Id
     @GeneratedValue
@@ -28,7 +28,7 @@ public class Person {
     private String email;
     @Column(name = "date_of_birth")
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "dd-MM-yyyy") // дд/мм/гггг
+    @DateTimeFormat(pattern = "dd/MM/yyyy") // дд/мм/гггг
     @NotNull(message = "Поле email не должно быть пустым")
     private Date dateOfBirth;
     @OneToMany(mappedBy = "person")

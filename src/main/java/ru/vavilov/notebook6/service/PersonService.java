@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.repository.PersonRepository;
-import ru.vavilov.notebook6.util.PersonValidator;
 
 import java.util.Optional;
 
@@ -22,7 +21,7 @@ public class PersonService {
         return personRepository.findAll();
     }
 
-    public Person findOne(int id) {
+    public Person findById(int id) {
         return personRepository.findById(id).orElse(null);
     }
 

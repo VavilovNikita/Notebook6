@@ -10,6 +10,8 @@ import ru.vavilov.notebook6.entity.Notebook;
 import ru.vavilov.notebook6.service.NotebookService;
 import ru.vavilov.notebook6.util.NotebookValidator;
 
+import java.util.Optional;
+
 @Controller
 @RequestMapping("/notebook")
 public class NotebookController {
@@ -30,8 +32,9 @@ public class NotebookController {
 
     @GetMapping("/{id}")
     public String details(@PathVariable("id") int id, Model model) {
-        model.addAttribute("notebook", notebookService.findNotebookById(id));
-        model.addAttribute("person", notebookService.findNotebookPersonById(id));
+        Notebook notebook = notebookService.findById(id);
+        model.addAttribute("notebook", notebook);
+        model.addAttribute("person", notebook.getPerson());
         return "notebook/detailsPage";
     }
 
@@ -53,7 +56,7 @@ public class NotebookController {
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("notebook", notebookService.findNotebookById(id));
+        model.addAttribute("notebook", notebookService.findById(id));
         model.addAttribute("person", notebookService.findAllPerson());
         return "notebook/changePage";
     }

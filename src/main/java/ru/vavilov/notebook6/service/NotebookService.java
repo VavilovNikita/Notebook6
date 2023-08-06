@@ -26,11 +26,8 @@ public class NotebookService {
         return notebookRepository.findAll();
     }
 
-    public Person findNotebookPersonById(int id) {
-        return notebookRepository.findById(id).orElse(null).getPerson();
-    }
 
-    public Notebook findNotebookById(int id) {
+    public Notebook findById(int id) {
         return notebookRepository.findById(id).orElse(null);
     }
 
