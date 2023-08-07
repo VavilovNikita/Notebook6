@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>header</title>
+    <!--/*/ <th:block th:insert="~{person/headers/header.html :: navbar}">
+      </th:block> /*/-->
+</head>
+<body>
+
+<div align="middle">
+    <table class="table">
+        <tr>
+            <td><label for="firstName">Имя: </label>
+                <a th:text="${person.firstName}" id="firstName">qwe</a></td>
+        </tr>
+        <tr>
+            <td><label for="secondName">Фамилия: </label>
+                <a th:text="${person.secondName}" id="secondName"></a></td>
+        </tr>
+        <tr>
+            <td><label for="email">Почта: </label>
+                <a th:text="${person.email}" id="email"></a></td>
+        </tr>
+        <tr>
+            <td><label for="dateOfBirth">Дата рождения: </label>
+                <a th:text="${person.dateOfBirth}" id="dateOfBirth"></a></td>
+        </tr>
+        <th><a>Записи пользователя</a></th>
+        <tr th:each="notes : ${notes}">
+            <td><a class="nav-link" th:href="@{/notebook/{id}(id=${notes.id})}" th:text="${notes.title}">user</a>
+                <hr/>
+            </td>
+        </tr>
+        <hr/>
+        <tr>
+            <td>
+                <form th:method="GET" th:action="@{/person/{id}/edit(id=${person.id})}">
+                    <button type="submit" class="btn btn-primary">Изменить</button>
+                </form>
+                <hr/>
+                <form th:method="DELETE" th:action="@{/person/{id}(id=${person.id})}">
+                    <button type="submit" class="btn btn-primary">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
