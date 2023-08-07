@@ -22,6 +22,10 @@
             <td><label for="email">Почта: </label>
                 <a th:text="${person.email}" id="email"></a></td>
         </tr>
+        <tr>
+            <td><label for="dateOfBirth">Дата рождения: </label>
+                <a th:text="${person.dateOfBirth}" id="dateOfBirth"></a></td>
+        </tr>
         <th><a>Записи пользователя</a></th>
         <tr th:each="notes : ${notes}">
             <td><a class="nav-link" th:href="@{/notebook/{id}(id=${notes.id})}" th:text="${notes.title}">user</a>

@@ -7,24 +7,26 @@
       </th:block> /*/-->
 </head>
 <body>
-<!--TODO центровка через css не работает-->
-<div align="middle">
-    <form th:method="PATCH" th:action="@{/notebook/{id}(id=${notebook.id})}" th:object="${notebook}">
-        <a class="nav-link">Введите заголовок</a>
-        <label>
-            <textarea cols="100%" rows="2%" th:field="*{title}"></textarea>
-        </label>
-        <br/>
-        <a class="nav-link">Введите текст</a>
-        <textarea cols="100%" rows="7%" th:field="*{text}"></textarea>
-        <br/>
-        <label for="person_id">Выбери пользователя:</label>
-        <select id="person_id" th:field="*{person}">
-            <option th:each="person : ${person}" th:value="${person.id}"
-                    th:utext="${person.firstName} + ${person.secondName}"></option>
-        </select>
-        <button type="submit" class="btn btn-primary">Применить изменения</button>
-    </form>
-</div>
+<form class="row-cols-4" th:method="PATCH" th:action="@{/notebook/{id}(id=${notebook.id})}" th:object="${notebook}">
+    <label for="name">Введите заголовок: </label>
+    <input class="form-control" type="text" th:field="*{title}" id="name"/>
+    <div style="color:red" th:if="${#fields.hasErrors('title')}"
+         th:errors="*{title}">title Error
+    </div>
+    <br/>
+    <label for="secondName">Введите текст: </label>
+    <input class="form-control" type="text" th:field="*{text}" id="secondName"/>
+    <div style="color:red" th:if="${#fields.hasErrors('text')}"
+         th:errors="*{text}">text Error
+    </div>
+    <br/>
+    <label for="person_id">Выбери пользователя:</label>
+    <select class="form-select" id="person_id" th:field="*{person}">
+        <option th:each="person : ${person}" th:value="${person.id}"
+                th:utext="${person.firstName} + ${person.secondName}"></option>
+    </select>
+    <br/>
+    <input class="btn btn-primary" type="submit" value="Сохранить изменения"/>
+</form>
 </body>
 </html>

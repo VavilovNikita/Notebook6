@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.repository.PersonRepository;
 
+import java.util.Optional;
+
 @Service
 public class PersonService {
 
@@ -19,7 +21,7 @@ public class PersonService {
         return personRepository.findAll();
     }
 
-    public Person findOne(int id) {
+    public Person findById(int id) {
         return personRepository.findById(id).orElse(null);
     }
 
@@ -30,4 +32,9 @@ public class PersonService {
     public void deletePerson(int id) {
         personRepository.deleteById(id);
     }
+    public Optional<Person> findByEmail(String email) {
+        return personRepository.findByEmail(email);
+    }
+
+
 }

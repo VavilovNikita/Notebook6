@@ -7,6 +7,9 @@ import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.repository.NotebookRepository;
 import ru.vavilov.notebook6.repository.PersonRepository;
 
+import java.util.Date;
+import java.util.Optional;
+
 @Service
 public class NotebookService {
 
@@ -23,11 +26,8 @@ public class NotebookService {
         return notebookRepository.findAll();
     }
 
-    public Person findNotebookPersonById(int id) {
-        return notebookRepository.findById(id).orElse(null).getPerson();
-    }
 
-    public Notebook findNotebookById(int id) {
+    public Notebook findById(int id) {
         return notebookRepository.findById(id).orElse(null);
     }
 
@@ -36,10 +36,18 @@ public class NotebookService {
     }
 
     public void saveNotebook(Notebook notebook) {
+        notebook.setCreatedAt(new Date());
         notebookRepository.save(notebook);
     }
 
     public void deleteNotebook(int id) {
         notebookRepository.deleteById(id);
     }
+    public Optional<Notebook> findByText(String text) {
+        return notebookRepository.findByText(text);
+    }
+    public Optional<Notebook> findByTitle(String title) {
+        return notebookRepository.findByTitle(title);
+    }
+
 }
