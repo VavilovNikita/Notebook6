@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>header</title>
+    <!--/*/ <th:block th:insert="~{person/headers/header.html :: navbar}">
+        </th:block> /*/-->
+</head>
+<body>
+<form class="row-cols-4" th:method="POST" th:action="@{/perform-login}">
+    <label for="username">Введите имя пользователя: </label>
+    <input class="form-control" type="text" name="username" id="username"/>
+    <br/>
+    <label for="password">Введите пароль: </label>
+    <input class="form-control" type="text" name="password" id="password"/>
+    <input class="btn btn-primary" type="submit" value="Войти"/>
+</form>
+</body>
+</html>
