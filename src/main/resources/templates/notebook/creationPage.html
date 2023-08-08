@@ -17,12 +17,13 @@
     <input class="form-control" type="text" th:field="*{text}" id="secondName"/>
     <div style="color:red" th:if="${#fields.hasErrors('text')}"
          th:errors="*{text}">text Error</div>
-    <br/>
-    <label for="person_id">Выбери пользователя:</label>
-    <select class="form-select" id="person_id" th:field="*{person}">
-        <option th:each="person : ${person}" th:value="${person.id}"
-                th:utext="${person.firstName} + ${person.secondName}"></option>
-    </select>
+<!--    <br/>-->
+<!--    <label for="person_id">Выбери пользователя:</label>-->
+<!--    <select class="form-select" id="person_id" th:field="*{person}">-->
+<!--        <option value="null">Выберите пользователя</option>-->
+<!--        <option th:each="person : ${person}" th:value="${person.id}"-->
+<!--                th:utext="${person.firstName} + ${person.secondName}"></option>-->
+<!--    </select>-->
     <br/>
     <input class="btn btn-primary" type="submit" value="Создать"/>
 </form>

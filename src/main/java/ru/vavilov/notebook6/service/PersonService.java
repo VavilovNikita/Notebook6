@@ -12,15 +12,13 @@ import ru.vavilov.notebook6.repository.PersonRepository;
 import java.util.Optional;
 
 @Service
-public class PersonService implements UserDetailsService {
+public class PersonService{
 
     private final PersonRepository personRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public PersonService(PersonRepository personRepository, BCryptPasswordEncoder passwordEncoder) {
+    public PersonService(PersonRepository personRepository) {
         this.personRepository = personRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public Iterable<Person> findAll() {
@@ -32,7 +30,7 @@ public class PersonService implements UserDetailsService {
     }
 
     public void savePerson(Person person) {
-        person.setPassword(passwordEncoder.encode(person.getPassword()));
+
         personRepository.save(person);
     }
 
@@ -41,14 +39,6 @@ public class PersonService implements UserDetailsService {
     }
     public Optional<Person> findByEmail(String email) {
         return personRepository.findByEmail(email);
-    }
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-       Person person = personRepository.getByUsername(username);
-       if(person == null){
-           throw new UsernameNotFoundException("Не удается найти пользователя" + username);
-       }
-       return person;
     }
 
 }

@@ -6,25 +6,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.service.PersonService;
 
 @Controller
-public class AuthConroller {
+public class RegisterConroller {
 
     PersonService personService;
 
     @Autowired
-    public AuthConroller(PersonService personService) {
+    public RegisterConroller(PersonService personService) {
         this.personService = personService;
     }
-
-    @GetMapping("/login")
-    public String login() {
-        return "auth/login";
-    }
-
     @GetMapping("/register")
     public String register(Model model) {
         model.addAttribute("person",new Person());

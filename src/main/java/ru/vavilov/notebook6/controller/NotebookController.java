@@ -2,11 +2,15 @@ package ru.vavilov.notebook6.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.Notebook;
+import ru.vavilov.notebook6.security.PersonDetails;
 import ru.vavilov.notebook6.service.NotebookService;
 import ru.vavilov.notebook6.util.NotebookValidator;
 
@@ -24,9 +28,14 @@ public class NotebookController {
         this.notebookValidator = notebookValidator;
     }
 
-    @GetMapping()
+    @GetMapping("/allNotes")
     public String index(Model model) {
         model.addAttribute("notebook", notebookService.findAll());
+        return "notebook/indexByIdPage";
+    }
+    @GetMapping()
+    public String indexById(Model model) {
+        model.addAttribute("notebook", notebookService.getAuthPerson().getNotes());
         return "notebook/indexPage";
     }
 
