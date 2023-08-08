@@ -24,7 +24,7 @@ public class WebSecurityConfig {
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
-                        .successForwardUrl("/notebook")
+                        .defaultSuccessUrl("/notebook",true)
                         .loginProcessingUrl("/perform-login")
                         .usernameParameter("username")
                         .passwordParameter("password")
