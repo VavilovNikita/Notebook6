@@ -8,29 +8,29 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import ru.vavilov.notebook6.service.PersonDetailsService;
+import ru.vavilov.notebook6.service.UserDetailService;
 
 import java.util.Collections;
 
 @Component
 public class AuthProvider implements AuthenticationProvider {
-    private final PersonDetailsService personDetailsService;
+    private final UserDetailService userDetailsService;
 
     @Autowired
-    public AuthProvider(PersonDetailsService personDetailsService) {
-        this.personDetailsService = personDetailsService;
+    public AuthProvider(UserDetailService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String userName = authentication.getName();
-        UserDetails personDetails = personDetailsService.loadUserByUsername(userName);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
         String password = authentication.getCredentials().toString();
 
-        if (!password.equals(personDetails.getPassword()))
+        if (!password.equals(userDetails.getPassword()))
             throw new BadCredentialsException("Неверный пароль");
         return new UsernamePasswordAuthenticationToken(
-                personDetails,
+                userDetails,
                 password,
                 Collections.emptyList());//лист нужен для списка прав
     }

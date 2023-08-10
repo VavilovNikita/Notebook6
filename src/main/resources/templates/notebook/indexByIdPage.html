@@ -12,9 +12,9 @@
         </td>
         <td>
             <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id}">
-            <button class="btn btn-primary" th:onclick="'myFunction(\'' + ${notebook.id} + '\')'">Скопировать</button>
+            <button class="btn btn-primary" th:onclick="'copyText(\'' + ${notebook.id} + '\')'">Скопировать</button>
             <script th:inline="javascript">
-                function myFunction(id) {
+                function copyText(id) {
                     const copyText = document.getElementById(id);
                     copyText.select();
                     navigator.clipboard.writeText(copyText.value);

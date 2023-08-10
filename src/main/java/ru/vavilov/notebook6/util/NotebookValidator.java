@@ -5,9 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.vavilov.notebook6.entity.Notebook;
-import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.service.NotebookService;
-import ru.vavilov.notebook6.service.PersonService;
 
 @Component
 public class NotebookValidator implements Validator {

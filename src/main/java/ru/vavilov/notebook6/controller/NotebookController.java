@@ -2,19 +2,15 @@ package ru.vavilov.notebook6.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.Notebook;
-import ru.vavilov.notebook6.security.PersonDetails;
+import ru.vavilov.notebook6.service.AuthService;
 import ru.vavilov.notebook6.service.NotebookService;
 import ru.vavilov.notebook6.util.NotebookValidator;
 
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/notebook")
@@ -35,7 +31,7 @@ public class NotebookController {
     }
     @GetMapping()
     public String indexById(Model model) {
-        model.addAttribute("notebook", notebookService.getAuthPerson().getNotes());
+        model.addAttribute("notebook", AuthService.getUser().getNotes());
         return "notebook/indexPage";
     }
 
@@ -43,13 +39,13 @@ public class NotebookController {
     public String details(@PathVariable("id") int id, Model model) {
         Notebook notebook = notebookService.findById(id);
         model.addAttribute("notebook", notebook);
-        model.addAttribute("person", notebook.getPerson());
+        model.addAttribute("user", notebook.getUser());
         return "notebook/detailsPage";
     }
 
     @GetMapping("/new")
     public String newNotebook(@ModelAttribute("notebook") Notebook notebook, Model model) {
-        model.addAttribute("person", notebookService.findAllPerson());
+        model.addAttribute("user", notebookService.findAllUser());
         return "notebook/creationPage";
     }
 
@@ -66,7 +62,7 @@ public class NotebookController {
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
         model.addAttribute("notebook", notebookService.findById(id));
-        model.addAttribute("person", notebookService.findAllPerson());
+        model.addAttribute("user", notebookService.findAllUser());
         return "notebook/changePage";
     }
 

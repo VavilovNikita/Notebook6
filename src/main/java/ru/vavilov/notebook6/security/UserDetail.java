@@ -4,16 +4,16 @@ package ru.vavilov.notebook6.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.vavilov.notebook6.entity.Person;
+import ru.vavilov.notebook6.entity.User;
 
 import java.util.Collection;
 
-public class PersonDetails implements UserDetails {
-    Person person;
+public class UserDetail implements UserDetails {
+    User user;
 
     @Autowired
-    public PersonDetails(Person person) {
-        this.person = person;
+    public UserDetail(User user) {
+        this.user = user;
     }
 
     @Override
@@ -23,12 +23,12 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.person.getPassword();
+        return this.user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.person.getUsername();
+        return this.user.getUsername();
     }
 
     @Override
@@ -50,7 +50,7 @@ public class PersonDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    public Person getPerson(){
-        return person;
+    public User getUser(){
+        return user;
     }
 }

@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>header</title>
-    <!--/*/ <th:block th:insert="~{person/headers/header.html :: navbar}">
+    <!--/*/ <th:block th:insert="~{user/headers/header.html :: navbar}">
         </th:block> /*/-->
 </head>
 <body>
-<form class="row-cols-4" th:method="POST" th:action="@{/register}" th:object="${person}">
+<form class="row-cols-4" th:method="POST" th:action="@{/register}" th:object="${user}">
     <label for="username">Введите имя пользователя: </label>
     <input class="form-control" type="text" th:field="*{username}" id="username"/>
     <label for="password">Введите пароль: </label>
@@ -17,10 +17,10 @@
     <div style="color:red" th:if="${#fields.hasErrors('firstName')}"
          th:errors="*{firstName}">firstName Error</div>
     <br/>
-    <label for="secondName">Введите фамилию: </label>
-    <input class="form-control" type="text" th:field="*{secondName}" id="secondName"/>
-    <div style="color:red" th:if="${#fields.hasErrors('secondName')}"
-         th:errors="*{secondName}">secondName Error</div>
+    <label for="lastName">Введите фамилию: </label>
+    <input class="form-control" type="text" th:field="*{lastName}" id="lastName"/>
+    <div style="color:red" th:if="${#fields.hasErrors('lastName')}"
+         th:errors="*{lastName}">secondName Error</div>
     <br/>
     <label for="email">Введите email: </label>
     <input class="form-control" type="text" th:field="*{email}" id="email"/>

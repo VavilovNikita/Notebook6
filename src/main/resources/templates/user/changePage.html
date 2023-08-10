@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>header</title>
-    <!--/*/ <th:block th:insert="~{person/headers/header.html :: navbar}">
+    <!--/*/ <th:block th:insert="~{user/headers/header.html :: navbar}">
       </th:block> /*/-->
 </head>
 <body>
 <!--TODO центровка через css не работает-->
-<form class="row-cols-1" th:method="PATCH" th:action="@{/person/{id}(id=${person.id})}" th:object="${person}">
+<form class="row-cols-1" th:method="PATCH" th:action="@{/templates/user/{id}(id=${user.id})}" th:object="${user}">
     <label for="name">Введите имя: </label>
     <input class="form-control" type="text" th:field="*{firstName}" id="name"/>
     <div style="color:red" th:if="${#fields.hasErrors('firstName')}"
          th:errors="*{firstName}">firstName Error
     </div>
     <br/>
-    <label for="secondName">Введите фамилию: </label>
-    <input class="form-control" type="text" th:field="*{secondName}" id="secondName"/>
-    <div style="color:red" th:if="${#fields.hasErrors('secondName')}"
-         th:errors="*{secondName}">secondName Error
+    <label for="lastName">Введите фамилию: </label>
+    <input class="form-control" type="text" th:field="*{lastName}" id="lastName"/>
+    <div style="color:red" th:if="${#fields.hasErrors('lastName')}"
+         th:errors="*{lastName}">lastName Error
     </div>
     <br/>
     <label for="email">Введите email: </label>
