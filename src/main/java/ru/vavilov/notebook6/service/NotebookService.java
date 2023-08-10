@@ -15,11 +15,12 @@ public class NotebookService {
 
     private final NotebookRepository notebookRepository;
     private final UserRepository userRepository;
-
-    @Autowired
-    public NotebookService(NotebookRepository notebookRepository, UserRepository userRepository) {
+    private final AuthService authService;
+@Autowired
+    public NotebookService(NotebookRepository notebookRepository, UserRepository userRepository, AuthService authService) {
         this.notebookRepository = notebookRepository;
         this.userRepository = userRepository;
+        this.authService = authService;
     }
 
     public Iterable<Notebook> findAll() {
@@ -36,7 +37,7 @@ public class NotebookService {
     }
 
     public void saveNotebook(Notebook notebook) {
-        notebook.setUser(AuthService.getUser());
+        notebook.setUser(authService.getUser());
         notebook.setCreatedAt(new Date());
         notebookRepository.save(notebook);
     }

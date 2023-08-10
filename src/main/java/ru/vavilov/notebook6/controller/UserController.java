@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/new")
-    public String newNotebook(@ModelAttribute("user") User user) {
+    public String newUser(@ModelAttribute("user") User user) {
         return "user/creationPage";
     }
 

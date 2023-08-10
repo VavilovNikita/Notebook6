@@ -8,7 +8,7 @@
 </head>
 <body>
 <!--TODO центровка через css не работает-->
-<form class="row-cols-1" th:method="PATCH" th:action="@{/templates/user/{id}(id=${user.id})}" th:object="${user}">
+<form class="row-cols-1" th:method="PATCH" th:action="@{/user/{id}(id=${user.id})}" th:object="${user}">
     <label for="name">Введите имя: </label>
     <input class="form-control" type="text" th:field="*{firstName}" id="name"/>
     <div style="color:red" th:if="${#fields.hasErrors('firstName')}"

@@ -17,22 +17,25 @@ import ru.vavilov.notebook6.util.NotebookValidator;
 public class NotebookController {
     private final NotebookService notebookService;
     private final NotebookValidator notebookValidator;
+    private final AuthService authService;
 
     @Autowired
-    public NotebookController(NotebookService notebookService, NotebookValidator notebookValidator) {
+    public NotebookController(NotebookService notebookService, NotebookValidator notebookValidator,AuthService authService) {
         this.notebookService = notebookService;
         this.notebookValidator = notebookValidator;
+        this.authService = authService;
     }
 
     @GetMapping("/allNotes")
     public String index(Model model) {
         model.addAttribute("notebook", notebookService.findAll());
-        return "notebook/indexByIdPage";
+        return "notebook/indexPage";
     }
+
     @GetMapping()
     public String indexById(Model model) {
-        model.addAttribute("notebook", AuthService.getUser().getNotes());
-        return "notebook/indexPage";
+        model.addAttribute("notebook", authService.getUser().getNotes());
+        return "notebook/indexByIdPage";
     }
 
     @GetMapping("/{id}")
@@ -44,15 +47,14 @@ public class NotebookController {
     }
 
     @GetMapping("/new")
-    public String newNotebook(@ModelAttribute("notebook") Notebook notebook, Model model) {
-        model.addAttribute("user", notebookService.findAllUser());
+    public String newNotebook(@ModelAttribute("notebook") Notebook notebook) {
         return "notebook/creationPage";
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("notebook")@Valid Notebook notebook, BindingResult bindingResult) {
-        notebookValidator.validate(notebook,bindingResult);
-        if (bindingResult.hasErrors()){
+    public String create(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult) {
+        notebookValidator.validate(notebook, bindingResult);
+        if (bindingResult.hasErrors()) {
             return "notebook/creationPage";
         }
         notebookService.saveNotebook(notebook);
@@ -67,8 +69,8 @@ public class NotebookController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("notebook")@Valid Notebook notebook,BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
+    public String update(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             return "notebook/changePage";
         }
         notebookService.saveNotebook(notebook);

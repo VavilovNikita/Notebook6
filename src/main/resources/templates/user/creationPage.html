@@ -7,7 +7,7 @@
         </th:block> /*/-->
 </head>
 <body>
-<form class="row-cols-4" th:method="POST" th:action="@{/templates/user}" th:object="${user}">
+<form class="row-cols-4" th:method="POST" th:action="@{/user}" th:object="${user}">
     <label for="name">Введите имя: </label>
     <input class="form-control" type="text" th:field="*{firstName}" id="name"/>
     <div style="color:red" th:if="${#fields.hasErrors('firstName')}"

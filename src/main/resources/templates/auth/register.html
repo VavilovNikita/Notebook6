@@ -10,8 +10,14 @@
 <form class="row-cols-4" th:method="POST" th:action="@{/register}" th:object="${user}">
     <label for="username">Введите имя пользователя: </label>
     <input class="form-control" type="text" th:field="*{username}" id="username"/>
+    <div style="color:red" th:if="${#fields.hasErrors('username')}"
+         th:errors="*{username}">firstName Error</div>
+
     <label for="password">Введите пароль: </label>
     <input class="form-control" type="text" th:field="*{password}" id="password"/>
+    <div style="color:red" th:if="${#fields.hasErrors('password')}"
+         th:errors="*{password}">firstName Error</div>
+
     <label for="name">Введите имя: </label>
     <input class="form-control" type="text" th:field="*{firstName}" id="name"/>
     <div style="color:red" th:if="${#fields.hasErrors('firstName')}"

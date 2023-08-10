@@ -8,7 +8,7 @@
 <body>
 <table class="table">
     <tr th:each="user : ${user}">
-        <td><a class="nav-link" th:href="@{/templates/user/{id}(id=${user.id})}" th:text="${user.firstName}"
+        <td><a class="nav-link" th:href="@{/user/{id}(id=${user.id})}" th:text="${user.firstName}"
                id="text">user</a>
         </td>
         <td>
