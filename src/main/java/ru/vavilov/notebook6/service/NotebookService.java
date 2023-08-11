@@ -16,7 +16,8 @@ public class NotebookService {
     private final NotebookRepository notebookRepository;
     private final UserRepository userRepository;
     private final AuthService authService;
-@Autowired
+
+    @Autowired
     public NotebookService(NotebookRepository notebookRepository, UserRepository userRepository, AuthService authService) {
         this.notebookRepository = notebookRepository;
         this.userRepository = userRepository;

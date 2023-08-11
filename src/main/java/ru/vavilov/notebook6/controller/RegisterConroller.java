@@ -15,9 +15,10 @@ import ru.vavilov.notebook6.util.UserValidator;
 @Controller
 public class RegisterConroller {
 
-    UserService userService;
-    UserValidator userValidator;
-@Autowired
+    private final UserService userService;
+    private final UserValidator userValidator;
+
+    @Autowired
     public RegisterConroller(UserService userService, UserValidator userValidator) {
         this.userService = userService;
         this.userValidator = userValidator;
@@ -25,14 +26,14 @@ public class RegisterConroller {
 
     @GetMapping("/register")
     public String register(Model model) {
-        model.addAttribute("user",new User());
+        model.addAttribute("user", new User());
         return "auth/register";
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("user")@Valid User user, BindingResult bindingResult) {
-        userValidator.validate(user,bindingResult);
-        if (bindingResult.hasErrors()){
+    public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+        userValidator.validate(user, bindingResult);
+        if (bindingResult.hasErrors()) {
             return "auth/register";
         }
         userService.saveUser(user);

@@ -42,9 +42,9 @@ public class UserController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("user")@Valid User user, BindingResult bindingResult) {
-        userValidator.validate(user,bindingResult);
-        if (bindingResult.hasErrors()){
+    public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+        userValidator.validate(user, bindingResult);
+        if (bindingResult.hasErrors()) {
             return "user/creationPage";
         }
 
@@ -59,8 +59,8 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("user")@Valid User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
+    public String update(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             return "user/changePage";
         }
         userService.saveUser(user);

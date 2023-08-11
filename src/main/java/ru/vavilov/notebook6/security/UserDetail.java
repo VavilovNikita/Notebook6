@@ -9,7 +9,7 @@ import ru.vavilov.notebook6.entity.User;
 import java.util.Collection;
 
 public class UserDetail implements UserDetails {
-    User user;
+    private final User user;
 
     @Autowired
     public UserDetail(User user) {
@@ -50,7 +50,8 @@ public class UserDetail implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    public User getUser(){
+
+    public User getUser() {
         return user;
     }
 }

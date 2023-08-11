@@ -25,10 +25,10 @@ public class NotebookValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Notebook notebook = (Notebook) target;
         if (notebookService.findByText(notebook.getText()).isPresent()) {
-            errors.rejectValue("text", "","Запись с таким текстом уже существует");
+            errors.rejectValue("text", "", "Запись с таким текстом уже существует");
         }
         if (notebookService.findByTitle(notebook.getTitle()).isPresent()) {
-            errors.rejectValue("title", "","Запись с таким заголовком уже существует");
+            errors.rejectValue("title", "", "Запись с таким заголовком уже существует");
         }
     }
 }

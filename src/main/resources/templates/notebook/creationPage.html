@@ -11,12 +11,14 @@
     <label for="name">Введите заголовок: </label>
     <input class="form-control" type="text" th:field="*{title}" id="name"/>
     <div style="color:red" th:if="${#fields.hasErrors('title')}"
-         th:errors="*{title}">title Error</div>
+         th:errors="*{title}">title Error
+    </div>
     <br/>
     <label for="secondName">Введите текст: </label>
     <input class="form-control" type="text" th:field="*{text}" id="secondName"/>
     <div style="color:red" th:if="${#fields.hasErrors('text')}"
-         th:errors="*{text}">text Error</div>
+         th:errors="*{text}">text Error
+    </div>
     <br/>
     <input class="btn btn-primary" type="submit" value="Создать"/>
 </form>

@@ -19,7 +19,8 @@ public class WebSecurityConfig extends WebSecurityConfiguration {
     public WebSecurityConfig(AuthProvider authProvider) {
         this.authProvider = authProvider;
     }
-    protected void configure(AuthenticationManagerBuilder auth){
+
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authProvider);
     }
 }

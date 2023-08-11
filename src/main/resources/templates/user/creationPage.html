@@ -11,22 +11,26 @@
     <label for="name">Введите имя: </label>
     <input class="form-control" type="text" th:field="*{firstName}" id="name"/>
     <div style="color:red" th:if="${#fields.hasErrors('firstName')}"
-         th:errors="*{firstName}">firstName Error</div>
+         th:errors="*{firstName}">firstName Error
+    </div>
     <br/>
     <label for="lastName">Введите фамилию: </label>
     <input class="form-control" type="text" th:field="*{lastName}" id="lastName"/>
     <div style="color:red" th:if="${#fields.hasErrors('lastName')}"
-         th:errors="*{lastName}">lastName Error</div>
+         th:errors="*{lastName}">lastName Error
+    </div>
     <br/>
     <label for="email">Введите email: </label>
     <input class="form-control" type="text" th:field="*{email}" id="email"/>
     <div style="color:red" th:if="${#fields.hasErrors('email')}"
-         th:errors="*{email}">email Error</div>
+         th:errors="*{email}">email Error
+    </div>
     <br/>
     <label for="date_of_birth">Введите дату рождения (дд/мм/гггг): </label>
     <input class="form-control" type="text" th:field="*{dateOfBirth}" id="date_of_birth"/>
     <div style="color:red" th:if="${#fields.hasErrors('dateOfBirth')}"
-         th:errors="*{dateOfBirth}">Date of birth Error</div>
+         th:errors="*{dateOfBirth}">Date of birth Error
+    </div>
     <br/>
     <input class="btn btn-primary" type="submit" value="Создать"/>
 </form>

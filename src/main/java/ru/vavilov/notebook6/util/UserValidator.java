@@ -25,15 +25,15 @@ public class UserValidator implements Validator {
     public void validate(Object target, Errors errors) {
         User user = (User) target;
         if (userService.findByEmail(user.getEmail()).isPresent()) {
-            errors.rejectValue("email", "","Этот email уже зарегестрирован");
+            errors.rejectValue("email", "", "Этот email уже зарегестрирован");
         }
         if (userService.findByUserName(user.getUsername()).isPresent()) {
-            errors.rejectValue("username", "","Этот имя пользователя уже зарегестрирован");
+            errors.rejectValue("username", "", "Этот имя пользователя уже зарегестрирован");
         }
         try {
             user.getDateOfBirth().getTime();
-        }catch (Throwable e){
-            errors.rejectValue("dateOfBirth", "","неверный формат даты");
+        } catch (Throwable e) {
+            errors.rejectValue("dateOfBirth", "", "неверный формат даты");
         }
 
     }

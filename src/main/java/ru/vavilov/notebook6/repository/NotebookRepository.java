@@ -7,7 +7,8 @@ import ru.vavilov.notebook6.entity.Notebook;
 import java.util.Optional;
 
 @Repository
-public interface NotebookRepository extends CrudRepository<Notebook,Integer> {
+public interface NotebookRepository extends CrudRepository<Notebook, Integer> {
     Optional<Notebook> findByText(String text);
+
     Optional<Notebook> findByTitle(String title);
 }

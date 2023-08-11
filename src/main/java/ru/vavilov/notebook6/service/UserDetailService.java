@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Component
 public class UserDetailService implements UserDetailsService {
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public UserDetailService(UserRepository userRepository) {
         this.userRepository = userRepository;

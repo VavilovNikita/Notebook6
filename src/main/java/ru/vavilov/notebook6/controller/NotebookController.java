@@ -20,7 +20,7 @@ public class NotebookController {
     private final AuthService authService;
 
     @Autowired
-    public NotebookController(NotebookService notebookService, NotebookValidator notebookValidator,AuthService authService) {
+    public NotebookController(NotebookService notebookService, NotebookValidator notebookValidator, AuthService authService) {
         this.notebookService = notebookService;
         this.notebookValidator = notebookValidator;
         this.authService = authService;
