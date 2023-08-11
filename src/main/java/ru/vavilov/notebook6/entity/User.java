@@ -35,7 +35,7 @@ public class User {
     private String email;
     @Column(name = "date_of_birth")
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "dd/MM/yyyy") // дд/мм/гггг
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // мм/дд/гггг
     @NotNull(message = "Поле email не должно быть пустым")
     private Date dateOfBirth;
     @OneToMany(mappedBy = "user")

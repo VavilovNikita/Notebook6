@@ -35,5 +35,10 @@ a:hover {
     font-weight: 500;
     text-transform: uppercase;
 }
+.navbar-nav .dropdown-menu {
+    position: absolute;
+    right: 0;
+    left: auto;
+}
 
 /* Header */

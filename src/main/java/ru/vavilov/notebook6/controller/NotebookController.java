@@ -27,58 +27,57 @@ public class NotebookController {
     }
 
     @GetMapping("/allNotes")
-    public String index(Model model) {
+    public String getNotes(Model model) {
         model.addAttribute("notebook", notebookService.findAll());
-        return "notebook/indexPage";
+        return "notebook/allNotesPage";
     }
 
     @GetMapping()
-    public String indexById(Model model) {
+    public String getUserNotes(Model model) {
         model.addAttribute("notebook", authService.getUser().getNotes());
-        return "notebook/indexByIdPage";
+        return "notebook/notesByUserIdPage";
     }
 
     @GetMapping("/{id}")
-    public String details(@PathVariable("id") int id, Model model) {
+    public String noteInfo(@PathVariable("id") int id, Model model) {
         Notebook notebook = notebookService.findById(id);
         model.addAttribute("notebook", notebook);
         model.addAttribute("user", notebook.getUser());
-        return "notebook/detailsPage";
+        return "notebook/noteInfoPage";
     }
 
     @GetMapping("/new")
-    public String newNotebook(@ModelAttribute("notebook") Notebook notebook) {
-        return "notebook/creationPage";
+    public String newNote(@ModelAttribute("notebook") Notebook notebook) {
+        return "notebook/createNotePage";
     }
 
     @PostMapping()
     public String create(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult) {
         notebookValidator.validate(notebook, bindingResult);
         if (bindingResult.hasErrors()) {
-            return "notebook/creationPage";
+            return "notebook/createNotePage";
         }
         notebookService.saveNotebook(notebook);
         return "redirect:/notebook";
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id) {
+    public String editNote(Model model, @PathVariable("id") int id) {
         model.addAttribute("notebook", notebookService.findById(id));
-        model.addAttribute("user", notebookService.findAllUser());
-        return "notebook/changePage";
+        return "notebook/changeNotePage";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "notebook/changePage";
+            return "notebook/changeNotePage";
         }
         notebookService.saveNotebook(notebook);
         return "redirect:/notebook";
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
+    public String deleteNote(@PathVariable("id") int id) {
         notebookService.deleteNotebook(id);
         return "redirect:/notebook";
     }

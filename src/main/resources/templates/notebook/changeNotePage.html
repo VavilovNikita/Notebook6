@@ -20,12 +20,6 @@
          th:errors="*{text}">text Error
     </div>
     <br/>
-    <label for="user_id">Выбери пользователя:</label>
-    <select class="form-select" id="user_id" th:field="*{user}">
-        <option th:each="user : ${user}" th:value="${user.id}"
-                th:utext="${user.firstName} + ${user.lastName}"></option>
-    </select>
-    <br/>
     <input class="btn btn-primary" type="submit" value="Сохранить изменения"/>
 </form>
 </body>
