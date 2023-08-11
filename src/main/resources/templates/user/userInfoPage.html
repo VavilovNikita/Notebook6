@@ -15,10 +15,6 @@
                 <a th:text="${user.username}" id="username">qwe</a></td>
         </tr>
         <tr>
-            <td><label for="password">Пароль: </label>
-                <a th:text="${user.password}" id="password">qwe</a></td>
-        </tr>
-        <tr>
             <td><label for="firstName">Имя: </label>
                 <a th:text="${user.firstName}" id="firstName">qwe</a></td>
         </tr>
@@ -47,7 +43,7 @@
                     <button type="submit" class="btn btn-primary">Изменить</button>
                 </form>
                 <hr/>
-                <form th:method="DELETE" th:action="@{/templates/user/{id}(id=${user.id})}">
+                <form th:method="DELETE" th:action="@{/user/{id}(id=${user.id})}">
                     <button type="submit" class="btn btn-primary">Удалить</button>
                 </form>
             </td>

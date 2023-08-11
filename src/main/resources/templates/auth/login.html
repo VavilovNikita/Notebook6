@@ -12,8 +12,9 @@
     <input class="form-control" type="text" name="username" id="username"/>
     <br/>
     <label for="password">Введите пароль: </label>
-    <input class="form-control" type="text" name="password" id="password"/>
+    <input class="form-control" type="password" name="password" id="password"/>
     <input class="btn btn-primary" type="submit" value="Войти"/>
+    <div th:if="${param.error}" style="color: red">Неправильные имя или пароль</div>
 </form>
 </body>
 </html>

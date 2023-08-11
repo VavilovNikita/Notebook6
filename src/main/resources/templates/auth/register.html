@@ -39,7 +39,7 @@
     </div>
     <br/>
     <label for="date_of_birth">Введите дату рождения (дд/мм/гггг): </label>
-    <input class="form-control" type="text" th:field="*{dateOfBirth}" id="date_of_birth"/>
+    <input class="form-control" type="date" th:field="*{dateOfBirth}" id="date_of_birth"/>
     <div style="color:red" th:if="${#fields.hasErrors('dateOfBirth')}"
          th:errors="*{dateOfBirth}">Date of birth Error
     </div>

@@ -30,11 +30,6 @@ public class UserValidator implements Validator {
         if (userService.findByUserName(user.getUsername()).isPresent()) {
             errors.rejectValue("username", "", "Этот имя пользователя уже зарегестрирован");
         }
-        try {
-            user.getDateOfBirth().getTime();
-        } catch (Throwable e) {
-            errors.rejectValue("dateOfBirth", "", "неверный формат даты");
-        }
 
     }
 }
