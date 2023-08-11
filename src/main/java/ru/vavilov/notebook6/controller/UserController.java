@@ -7,16 +7,19 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.User;
+import ru.vavilov.notebook6.service.AuthService;
 import ru.vavilov.notebook6.service.UserService;
 
 @Controller
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
+    private final AuthService authService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AuthService authService) {
         this.userService = userService;
+        this.authService = authService;
     }
 
     @GetMapping()
@@ -28,6 +31,13 @@ public class UserController {
     @GetMapping("/{id}")
     public String userInfo(@PathVariable("id") int id, Model model) {
         User user = userService.findById(id);
+        model.addAttribute("user", user);
+        model.addAttribute("notes", user.getNotes());
+        return "user/userInfoPage";
+    }
+    @GetMapping("/profile")
+    public String getAuthUserInfo(Model model) {
+        User user = userService.findById(authService.getUser().getId());
         model.addAttribute("user", user);
         model.addAttribute("notes", user.getNotes());
         return "user/userInfoPage";

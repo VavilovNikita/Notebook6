@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.vavilov.notebook6.entity.User;
+import ru.vavilov.notebook6.service.AuthService;
 import ru.vavilov.notebook6.service.UserService;
 import ru.vavilov.notebook6.util.UserValidator;
 
