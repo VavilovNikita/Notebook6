@@ -8,12 +8,12 @@
 <body>
 <table class="table">
     <tr th:each="user : ${user}">
-        <td><a class="nav-link" th:href="@{/user/{id}(id=${user.id})}" th:text="${user.firstName}"
+        <td><a class="nav-link" th:href="@{/admin/{id}(id=${user.id})}" th:text="${user.firstName}"
                id="text">user</a>
         </td>
         <td>
             <input type="hidden" th:value="*{user.email}" th:id="${user.id}">
-            <button class="btn btn-primary" th:onclick="'copyText(\'' + ${user.id} + '\')'">Скопировать</button>
+            <button class="btn btn-primary" th:onclick="'copyText(\'' + ${user.id} + '\')'">Скопировать почту</button>
             <script th:inline="javascript">
                 function copyText(id) {
                     const copyText = document.getElementById(id);

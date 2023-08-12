@@ -22,19 +22,6 @@ public class UserController {
         this.authService = authService;
     }
 
-    @GetMapping()
-    public String allUserPage(Model model) {
-        model.addAttribute("user", userService.findAll());
-        return "user/allUserPage";
-    }
-
-    @GetMapping("/{id}")
-    public String userInfo(@PathVariable("id") int id, Model model) {
-        User user = userService.findById(id);
-        model.addAttribute("user", user);
-        model.addAttribute("notes", user.getNotes());
-        return "user/userInfoPage";
-    }
     @GetMapping("/profile")
     public String getAuthUserInfo(Model model) {
         User user = userService.findById(authService.getUser().getId());
@@ -43,9 +30,9 @@ public class UserController {
         return "user/userInfoPage";
     }
 
-    @GetMapping("/{id}/edit")
-    public String updateUser(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user", userService.findById(id));
+    @GetMapping("/edit")
+    public String updateAuthUser(Model model) {
+        model.addAttribute("user", userService.findById(authService.getUser().getId()));
         return "user/updateUserPage";
     }
 
@@ -58,10 +45,6 @@ public class UserController {
         return "redirect:/user";
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable("id") int id) {
-        userService.deleteUser(id);
-        return "redirect:/user";
-    }
+
 
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>header</title>
-    <!--/*/ <th:block th:insert="~{notebook/headers/header.html :: navbar}">
+    <!--/*/ <th:block th:insert="~{user/headers/header.html :: navbar}">
       </th:block> /*/-->
 </head>
 <body>
@@ -13,6 +13,10 @@
         <tr>
             <td><label for="username">Имя пользователя: </label>
                 <a th:text="${user.username}" id="username">qwe</a></td>
+        </tr>
+        <tr>
+            <td><label for="role">Роль: </label>
+                <a th:text="${user.role}" id="role">qwe</a></td>
         </tr>
         <tr>
             <td><label for="firstName">Имя: </label>
@@ -30,7 +34,7 @@
             <td><label for="dateOfBirth">Дата рождения: </label>
                 <a th:text="${user.dateOfBirth}" id="dateOfBirth"></a></td>
         </tr>
-        <th><a>Мои Записи</a></th>
+        <th><a>Записи пользователя</a></th>
         <tr th:each="notes : ${notes}">
             <td><a class="nav-link" th:href="@{/notebook/{id}(id=${notes.id})}" th:text="${notes.title}">user</a>
                 <hr/>
@@ -39,10 +43,13 @@
         <hr/>
         <tr>
             <td>
-                <form th:method="GET" th:action="@{/user/{id}/edit(id=${user.id})}">
+                <form th:method="GET" th:action="@{/admin/{id}/edit(id=${user.id})}">
                     <button type="submit" class="btn btn-primary">Изменить</button>
                 </form>
                 <hr/>
+                <form th:method="DELETE" th:action="@{/admin/{id}(id=${user.id})}">
+                    <button type="submit" class="btn btn-primary">Удалить</button>
+                </form>
             </td>
         </tr>
     </table>

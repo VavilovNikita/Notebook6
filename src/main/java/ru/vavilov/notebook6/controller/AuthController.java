@@ -30,6 +30,11 @@ public class AuthController {
         this.encoder = encoder;
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "auth/login";
+    }
+
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -44,17 +49,13 @@ public class AuthController {
         return "auth/register";
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "auth/login";
-    }
-
     @PostMapping("/register")
     public String register(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             return "auth/register";
         }
+        user.setRole("ROLE_USER");
         user.setPassword(encoder.encode(user.getPassword()));
         userService.saveUser(user);
         return "redirect:/user";
