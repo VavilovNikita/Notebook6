@@ -1,16 +1,12 @@
 package ru.vavilov.notebook6.config;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.vavilov.notebook6.service.UserDetailService;
 
@@ -23,7 +19,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.
                 authorizeHttpRequests((request) -> request
-                        .requestMatchers("/register","/error").permitAll()
+                        .requestMatchers("/register", "/error").permitAll()
                         .anyRequest().authenticated())
                 .formLogin((form) -> form
                         .loginPage("/login")
@@ -33,9 +29,10 @@ public class WebSecurityConfig {
                         .usernameParameter("username")
                         .passwordParameter("password")
                         .permitAll()
-                ).logout((logout) ->logout.logoutSuccessUrl("/login"));
+                ).logout((logout) -> logout.logoutSuccessUrl("/login"));
         return http.build();
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider(UserDetailService userDetailService) {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -43,6 +40,7 @@ public class WebSecurityConfig {
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
