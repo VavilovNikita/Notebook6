@@ -50,7 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String createUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+    public String register(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             return "auth/register";
