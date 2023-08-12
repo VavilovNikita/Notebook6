@@ -5,56 +5,52 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "person")
-public class Person  implements UserDetails {
+@Table(name = "user_table")
+public class User {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private int id;
 
     @NotEmpty(message = "Поле Имя пользователя не должно быть пустым")
-    @Column(name = "username")
+    @Column(name = "user_name")
     private String username;
     @NotEmpty(message = "Поле Имя пользователя не должно быть пустым")
     @Column(name = "password")
     private String password;
     @NotEmpty(message = "Поле Имя не должно быть пустым")
-    @Column(name = "firstName")
+    @Column(name = "first_Name")
     private String firstName;
     @NotEmpty(message = "Поле Фамилия не должно быть пустым")
-    @Column(name = "secondName")
-    private String secondName;
+    @Column(name = "last_Name")
+    private String lastName;
     @Column(name = "email")
     @Email(message = "Неверный формат Email")
     @NotEmpty(message = "Поле email не должно быть пустым")
     private String email;
     @Column(name = "date_of_birth")
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "dd/MM/yyyy") // дд/мм/гггг
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // мм/дд/гггг
     @NotNull(message = "Поле email не должно быть пустым")
     private Date dateOfBirth;
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "user")
     private List<Notebook> notes;
 
-    public Person(int id, String firstName, String secondName, String email, Date dateOfBirth, List<Notebook> notes) {
+    public User(int id, String firstName, String secondName, String email, Date dateOfBirth, List<Notebook> notes) {
         this.id = id;
         this.firstName = firstName;
-        this.secondName = secondName;
+        this.lastName = secondName;
         this.email = email;
         this.dateOfBirth = dateOfBirth;
         this.notes = notes;
     }
 
-    public Person() {
+    public User() {
     }
 
     public int getId() {
@@ -73,12 +69,12 @@ public class Person  implements UserDetails {
         this.firstName = firstName;
     }
 
-    public String getSecondName() {
-        return secondName;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
+    public void setLastName(String secondName) {
+        this.lastName = secondName;
     }
 
     public String getEmail() {
@@ -113,38 +109,11 @@ public class Person  implements UserDetails {
         this.username = username;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("USER"));
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
     public String getUsername() {
         return username;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public String getPassword() {
+        return password;
     }
 }

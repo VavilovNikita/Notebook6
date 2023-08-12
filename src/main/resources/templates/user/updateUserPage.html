@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>header</title>
+    <!--/*/ <th:block th:insert="~{user/headers/header.html :: navbar}">
+      </th:block> /*/-->
+</head>
+<body>
+<form class="row-cols-1" th:method="PATCH" th:action="@{/user/{id}(id=${user.id})}" th:object="${user}">
+    <input type="text" hidden th:field="*{username}"/>
+    <input type="text" hidden th:field="*{password}"/>
+    <input type="text" hidden th:field="*{email}"/>
+    <label for="name">Введите имя: </label>
+    <input class="form-control" type="text" th:field="*{firstName}" id="name"/>
+    <div style="color:red" th:if="${#fields.hasErrors('firstName')}"
+         th:errors="*{firstName}">firstName Error
+    </div>
+    <br/>
+    <label for="lastName">Введите фамилию: </label>
+    <input class="form-control" type="text" th:field="*{lastName}" id="lastName"/>
+    <div style="color:red" th:if="${#fields.hasErrors('lastName')}"
+         th:errors="*{lastName}">lastName Error
+    </div>
+    <br/>
+    <label for="date_of_birth">Введите дату рождения (дд/мм/гггг): </label>
+    <input class="form-control" type="date" th:field="*{dateOfBirth}" id="date_of_birth"/>
+    <div style="color:red" th:if="${#fields.hasErrors('dateOfBirth')}"
+         th:errors="*{dateOfBirth}">Date of birth Error
+    </div>
+    <br/>
+    <input class="btn btn-primary" type="submit" value="Сохранить изменения!"/>
+</form>
+</body>
+</html>

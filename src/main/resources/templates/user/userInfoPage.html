@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>header</title>
-    <!--/*/ <th:block th:insert="~{person/headers/header.html :: navbar}">
+    <!--/*/ <th:block th:insert="~{user/headers/header.html :: navbar}">
       </th:block> /*/-->
 </head>
 <body>
@@ -11,20 +11,24 @@
 <div align="middle">
     <table class="table">
         <tr>
-            <td><label for="firstName">Имя: </label>
-                <a th:text="${person.firstName}" id="firstName">qwe</a></td>
+            <td><label for="username">Имя пользователя: </label>
+                <a th:text="${user.username}" id="username">qwe</a></td>
         </tr>
         <tr>
-            <td><label for="secondName">Фамилия: </label>
-                <a th:text="${person.secondName}" id="secondName"></a></td>
+            <td><label for="firstName">Имя: </label>
+                <a th:text="${user.firstName}" id="firstName">qwe</a></td>
+        </tr>
+        <tr>
+            <td><label for="lastName">Фамилия: </label>
+                <a th:text="${user.lastName}" id="lastName"></a></td>
         </tr>
         <tr>
             <td><label for="email">Почта: </label>
-                <a th:text="${person.email}" id="email"></a></td>
+                <a th:text="${user.email}" id="email"></a></td>
         </tr>
         <tr>
             <td><label for="dateOfBirth">Дата рождения: </label>
-                <a th:text="${person.dateOfBirth}" id="dateOfBirth"></a></td>
+                <a th:text="${user.dateOfBirth}" id="dateOfBirth"></a></td>
         </tr>
         <th><a>Записи пользователя</a></th>
         <tr th:each="notes : ${notes}">
@@ -35,11 +39,11 @@
         <hr/>
         <tr>
             <td>
-                <form th:method="GET" th:action="@{/person/{id}/edit(id=${person.id})}">
+                <form th:method="GET" th:action="@{/user/{id}/edit(id=${user.id})}">
                     <button type="submit" class="btn btn-primary">Изменить</button>
                 </form>
                 <hr/>
-                <form th:method="DELETE" th:action="@{/person/{id}(id=${person.id})}">
+                <form th:method="DELETE" th:action="@{/user/{id}(id=${user.id})}">
                     <button type="submit" class="btn btn-primary">Удалить</button>
                 </form>
             </td>

@@ -2,20 +2,20 @@
 <html lang="en">
 <head>
     <title>index</title>
-    <!--/*/ <th:block th:insert="~{person/headers/header.html :: navbar}">
+    <!--/*/ <th:block th:insert="~{user/headers/header.html :: navbar}">
       </th:block> /*/-->
 </head>
 <body>
 <table class="table">
-    <tr th:each="person : ${person}">
-        <td><a class="nav-link" th:href="@{/person/{id}(id=${person.id})}" th:text="${person.firstName}"
+    <tr th:each="user : ${user}">
+        <td><a class="nav-link" th:href="@{/user/{id}(id=${user.id})}" th:text="${user.firstName}"
                id="text">user</a>
         </td>
         <td>
-            <input type="hidden" th:value="*{person.email}" th:id="${person.id}">
-            <button class="btn btn-primary" th:onclick="'myFunction(\'' + ${person.id} + '\')'">Скопировать</button>
+            <input type="hidden" th:value="*{user.email}" th:id="${user.id}">
+            <button class="btn btn-primary" th:onclick="'copyText(\'' + ${user.id} + '\')'">Скопировать</button>
             <script th:inline="javascript">
-                function myFunction(id) {
+                function copyText(id) {
                     const copyText = document.getElementById(id);
                     copyText.select();
                     navigator.clipboard.writeText(copyText.value);

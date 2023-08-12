@@ -10,8 +10,8 @@
 <table class="table">
     <tr>
         <th><label for="author_name">Автор записи:</label>
-            <a class="nav-link" th:href="@{/person/{id}(id=${person.id})}"
-               th:text="${person.firstName} + ${person.secondName}" id="author_name"></a></th>
+            <a class="nav-link" th:href="@{/user/{id}(id=${user.id})}"
+               th:text="${user.firstName} + ${user.lastName}" id="author_name"></a></th>
     </tr>
     <tr>
         <td><label for="title">Заголовок:</label>

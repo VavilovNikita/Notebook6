@@ -3,34 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>header</title>
-    <!--/*/ <th:block th:insert="~{person/headers/header.html :: navbar}">
+    <!--/*/ <th:block th:insert="~{auth/headers/header.html :: navbar}">
         </th:block> /*/-->
 </head>
 <body>
-<form class="row-cols-4" th:method="POST" th:action="@{/register}" th:object="${person}">
+<form class="row-cols-4" th:method="POST" th:action="@{/register}" th:object="${user}">
     <label for="username">Введите имя пользователя: </label>
     <input class="form-control" type="text" th:field="*{username}" id="username"/>
+    <div style="color:red" th:if="${#fields.hasErrors('username')}"
+         th:errors="*{username}">firstName Error
+    </div>
+
     <label for="password">Введите пароль: </label>
     <input class="form-control" type="text" th:field="*{password}" id="password"/>
+    <div style="color:red" th:if="${#fields.hasErrors('password')}"
+         th:errors="*{password}">firstName Error
+    </div>
+
     <label for="name">Введите имя: </label>
     <input class="form-control" type="text" th:field="*{firstName}" id="name"/>
     <div style="color:red" th:if="${#fields.hasErrors('firstName')}"
-         th:errors="*{firstName}">firstName Error</div>
+         th:errors="*{firstName}">firstName Error
+    </div>
     <br/>
-    <label for="secondName">Введите фамилию: </label>
-    <input class="form-control" type="text" th:field="*{secondName}" id="secondName"/>
-    <div style="color:red" th:if="${#fields.hasErrors('secondName')}"
-         th:errors="*{secondName}">secondName Error</div>
+    <label for="lastName">Введите фамилию: </label>
+    <input class="form-control" type="text" th:field="*{lastName}" id="lastName"/>
+    <div style="color:red" th:if="${#fields.hasErrors('lastName')}"
+         th:errors="*{lastName}">secondName Error
+    </div>
     <br/>
     <label for="email">Введите email: </label>
     <input class="form-control" type="text" th:field="*{email}" id="email"/>
     <div style="color:red" th:if="${#fields.hasErrors('email')}"
-         th:errors="*{email}">email Error</div>
+         th:errors="*{email}">email Error
+    </div>
     <br/>
     <label for="date_of_birth">Введите дату рождения (дд/мм/гггг): </label>
-    <input class="form-control" type="text" th:field="*{dateOfBirth}" id="date_of_birth"/>
+    <input class="form-control" type="date" th:field="*{dateOfBirth}" id="date_of_birth"/>
     <div style="color:red" th:if="${#fields.hasErrors('dateOfBirth')}"
-         th:errors="*{dateOfBirth}">Date of birth Error</div>
+         th:errors="*{dateOfBirth}">Date of birth Error
+    </div>
     <br/>
     <input class="btn btn-primary" type="submit" value="Зарегистрироватся"/>
 </form>

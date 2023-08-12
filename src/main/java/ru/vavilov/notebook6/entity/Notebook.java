@@ -2,7 +2,6 @@ package ru.vavilov.notebook6.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.Date;
 
@@ -15,8 +14,8 @@ public class Notebook {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "person_id", referencedColumnName = "id")
-    private Person person;
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
     @Column(name = "title")
     @NotEmpty(message = "Поле заголовок не может быть пустым")
     private String title;
@@ -60,12 +59,12 @@ public class Notebook {
         this.text = text;
     }
 
-    public Person getPerson() {
-        return person;
+    public User getUser() {
+        return user;
     }
 
-    public void setPerson(Person person) {
-        this.person = person;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Date getCreatedAt() {

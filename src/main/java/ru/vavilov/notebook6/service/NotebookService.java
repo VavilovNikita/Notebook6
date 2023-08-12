@@ -3,9 +3,9 @@ package ru.vavilov.notebook6.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.vavilov.notebook6.entity.Notebook;
-import ru.vavilov.notebook6.entity.Person;
+import ru.vavilov.notebook6.entity.User;
 import ru.vavilov.notebook6.repository.NotebookRepository;
-import ru.vavilov.notebook6.repository.PersonRepository;
+import ru.vavilov.notebook6.repository.UserRepository;
 
 import java.util.Date;
 import java.util.Optional;
@@ -14,12 +14,14 @@ import java.util.Optional;
 public class NotebookService {
 
     private final NotebookRepository notebookRepository;
-    private final PersonRepository personRepository;
+    private final UserRepository userRepository;
+    private final AuthService authService;
 
     @Autowired
-    public NotebookService(NotebookRepository notebookRepository, PersonRepository personRepository) {
+    public NotebookService(NotebookRepository notebookRepository, UserRepository userRepository, AuthService authService) {
         this.notebookRepository = notebookRepository;
-        this.personRepository = personRepository;
+        this.userRepository = userRepository;
+        this.authService = authService;
     }
 
     public Iterable<Notebook> findAll() {
@@ -31,11 +33,12 @@ public class NotebookService {
         return notebookRepository.findById(id).orElse(null);
     }
 
-    public Iterable<Person> findAllPerson() {
-        return personRepository.findAll();
+    public Iterable<User> findAllUser() {
+        return userRepository.findAll();
     }
 
     public void saveNotebook(Notebook notebook) {
+        notebook.setUser(authService.getUser());
         notebook.setCreatedAt(new Date());
         notebookRepository.save(notebook);
     }
@@ -43,11 +46,14 @@ public class NotebookService {
     public void deleteNotebook(int id) {
         notebookRepository.deleteById(id);
     }
+
     public Optional<Notebook> findByText(String text) {
         return notebookRepository.findByText(text);
     }
+
     public Optional<Notebook> findByTitle(String title) {
         return notebookRepository.findByTitle(title);
     }
+
 
 }

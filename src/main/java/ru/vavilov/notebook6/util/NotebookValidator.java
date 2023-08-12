@@ -5,9 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.vavilov.notebook6.entity.Notebook;
-import ru.vavilov.notebook6.entity.Person;
 import ru.vavilov.notebook6.service.NotebookService;
-import ru.vavilov.notebook6.service.PersonService;
 
 @Component
 public class NotebookValidator implements Validator {
@@ -27,10 +25,10 @@ public class NotebookValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Notebook notebook = (Notebook) target;
         if (notebookService.findByText(notebook.getText()).isPresent()) {
-            errors.rejectValue("text", "","Запись с таким текстом уже существует");
+            errors.rejectValue("text", "", "Запись с таким текстом уже существует");
         }
         if (notebookService.findByTitle(notebook.getTitle()).isPresent()) {
-            errors.rejectValue("title", "","Запись с таким заголовком уже существует");
+            errors.rejectValue("title", "", "Запись с таким заголовком уже существует");
         }
     }
 }
