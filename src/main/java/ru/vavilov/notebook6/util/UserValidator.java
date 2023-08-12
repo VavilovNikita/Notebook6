@@ -9,7 +9,7 @@ import ru.vavilov.notebook6.service.UserService;
 
 @Component
 public class UserValidator implements Validator {
-    UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserValidator(UserService userService) {

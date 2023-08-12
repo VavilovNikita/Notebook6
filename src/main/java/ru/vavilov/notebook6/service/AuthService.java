@@ -10,7 +10,7 @@ import ru.vavilov.notebook6.security.UserDetail;
 
 @Component
 public class AuthService {
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public AuthService(UserRepository userRepository) {
