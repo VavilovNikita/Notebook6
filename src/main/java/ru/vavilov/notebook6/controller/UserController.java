@@ -30,7 +30,7 @@ public class UserController {
         return "user/userInfoPage";
     }
 
-    @GetMapping("/edit")
+    @GetMapping("/{id}/edit")
     public String updateAuthUser(Model model) {
         model.addAttribute("user", userService.findById(authService.getUser().getId()));
         return "user/updateUserPage";
@@ -41,8 +41,9 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "user/updateUserPage";
         }
+        user.setRole(authService.getUser().getRole());
         userService.saveUser(user);
-        return "redirect:/user";
+        return "redirect:/user/profile";
     }
 
 
