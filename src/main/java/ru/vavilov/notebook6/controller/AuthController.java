@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import ru.vavilov.notebook6.entity.Role;
 import ru.vavilov.notebook6.entity.User;
 import ru.vavilov.notebook6.service.UserService;
 import ru.vavilov.notebook6.util.UserValidator;
@@ -55,7 +56,7 @@ public class AuthController {
         if (bindingResult.hasErrors()) {
             return "auth/register";
         }
-        user.setRole("ROLE_USER");
+        user.setRole(new Role("ROLE_USER"));
         user.setPassword(encoder.encode(user.getPassword()));
         userService.saveUser(user);
         return "redirect:/user";

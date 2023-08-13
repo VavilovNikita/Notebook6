@@ -38,12 +38,14 @@ public class User {
     @DateTimeFormat(pattern = "yyyy-MM-dd") // мм/дд/гггг
     @NotNull(message = "Поле email не должно быть пустым")
     private Date dateOfBirth;
-    @Column(name = "role")
-    private String role;
     @OneToMany(mappedBy = "user")
     private List<Notebook> notes;
 
-    public User(int id, String firstName, String secondName, String email, Date dateOfBirth, String role, List<Notebook> notes) {
+    @ManyToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private Role role;
+
+    public User(int id, String firstName, String secondName, String email, Date dateOfBirth, Role role, List<Notebook> notes) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = secondName;
@@ -120,12 +122,11 @@ public class User {
         return password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
-
 }
