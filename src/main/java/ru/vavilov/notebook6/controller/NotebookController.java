@@ -26,16 +26,14 @@ public class NotebookController {
         this.authService = authService;
     }
 
-    @GetMapping("/allNotes")
-    public String getNotes(Model model) {
-        model.addAttribute("notebook", notebookService.findAll());
-        return "notebook/allNotesPage";
-    }
-
     @GetMapping()
-    public String getUserNotes(Model model) {
-        model.addAttribute("notebook", authService.getUser().getNotes());
-        return "notebook/notesByUserIdPage";
+    public String getNotes(Model model,@RequestParam(defaultValue = "0",required = false)String allNotes) {
+        if(allNotes.equals("0")){
+            model.addAttribute("notebook", authService.getUser().getNotes());
+        }else{
+            model.addAttribute("notebook", notebookService.findAll());
+        }
+        return "notebook/allNotesPage";
     }
 
     @GetMapping("/{id}")

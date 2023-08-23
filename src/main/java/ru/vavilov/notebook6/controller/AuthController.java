@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.vavilov.notebook6.entity.Role;
 import ru.vavilov.notebook6.entity.User;
+import ru.vavilov.notebook6.service.RoleService;
 import ru.vavilov.notebook6.service.UserService;
 import ru.vavilov.notebook6.util.UserValidator;
 
@@ -23,12 +24,14 @@ public class AuthController {
     private final UserService userService;
     private final UserValidator userValidator;
     private final BCryptPasswordEncoder encoder;
+    private final RoleService roleService;
 
     @Autowired
-    public AuthController(UserService userService, UserValidator userValidator, BCryptPasswordEncoder encoder) {
+    public AuthController(UserService userService, UserValidator userValidator, BCryptPasswordEncoder encoder, RoleService roleService) {
         this.userService = userService;
         this.userValidator = userValidator;
         this.encoder = encoder;
+        this.roleService = roleService;
     }
 
     @GetMapping("/login")
@@ -44,6 +47,7 @@ public class AuthController {
         }
         return "redirect:/login";
     }
+
     @GetMapping("/register")
     public String registerPage(Model model) {
         model.addAttribute("user", new User());
@@ -56,7 +60,8 @@ public class AuthController {
         if (bindingResult.hasErrors()) {
             return "auth/register";
         }
-        user.setRole(new Role("ROLE_USER"));
+        review
+        user.setRole(roleService.getRoleById(1));
         user.setPassword(encoder.encode(user.getPassword()));
         userService.saveUser(user);
         return "redirect:/user";
