@@ -25,7 +25,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/notebook?allNotes=1">Все записи</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" th:if="${authUser.role.getRole() == 'ROLE_ADMIN'}">
                         <a class="nav-link" href="/admin">Админ</a>
                     </li>
                     <!--/*/ <th:block th:insert="~{userDropdownMenu/dropDownMenu.html :: dropDownMenu}">

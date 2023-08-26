@@ -28,6 +28,7 @@ public class NotebookController {
 
     @GetMapping()
     public String getNotes(Model model,@RequestParam(defaultValue = "0",required = false)String allNotes) {
+        model.addAttribute("authUser", authService.getUser());
         if(allNotes.equals("0")){
             model.addAttribute("notebook", authService.getUser().getNotes());
         }else{
@@ -41,11 +42,13 @@ public class NotebookController {
         Notebook notebook = notebookService.findById(id);
         model.addAttribute("notebook", notebook);
         model.addAttribute("user", notebook.getUser());
+        model.addAttribute("authUser", authService.getUser());
         return "notebook/noteInfoPage";
     }
 
     @GetMapping("/new")
-    public String newNote(@ModelAttribute("notebook") Notebook notebook) {
+    public String newNote(@ModelAttribute("notebook") Notebook notebook,Model model) {
+        model.addAttribute("authUser", authService.getUser());
         return "notebook/createNotePage";
     }
 
@@ -62,6 +65,7 @@ public class NotebookController {
     @GetMapping("/{id}/edit")
     public String editNote(Model model, @PathVariable("id") int id) {
         model.addAttribute("notebook", notebookService.findById(id));
+        model.addAttribute("authUser", authService.getUser());
         return "notebook/changeNotePage";
     }
 
