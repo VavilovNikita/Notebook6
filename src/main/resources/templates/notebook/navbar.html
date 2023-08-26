@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="navbar">
+    <nav class="navbar navbar-expand-sm navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/notebook">ЗАПИСИ</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 top-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/notebook">домой</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/notebook/new">создать</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/notebook?allNotes=1">Все записи</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Админ</a>
+                    </li>
+                    <!--/*/ <th:block th:insert="~{userDropdownMenu/dropDownMenu.html :: dropDownMenu}">
+      </th:block> /*/-->
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+</body>
+</html>
