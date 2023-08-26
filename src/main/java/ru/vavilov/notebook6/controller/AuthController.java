@@ -60,7 +60,6 @@ public class AuthController {
         if (bindingResult.hasErrors()) {
             return "auth/register";
         }
-        review
         user.setRole(roleService.getRoleById(1));
         user.setPassword(encoder.encode(user.getPassword()));
         userService.saveUser(user);

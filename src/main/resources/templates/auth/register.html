@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>header</title>
-    <!--/*/ <th:block th:insert="~{auth/headers/header.html :: navbar}">
-        </th:block> /*/-->
+    <!--/*/ <th:block th:insert="~{headers/header.html :: head}">
+      </th:block> /*/-->
 </head>
 <body>
+<!--/*/ <th:block th:insert="~{auth/navbar.html :: navbar}">
+    </th:block> /*/-->
 <form class="row-cols-4" th:method="POST" th:action="@{/register}" th:object="${user}">
     <label for="username">Введите имя пользователя: </label>
     <input class="form-control" type="text" th:field="*{username}" id="username"/>
