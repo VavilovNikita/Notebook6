@@ -12,10 +12,7 @@ body {
     min-width: 320px;
 }
 
-img {
-    max-width: 100%;
-    height: auto;
-}
+
 
 section {
     padding: 50px 0;
@@ -29,16 +26,11 @@ a:hover {
     color: #555;
 }
 
-/* Header */
 .navbar-light .navbar-nav .nav-link {
     color: #111;
     font-weight: 500;
     text-transform: uppercase;
 }
-.navbar-nav .dropdown-menu {
-    position: absolute;
-    right: 0;
-    left: auto;
+.col{
+    text-align: center;
 }
-
-/* Header */

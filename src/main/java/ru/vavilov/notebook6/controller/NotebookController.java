@@ -27,9 +27,9 @@ public class NotebookController {
     }
 
     @GetMapping()
-    public String getNotes(Model model,@RequestParam(defaultValue = "0",required = false)String allNotes) {
+    public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes,@RequestParam(defaultValue = "",required = false)String searchWord) {
         model.addAttribute("authUser", authService.getUser());
-        if(allNotes.equals("0")){
+        if(allNotes.isBlank()){
             model.addAttribute("notebook", authService.getUser().getNotes());
         }else{
             model.addAttribute("notebook", notebookService.findAll());
