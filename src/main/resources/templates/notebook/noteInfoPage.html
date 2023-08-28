@@ -9,36 +9,49 @@
       </th:block> /*/-->
 </head>
 <body>
-<table class="table">
-    <tr>
-        <th><label for="author_name">Автор записи:</label>
-            <a class="nav-link" th:text="${user.firstName} + ${user.lastName}"
-               id="author_name"></a></th>
-    </tr>
-    <tr>
-        <td><label for="title">Заголовок:</label>
-            <a th:text="${notebook.title}" id="title">qwe</a></td>
-    </tr>
-    <tr>
-        <td><label for="text">Текст:</label>
-            <a th:text="${notebook.text}" id="text"></a></td>
-    </tr>
-    <tr>
-        <td><label for="date">Время создания:</label>
-            <a th:text="${notebook.createdAt}" id="date"></a></td>
-    </tr>
-    <hr/>
-    <tr>
-        <td>
-            <form th:method="GET" th:action="@{/notebook/{id}/edit(id=${notebook.id})}">
-                <button type="submit" class="btn btn-primary">Изменить</button>
-            </form>
+<div class="row align-items-end" style="height: 300px;">
+    <div class="col">
+    </div>
+    <div class="col-8 col-md-6 col-xl-4 text-center">
+        <form>
+            <div class="form-group row align-items-center">
+                <label for="title" class="col-sm-2 col-form-label">Заголовок</label>
+                <div class="col-sm-10">
+                    <a th:text="${notebook.title}" id="title">qwe</a>
+                </div>
+            </div>
             <hr/>
-            <form th:method="DELETE" th:action="@{/notebook/{id}(id=${notebook.id})}">
-                <button type="submit" class="btn btn-primary">Удалить</button>
-            </form>
-        </td>
-    </tr>
-</table>
+            <div class="form-group row align-items-center">
+                <label for="text" class="col-sm-2 col-form-label">Текст</label>
+                <div class="col-sm-10">
+                    <a th:text="${notebook.text}" id="text"></a>
+                </div>
+            </div>
+            <hr/>
+            <div class="form-group row align-items-center">
+                <label for="author_name" class="col-sm-2 col-form-label">Автор</label>
+                <div class="col-sm-10">
+                    <a th:text="${notebook.user.firstName} + ' ' + ${notebook.user.lastName}"
+                       id="author_name"></a>
+                </div>
+            </div>
+            <hr/>
+            <div class="form-group row align-items-center">
+                <label for="dateCreated" class="col-sm-2 col-form-label">Дата создания</label>
+                <div class="col-sm-10">
+                    <a th:text="${notebook.createdAt}" id="dateCreated"></a>
+                </div>
+            </div>
+            <hr/>
+            <div class="form-group row align-items-center">
+                <label for="dateUpdate" class="col-sm-2 col-form-label">Дата последнего обновления</label>
+                <div class="col-sm-10">
+                    <a th:text="${notebook.updatedAt}" id="dateUpdate"></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col"></div>
+</div>
 </body>
 </html>

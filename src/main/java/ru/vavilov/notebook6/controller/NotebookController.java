@@ -41,7 +41,6 @@ public class NotebookController {
     public String noteInfo(@PathVariable("id") int id, Model model) {
         Notebook notebook = notebookService.findById(id);
         model.addAttribute("notebook", notebook);
-        model.addAttribute("user", notebook.getUser());
         model.addAttribute("authUser", authService.getUser());
         return "notebook/noteInfoPage";
     }

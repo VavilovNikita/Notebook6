@@ -3,6 +3,7 @@ package ru.vavilov.notebook6.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -23,8 +24,11 @@ public class Notebook {
     @NotEmpty(message = "Поле текст не может быть пустым")
     private String text;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    @Temporal(TemporalType.DATE)
+    private LocalDate createdAt;
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.DATE)
+    private LocalDate updatedAt;
 
     public Notebook(int id, String head, String text) {
         this.id = id;
@@ -67,11 +71,19 @@ public class Notebook {
         this.user = user;
     }
 
-    public Date getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public LocalDate getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDate updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
