@@ -21,8 +21,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.
                 authorizeHttpRequests((request) -> request
-                        .requestMatchers("/register", "/error").permitAll()
-                        .anyRequest().hasAnyRole("USER","ADMIN"))
+                        .requestMatchers("/register", "/error","/images/**")
+                        .permitAll()
+                        .anyRequest().hasAnyRole("USER", "ADMIN"))
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/perform-login")
@@ -30,8 +31,8 @@ public class WebSecurityConfig {
                         .failureUrl("/login?error")
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        .permitAll()
-                ).logout((logout) -> logout.logoutSuccessUrl("/login"));
+                        .permitAll())
+                .logout((logout) -> logout.logoutSuccessUrl("/login"));
         return http.build();
     }
 

@@ -7,16 +7,46 @@
       </th:block> /*/-->
 </head>
 <body>
-<!--/*/ <th:block th:insert="~{auth/navbar.html :: navbar}">
-  </th:block> /*/-->
-<form class="row-cols-4" th:method="POST" th:action="@{/perform-login}">
-    <label for="username">Введите имя пользователя: </label>
-    <input class="form-control" type="text" name="username" id="username"/>
-    <br/>
-    <label for="password">Введите пароль: </label>
-    <input class="form-control" type="password" name="password" id="password"/>
-    <input class="btn btn-primary" type="submit" value="Войти"/>
-    <div th:if="${param.error}" style="color: red">Неправильные имя или пароль</div>
-</form>
+
+<div class="row align-items-center" style="height: 200px;">
+    <div class="col">
+    </div>
+    <div class="col text-center">
+        <img th:src="@{/images/notebook.png}" alt="NOTEBOOK"/>
+    </div>
+    <div class="col">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+    </div>
+    <div class="col-6 col-md-5 col-xl-3 text-center">
+        <form th:method="POST" th:action="@{/perform-login}">
+            <input class="form-control" type="text" name="username" placeholder="Имя пользователя"/>
+            <br/>
+            <input class="form-control" type="password" name="password" placeholder="Пароль"/>
+            <br/>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col text-center">
+                    <input class="btn btn-primary" type="submit" value="Войти"/>
+                </div>
+                <div class="col"></div>
+            </div>
+            <div th:if="${param.error}" style="color: red">Неправильные имя или пароль</div>
+            <br/>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col text-center">
+                    <a href="/register">Регистрация</a>
+                </div>
+                <div class="col"></div>
+            </div>
+        </form>
+    </div>
+    <div class="col">
+    </div>
+</div>
 </body>
 </html>

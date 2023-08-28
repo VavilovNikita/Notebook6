@@ -7,6 +7,7 @@ import ru.vavilov.notebook6.entity.User;
 import ru.vavilov.notebook6.repository.NotebookRepository;
 import ru.vavilov.notebook6.repository.UserRepository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Optional;
 
@@ -39,7 +40,10 @@ public class NotebookService {
 
     public void saveNotebook(Notebook notebook) {
         notebook.setUser(authService.getUser());
-        notebook.setCreatedAt(new Date());
+        notebook.setUpdatedAt(LocalDate.now());
+        if(notebookRepository.findById(notebook.getId()).isEmpty()){
+            notebook.setCreatedAt(LocalDate.now());
+        }
         notebookRepository.save(notebook);
     }
 
