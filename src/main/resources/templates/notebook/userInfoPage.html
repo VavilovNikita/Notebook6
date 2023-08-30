@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>header</title>
+    <!--/*/ <th:block th:insert="~{notebook/navbar.html :: navbar}">
+      </th:block> /*/-->
+    <!--/*/ <th:block th:insert="~{headers/header.html :: head}">
+      </th:block> /*/-->
+</head>
+<body>
+
+<div class="row align-items-end" style="height: 300px;">
+    <div class="col">
+    </div>
+    <div class="col-8 col-md-6 col-xl-4 text-center">
+        <table class="table">
+            <tr>
+                <td><label for="username">Имя пользователя: </label>
+                    <a th:text="${authUser.username}" id="username">qwe</a></td>
+            </tr>
+            <tr>
+                <td><label for="firstName">Имя: </label>
+                    <a th:text="${authUser.firstName}" id="firstName">qwe</a></td>
+            </tr>
+            <tr>
+                <td><label for="lastName">Фамилия: </label>
+                    <a th:text="${authUser.lastName}" id="lastName"></a></td>
+            </tr>
+            <tr>
+                <td><label for="email">Почта: </label>
+                    <a th:text="${authUser.email}" id="email"></a></td>
+            </tr>
+            <tr>
+                <td><label for="dateOfBirth">Дата рождения: </label>
+                    <a th:text="${authUser.dateOfBirth}" id="dateOfBirth"></a></td>
+            </tr>
+            <th><a>Мои Записи</a></th>
+            <tr th:each="notes : ${notes}">
+                <td><a class="nav-link" th:href="@{/notebook/{id}(id=${notes.id})}" th:text="${notes.title}">user</a>
+                    <hr/>
+                </td>
+            </tr>
+            <hr/>
+            <tr>
+                <td>
+                    <form th:method="GET" th:action="@{/user/{id}/edit(id=${authUser.id})}">
+                        <button type="submit" class="btn btn-primary">Изменить</button>
+                    </form>
+                    <hr/>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="col"></div>
+</div>
+</body>
+</html>

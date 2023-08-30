@@ -9,20 +9,17 @@ import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.Notebook;
 import ru.vavilov.notebook6.service.AuthService;
 import ru.vavilov.notebook6.service.NotebookService;
-import ru.vavilov.notebook6.util.NotebookValidator;
 
 
 @Controller
 @RequestMapping("/notebook")
 public class NotebookController {
     private final NotebookService notebookService;
-    private final NotebookValidator notebookValidator;
     private final AuthService authService;
 
     @Autowired
-    public NotebookController(NotebookService notebookService, NotebookValidator notebookValidator, AuthService authService) {
+    public NotebookController(NotebookService notebookService, AuthService authService) {
         this.notebookService = notebookService;
-        this.notebookValidator = notebookValidator;
         this.authService = authService;
     }
 
@@ -52,8 +49,8 @@ public class NotebookController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult) {
-        notebookValidator.validate(notebook, bindingResult);
+    public String create(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult,Model model) {
+        model.addAttribute("authUser", authService.getUser());
         if (bindingResult.hasErrors()) {
             return "notebook/createNotePage";
         }
@@ -69,7 +66,8 @@ public class NotebookController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult) {
+    public String update(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult,Model model) {
+        model.addAttribute("authUser", authService.getUser());
         if (bindingResult.hasErrors()) {
             return "notebook/changeNotePage";
         }

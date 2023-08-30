@@ -9,20 +9,30 @@
       </th:block> /*/-->
 </head>
 <body>
-<form class="row-cols-4" th:method="PATCH" th:action="@{/notebook/{id}(id=${notebook.id})}" th:object="${notebook}">
-    <label for="name">Введите заголовок: </label>
-    <input class="form-control" type="text" th:field="*{title}" id="name"/>
-    <div style="color:red" th:if="${#fields.hasErrors('title')}"
-         th:errors="*{title}">title Error
+<div class="row align-items-end" style="height: 300px;">
+    <div class="col">
     </div>
-    <br/>
-    <label for="secondName">Введите текст: </label>
-    <input class="form-control" type="text" th:field="*{text}" id="secondName"/>
-    <div style="color:red" th:if="${#fields.hasErrors('text')}"
-         th:errors="*{text}">text Error
+    <div class="col-6 col-md-5 col-xl-3 text-center">
+        <form id="createForm" class="row-cols-4" th:method="PATCH" th:action="@{/notebook/{id}(id=${notebook.id})}" th:object="${notebook}">
+            <input class="form-control" type="text" th:field="*{title}" id="name" placeholder="Заголовок"/>
+            <a style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">title Error
+            </a>
+            <br/>
+            <input class="form-control" type="text" th:field="*{text}" id="secondName" placeholder="Текст"/>
+            <a style="color:red" th:if="${#fields.hasErrors('text')}" th:errors="*{text}">text Error
+            </a>
+            <br/>
+        </form>
     </div>
-    <br/>
-    <input class="btn btn-primary" type="submit" value="Сохранить изменения"/>
-</form>
+    <div class="col">
+    </div>
+</div>
+<div class="row">
+    <div class="col"></div>
+    <div class="col-5 text-center">
+        <input onclick=document.getElementById("createForm").submit() class="btn btn-primary" value="Сохранить изменения"/>
+    </div>
+    <div class="col"></div>
+</div>
 </body>
 </html>
