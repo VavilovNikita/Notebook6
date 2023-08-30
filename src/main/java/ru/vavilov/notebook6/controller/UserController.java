@@ -25,21 +25,21 @@ public class UserController {
     @GetMapping("/profile")
     public String getAuthUserInfo(Model model) {
         User user = userService.findById(authService.getUser().getId());
-        model.addAttribute("user", user);
+        model.addAttribute("authUser", user);
         model.addAttribute("notes", user.getNotes());
-        return "user/userInfoPage";
+        return "notebook/userInfoPage";
     }
 
     @GetMapping("/{id}/edit")
     public String updateAuthUser(Model model) {
-        model.addAttribute("user", userService.findById(authService.getUser().getId()));
-        return "user/updateUserPage";
+        model.addAttribute("authUser", userService.findById(authService.getUser().getId()));
+        return "notebook/updateUserPage";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "user/updateUserPage";
+            return "notebook/updateUserPage";
         }
         user.setRole(authService.getUser().getRole());
         userService.saveUser(user);

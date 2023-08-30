@@ -15,12 +15,12 @@
     <div class="col-6 col-md-5 col-xl-3 text-center">
         <form id="createForm" class="row-cols-4" th:method="POST" th:action="@{/notebook}" th:object="${notebook}">
             <input class="form-control" type="text" th:field="*{title}" id="name" placeholder="Заголовок"/>
-            <div style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">title Error
-            </div>
+            <a style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">title Error
+            </a>
             <br/>
             <input class="form-control" type="text" th:field="*{text}" id="secondName" placeholder="Текст"/>
-            <div style="color:red" th:if="${#fields.hasErrors('text')}" th:errors="*{text}">text Error
-            </div>
+            <a style="color:red" th:if="${#fields.hasErrors('text')}" th:errors="*{text}">text Error
+            </a>
             <br/>
         </form>
     </div>

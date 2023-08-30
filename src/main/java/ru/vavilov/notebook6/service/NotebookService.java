@@ -34,15 +34,14 @@ public class NotebookService {
         return notebookRepository.findById(id).orElse(null);
     }
 
-    public Iterable<User> findAllUser() {
-        return userRepository.findAll();
-    }
 
     public void saveNotebook(Notebook notebook) {
         notebook.setUser(authService.getUser());
         notebook.setUpdatedAt(LocalDate.now());
         if(notebookRepository.findById(notebook.getId()).isEmpty()){
             notebook.setCreatedAt(LocalDate.now());
+        }else {
+            notebook.setCreatedAt(notebookRepository.findById(notebook.getId()).get().getCreatedAt());
         }
         notebookRepository.save(notebook);
     }
