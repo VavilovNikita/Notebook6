@@ -40,6 +40,13 @@
             <br/>
             <input type="hidden" th:field="*{password}"/>
 
+            <label for="role">Выберете роль пользователя</label>
+            <select class="form-select" th:field="*{role}" id="role">
+                <option value="1">Обычный пользователь</option>
+                <option value="2">Администратор</option>
+            </select>
+            <br/>
+
             <label for="email">Введите почту</label>
             <input class="form-control" type="email" th:field="*{email}" id="email"/>
             <div style="color:red" th:if="${#fields.hasErrors('email')}"

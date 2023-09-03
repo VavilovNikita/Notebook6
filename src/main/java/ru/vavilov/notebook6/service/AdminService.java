@@ -28,8 +28,6 @@ public class AdminService {
         return userRepository.findById(id).orElse(null);
     }
     public void saveUser(User user) {
-        user.setPassword(encoder.encode(user.getPassword()));
-        user.setRole(userRepository.findById(user.getId()).get().getRole());
         userRepository.save(user);
     }
     public void deleteUser(int id) {

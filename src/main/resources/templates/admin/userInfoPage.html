@@ -10,51 +10,60 @@
 </head>
 <body>
 
-<div align="middle">
-    <table class="table">
-        <tr>
-            <td><label for="username">Имя пользователя: </label>
-                <a th:text="${user.username}" id="username">qwe</a></td>
-        </tr>
-        <tr>
-            <td><label for="role">Роль: </label>
-                <a th:text="${user.role.getRole()}" id="role">qwe</a></td>
-        </tr>
-        <tr>
-            <td><label for="firstName">Имя: </label>
-                <a th:text="${user.firstName}" id="firstName">qwe</a></td>
-        </tr>
-        <tr>
-            <td><label for="lastName">Фамилия: </label>
-                <a th:text="${user.lastName}" id="lastName"></a></td>
-        </tr>
-        <tr>
-            <td><label for="email">Почта: </label>
-                <a th:text="${user.email}" id="email"></a></td>
-        </tr>
-        <tr>
-            <td><label for="dateOfBirth">Дата рождения: </label>
-                <a th:text="${user.dateOfBirth}" id="dateOfBirth"></a></td>
-        </tr>
-        <th><a>Записи пользователя</a></th>
-        <tr th:each="notes : ${notes}">
-            <td><a class="nav-link" th:href="@{/notebook/{id}(id=${notes.id})}" th:text="${notes.title}">user</a>
-                <hr/>
-            </td>
-        </tr>
-        <hr/>
-        <tr>
-            <td>
-                <form th:method="GET" th:action="@{/admin/{id}/edit(id=${user.id})}">
-                    <button type="submit" class="btn btn-primary">Изменить</button>
-                </form>
-                <hr/>
-                <form th:method="DELETE" th:action="@{/admin/{id}(id=${user.id})}">
-                    <button type="submit" class="btn btn-primary">Удалить</button>
-                </form>
-            </td>
-        </tr>
-    </table>
+<div class="row align-items-end" style="height: 300px;">
+    <div class="col">
+    </div>
+    <div class="col-8 col-md-6 col-xl-4 text-center">
+        <table class="table">
+            <tr>
+                <td><label for="username">Имя пользователя: </label>
+                    <a th:text="${user.username}" id="username">qwe</a></td>
+            </tr>
+            <tr>
+                <td><label for="role">Роль: </label>
+                    <a th:text="${user.role.getRole()}" id="role">qwe</a></td>
+            </tr>
+            <tr>
+                <td><label for="firstName">Имя: </label>
+                    <a th:text="${user.firstName}" id="firstName">qwe</a></td>
+            </tr>
+            <tr>
+                <td><label for="lastName">Фамилия: </label>
+                    <a th:text="${user.lastName}" id="lastName"></a></td>
+            </tr>
+            <tr>
+                <td><label for="email">Почта: </label>
+                    <a th:text="${user.email}" id="email"></a></td>
+            </tr>
+            <tr>
+                <td><label for="dateOfBirth">Дата рождения: </label>
+                    <a th:text="${user.dateOfBirth}" id="dateOfBirth"></a></td>
+            </tr>
+            <th><a>Записи пользователя</a></th>
+            <tr th:each="notes : ${notes}">
+                <td><a class="nav-link" th:href="@{/notebook/{id}(id=${notes.id})}" th:text="${notes.title}">user</a>
+                    <hr/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="row">
+                        <div class="col text-center">
+                            <form th:method="GET" th:action="@{/admin/{id}/edit(id=${user.id})}">
+                                <button type="submit" class="btn btn-primary">Изменить</button>
+                            </form>
+                        </div>
+                        <div class="col text-center">
+                            <form th:method="DELETE" th:action="@{/admin/{id}(id=${user.id})}">
+                                <button type="submit" class="btn btn-primary">Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="col"></div>
 </div>
 </body>
 </html>
