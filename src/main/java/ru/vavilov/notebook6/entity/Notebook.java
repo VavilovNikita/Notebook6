@@ -2,9 +2,9 @@ package ru.vavilov.notebook6.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name = "notebook")
@@ -20,7 +20,7 @@ public class Notebook {
     @Column(name = "title")
     @NotEmpty(message = "Поле заголовок не может быть пустым")
     private String title;
-    @Column(name = "text")
+    @Column(name = "text", columnDefinition="text")
     @NotEmpty(message = "Поле текст не может быть пустым")
     private String text;
     @Column(name = "created_at")

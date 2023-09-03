@@ -8,23 +8,32 @@
       </th:block> /*/-->
 </head>
 <body>
-<table class="table">
-    <tr th:each="user : ${user}">
-        <td><a class="nav-link" th:href="@{/admin/{id}(id=${user.id})}" th:text="${user.firstName}"
-               id="text">user</a>
-        </td>
-        <td>
-            <input type="hidden" th:value="*{user.email}" th:id="${user.id}">
-            <button class="btn btn-primary" th:onclick="'copyText(\'' + ${user.id} + '\')'">Скопировать почту</button>
-            <script th:inline="javascript">
-                function copyText(id) {
-                    const copyText = document.getElementById(id);
-                    copyText.select();
-                    navigator.clipboard.writeText(copyText.value);
-                }
-            </script>
-        </td>
-    </tr>
-</table>
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <div class="row align-items-center" style="height: 100px;">
+            <div class="col-2 text-center"><b>Имя пользователя</b></div>
+            <div class="col-2 text-center"><b>Роль</b></div>
+            <div class="col-2 text-center"><b>Имя</b></div>
+            <div class="col-2 text-center"><b>Фамилия</b></div>
+            <div class="col-2 text-center"><b>Почта</b></div>
+            <div class="col-2 text-center"><b>Дата рождения</b></div>
+
+        </div>
+        <div class="row align-items-center" th:each="user : ${user}">
+            <div class="col-2 text-center"><a class="nav-link" th:href="@{/admin/{id}(id=${user.id})}"
+                                              th:text="${user.username}"
+                                              id="text">user</a></div>
+            <div class="col-2 text-center" th:text="${user.role.getRole()}"></div>
+            <div class="col-2 text-center" th:text="${user.firstName}"></div>
+            <div class="col-2 text-center" th:text="${user.lastName}"></div>
+            <div class="col-2 text-center" th:text="${user.email}"></div>
+            <div class="col-2 text-center" th:text="${user.dateOfBirth}"></div>
+
+
+            <div class="col-1"></div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

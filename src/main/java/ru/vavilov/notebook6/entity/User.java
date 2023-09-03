@@ -13,14 +13,15 @@ import java.util.List;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "users_seq")
+    @SequenceGenerator(name = "users_seq", initialValue = 2)
     @Column(name = "id")
     private int id;
 
     @NotEmpty(message = "Поле Имя пользователя не должно быть пустым")
     @Column(name = "user_name")
     private String username;
-    @NotEmpty(message = "Поле Имя пользователя не должно быть пустым")
+    @NotEmpty(message = "Поле пароль не должно быть пустым")
     @Column(name = "password")
     private String password;
     @NotEmpty(message = "Поле Имя не должно быть пустым")
