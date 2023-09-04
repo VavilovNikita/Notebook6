@@ -39,12 +39,24 @@
                 <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id}">
                 <a class="nav-item" th:onclick="'copyText(\'' + ${notebook.id} + '\')'"><i
                         class="fa-solid fa-copy"></i></a>
+<!--                <script th:inline="javascript">-->
+<!--                    function copyText(id) {-->
+<!--                        const copyText = document.getElementById(id);-->
+<!--                        copyText.select();-->
+<!--                        navigator.clipboard.writeText(copyText.value);-->
+<!--                        alert('Скопированно');-->
+<!--                    }-->
+<!--                </script>-->
                 <script th:inline="javascript">
-                    function copyText(id) {
-                        const copyText = document.getElementById(id);
-                        copyText.select();
-                        navigator.clipboard.writeText(copyText.value);
-                        alert('Скопированно');
+                    const copyText = async (id) => {
+                        try {
+                            const copyText = document.getElementById(id);
+                            copyText.select();
+                            await navigator.clipboard.writeText(copyText.value);
+                            console.log('Text copied to clipboard');
+                        } catch (err) {
+                            console.error('Error copying text: ', err);
+                        }
                     }
                 </script>
                 <form th:id="${notebook.id} + 'delete'" th:method="DELETE"
