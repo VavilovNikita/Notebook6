@@ -11,5 +11,6 @@ http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
     <include file="sql/createRole.sql" relativeToChangelogFile="true"/>
     <include file="sql/createUsers.sql" relativeToChangelogFile="true"/>
     <include file="sql/createNotebook.sql" relativeToChangelogFile="true"/>
+    <include file="sql/addPosition.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

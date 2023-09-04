@@ -14,29 +14,29 @@
     <div class="col-1"></div>
     <div class="col-10">
         <div class="row align-items-center" style="height: 100px;">
-            <div class="col-4 text-center"><b>Название</b></div>
+            <div class="col-3 text-center"><b>Название</b></div>
             <div class="col-3 text-center"><b>Создатель</b></div>
-            <div class="col-2 text-center"><b>Дата последнего обновления</b></div>
-            <div class="col-3 text-center"><b>Дата создания</b></div>
+            <div class="col-1 text-center"><b>Важность</b></div>
+            <div class="col-5 text-center"><b>Действия</b></div>
         </div>
         <div class="row align-items-center" th:each="notebook : ${notebook}">
 
-            <li class="col-4 text-center nav-item dropdown">
+            <li class="col-3 text-center nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+                   th:text="${notebook.title}"></a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" th:text="${notebook.text}"
+                       th:href="@{/notebook/{id}(id=${notebook.id})}"></a>
+                </ul>
+            </li>
+
+
+            <div class="col-3 text-center" th:text="${notebook.user.firstName} + ' ' + ${notebook.user.lastName}"></div>
+            <div class="col-1 text-center" th:text="${notebook.position}">
+            </div>
+            <div class="col-5 text-center">
                 <div class="row">
-                    <div class="col">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
-                           th:text="${notebook.title}"></a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" th:text="${notebook.text}"
-                               th:href="@{/notebook/{id}(id=${notebook.id})}"></a>
-                        </ul>
-                    </div>
-                    <div class="col-1 text-center">
-                        <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
-                           th:href="@{/notebook/{id}/edit(id=${notebook.id})}"><i
-                                class="fa-solid fa-pen-to-square"></i></a>
-                    </div>
-                    <div class="col-1 text-center">
+                    <div class="col text-center">
                         <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id}">
                         <a class="nav-item" th:onclick="'copyText(\'' + ${notebook.id} + '\')'"><i
                                 class="fa-solid fa-copy"></i></a>
@@ -61,31 +61,23 @@
                               th:action="@{/notebook/{id}(id=${notebook.id})}">
                         </form>
                     </div>
-                </div>
-            </li>
-
-
-
-
-            <div class="col-3 text-center" th:text="${notebook.user.firstName} + ' ' + ${notebook.user.lastName}">
-            </div>
-            <div class="col-2 text-center" th:text="${notebook.createdAt}">
-            </div>
-            <div class="col-3">
-                <div class="row">
-                    <div class="col" th:text="${notebook.updatedAt}">
+                    <div class="col text-center">
+                        <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
+                           th:href="@{/notebook/{id}/edit(id=${notebook.id})}"><i
+                                class="fa-solid fa-pen-to-square"></i></a>
                     </div>
-                    <div class="col-1">
+                    <div class="col text-center">
                         <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
                            th:onclick="'document.getElementById(\'' + ${notebook.id}  + 'delete' + '\').submit()'"><i
                                 class="fa-solid fa-trash"></i></a>
                     </div>
                 </div>
+
             </div>
             <hr/>
-
+            <div class="col-1">
+            </div>
         </div>
-        <div class="col-1"></div>
     </div>
 </div>
 </body>

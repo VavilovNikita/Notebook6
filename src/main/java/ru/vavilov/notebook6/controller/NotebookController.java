@@ -10,6 +10,9 @@ import ru.vavilov.notebook6.entity.Notebook;
 import ru.vavilov.notebook6.service.AuthService;
 import ru.vavilov.notebook6.service.NotebookService;
 
+import java.util.Comparator;
+import java.util.List;
+
 
 @Controller
 @RequestMapping("/notebook")
@@ -27,7 +30,9 @@ public class NotebookController {
     public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes,@RequestParam(defaultValue = "",required = false)String searchWord) {
         model.addAttribute("authUser", authService.getUser());
         if(allNotes.isBlank()){
-            model.addAttribute("notebook", authService.getUser().getNotes());
+            List<Notebook> notesList = authService.getUser().getNotes();
+            notesList.sort(Comparator.comparingInt(Notebook::getPosition).reversed());
+            model.addAttribute("notebook", notesList);
         }else{
             model.addAttribute("notebook", notebookService.findAll());
         }
