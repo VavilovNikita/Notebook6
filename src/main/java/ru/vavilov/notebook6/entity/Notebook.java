@@ -2,7 +2,6 @@ package ru.vavilov.notebook6.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 

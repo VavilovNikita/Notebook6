@@ -9,16 +9,16 @@
       </th:block> /*/-->
 </head>
 <body>
-<div class="row align-items-end" style="height: 300px;">
+<div class="row align-items-end" style="height: 400px;">
     <div class="col">
     </div>
-    <div class="col-6 col-md-5 col-xl-3 text-center">
+    <div class="col-8 col-md-7 col-xl-5 text-center">
         <form id="createForm" class="row-cols-4" th:method="POST" th:action="@{/notebook}" th:object="${notebook}">
-            <input class="form-control" type="text" th:field="*{title}" id="name" placeholder="Заголовок"/>
-            <a style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">title Error
-            </a>
+                <input class="form-control" type="text" th:field="*{title}" id="name" placeholder="Заголовок"/>
+                <a style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">title Error
+                </a>
             <br/>
-            <input class="form-control" type="text" th:field="*{text}" id="secondName" placeholder="Текст"/>
+            <textarea class="form-control" style="height: 200px; resize: none" type="text" th:field="*{text}" id="secondName" placeholder="Текст"></textarea>
             <a style="color:red" th:if="${#fields.hasErrors('text')}" th:errors="*{text}">text Error
             </a>
             <br/>
