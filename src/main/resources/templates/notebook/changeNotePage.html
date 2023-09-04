@@ -18,7 +18,7 @@
             <a style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">title Error
             </a>
             <br/>
-            <textarea class="form-control" style="height: 200px; resize: none" type="text" th:field="*{text}" id="secondName" placeholder="Текст"></textarea>
+            <textarea class="form-control" style="height: 200px; resize: none" type="text" th:field="*{text}" id="secondName" placeholder="Текст записи"></textarea>
             <a style="color:red" th:if="${#fields.hasErrors('text')}" th:errors="*{text}">text Error
             </a>
             <br/>
