@@ -15,7 +15,7 @@
     <div class="col-10">
         <div class="row align-items-center" style="height: 100px;">
             <div class="col-3 text-center"><b>Название</b></div>
-            <div class="col-1"></div>
+            <div class="col-1"><b>Скопировать текст записи</b></div>
             <div class="col-4 text-center"><b>Создатель</b></div>
             <div class="col-2 text-center"><b>Дата последнего обновления</b></div>
             <div class="col-2 text-center"><b>Дата создания</b></div>
@@ -26,12 +26,14 @@
                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
                    th:text="${notebook.title}"></a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" th:text="${notebook.text}" th:href="@{/notebook/{id}(id=${notebook.id})}"></a>
+                    <a class="dropdown-item" th:text="${notebook.text}"
+                       th:href="@{/notebook/{id}(id=${notebook.id})}"></a>
                 </ul>
             </li>
 
             <div class="col-1 text-center">
-                <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}" th:href="@{/notebook/{id}/edit(id=${notebook.id})}"><i
+                <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
+                   th:href="@{/notebook/{id}/edit(id=${notebook.id})}"><i
                         class="fa-solid fa-pen-to-square"></i></a>
 
                 <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id}">
@@ -42,13 +44,15 @@
                         const copyText = document.getElementById(id);
                         copyText.select();
                         navigator.clipboard.writeText(copyText.value);
+                        alert('Скопированно');
                     }
                 </script>
-                <form th:id="${notebook.id} + 'delete'" th:method="DELETE" th:action="@{/notebook/{id}(id=${notebook.id})}">
+                <form th:id="${notebook.id} + 'delete'" th:method="DELETE"
+                      th:action="@{/notebook/{id}(id=${notebook.id})}">
                 </form>
-                <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}" th:onclick="'document.getElementById(\'' + ${notebook.id}  + 'delete' + '\').submit()'"><i
+                <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
+                   th:onclick="'document.getElementById(\'' + ${notebook.id}  + 'delete' + '\').submit()'"><i
                         class="fa-solid fa-trash"></i></a>
-                <!-- Кнопка-триггер модального окна -->
             </div>
             <div class="col-4 text-center" th:text="${notebook.user.firstName} + ' ' + ${notebook.user.lastName}">
             </div>
