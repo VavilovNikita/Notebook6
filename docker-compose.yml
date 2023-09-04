@@ -15,3 +15,13 @@ services:
       - pg_project_notebook:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  app:
+    restart: always
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - pg_db
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://pg_db:5432/notebook'
+      JAVA_OPTS: '-Xmx512m'
