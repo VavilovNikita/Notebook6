@@ -2,7 +2,6 @@ package ru.vavilov.notebook6.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.vavilov.notebook6.entity.User;
 import ru.vavilov.notebook6.repository.UserRepository;
@@ -13,12 +12,11 @@ import ru.vavilov.notebook6.repository.UserRepository;
 public class AdminService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder encoder;
+
 
     @Autowired
-    public AdminService(UserRepository userRepository, BCryptPasswordEncoder encoder) {
+    public AdminService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.encoder = encoder;
     }
 
     public Iterable<User> findAll() {

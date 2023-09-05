@@ -6,7 +6,6 @@ import ru.vavilov.notebook6.entity.Notebook;
 import ru.vavilov.notebook6.repository.NotebookRepository;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 public class NotebookService {
@@ -44,14 +43,4 @@ public class NotebookService {
     public void deleteNotebook(int id) {
         notebookRepository.deleteById(id);
     }
-
-    public Optional<Notebook> findByText(String text) {
-        return notebookRepository.findByText(text);
-    }
-
-    public Optional<Notebook> findByTitle(String title) {
-        return notebookRepository.findByTitle(title);
-    }
-
-
 }

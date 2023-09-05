@@ -22,10 +22,6 @@ public class UserService {
         this.roleService = roleService;
     }
 
-    public User findById(int id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
     public void saveUser(User user) {
         Optional<User> userFromDB = userRepository.findById(user.getId());
         if (userFromDB.isPresent()) {

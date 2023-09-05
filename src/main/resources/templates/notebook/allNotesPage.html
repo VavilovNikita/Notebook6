@@ -10,14 +10,16 @@
 <!--/*/ <th:block th:insert="~{notebook/navbar.html :: navbar}">
       </th:block> /*/-->
 <hr/>
-<div class="row">
+<div class="row align-items-center">
     <div class="col-1"></div>
     <div class="col-10">
         <div class="row align-items-center" style="height: 100px;">
             <div class="col-3 text-center"><b>Название</b></div>
+            <div class="col-1 text-center"><b>Копир.</b></div>
             <div class="col-3 text-center"><b>Создатель</b></div>
-            <div class="col-1 text-center"><b>Важность</b></div>
-            <div class="col-5 text-center"><b>Действия</b></div>
+            <div class="col-2 text-center"><b>Важность</b></div>
+            <div class="col-2 text-center"><b>Изменить</b></div>
+            <div class="col-1 text-center"><b>Удалить</b></div>
         </div>
         <div class="row align-items-center" th:each="notebook : ${notebook}">
 
@@ -30,55 +32,51 @@
                 </ul>
             </li>
 
+            <div class="col-1 text-center">
+                <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id}">
+                <a class="nav-item" th:onclick="'copyText(\'' + ${notebook.id} + '\')'"><i
+                        class="fa-solid fa-copy"></i></a>
+                <script th:inline="javascript">
+                    function copyText(id) {
+                        const textArea = document.createElement("textarea");
+                        const copyText = document.getElementById(id)
+                        copyText.select()
+                        textArea.value = copyText.value;
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                        } catch (err) {
+                            console.error('Unable to copy to clipboard', err);
+                        }
+                        document.body.removeChild(textArea);
+                    }
+                </script>
+                <form th:id="${notebook.id} + 'delete'" th:method="DELETE"
+                      th:action="@{/notebook/{id}(id=${notebook.id})}">
+                </form>
+            </div>
 
             <div class="col-3 text-center" th:text="${notebook.user.firstName} + ' ' + ${notebook.user.lastName}"></div>
-            <div class="col-1 text-center" th:text="${notebook.position}">
+            <div class="col-2 text-center" th:text="${notebook.position}">
             </div>
-            <div class="col-5 text-center">
-                <div class="row">
-                    <div class="col text-center">
-                        <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id}">
-                        <a class="nav-item" th:onclick="'copyText(\'' + ${notebook.id} + '\')'"><i
-                                class="fa-solid fa-copy"></i></a>
-                        <script th:inline="javascript">
-                            function copyText(id) {
-                                const textArea = document.createElement("textarea");
-                                const copyText = document.getElementById(id)
-                                copyText.select()
-                                textArea.value = copyText.value;
-                                document.body.appendChild(textArea);
-                                textArea.focus();
-                                textArea.select();
-                                try {
-                                    document.execCommand('copy');
-                                } catch (err) {
-                                    console.error('Unable to copy to clipboard', err);
-                                }
-                                document.body.removeChild(textArea);
-                            }
-                        </script>
-                        <form th:id="${notebook.id} + 'delete'" th:method="DELETE"
-                              th:action="@{/notebook/{id}(id=${notebook.id})}">
-                        </form>
-                    </div>
-                    <div class="col text-center">
-                        <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
-                           th:href="@{/notebook/{id}/edit(id=${notebook.id})}"><i
-                                class="fa-solid fa-pen-to-square"></i></a>
-                    </div>
-                    <div class="col text-center">
-                        <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
-                           th:onclick="'document.getElementById(\'' + ${notebook.id}  + 'delete' + '\').submit()'"><i
-                                class="fa-solid fa-trash"></i></a>
-                    </div>
-                </div>
-
+            <div class="col-2 text-center">
+                <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
+                   th:href="@{/notebook/{id}/edit(id=${notebook.id})}"><i
+                        class="fa-solid fa-pen-to-square"></i></a>
             </div>
-            <hr/>
-            <div class="col-1">
+            <div class="col-1 text-center">
+                <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
+                   th:onclick="'document.getElementById(\'' + ${notebook.id}  + 'delete' + '\').submit()'"><i
+                        class="fa-solid fa-trash"></i></a>
             </div>
         </div>
+        <hr/>
+        <div class="col-1">
+        </div>
     </div>
+</div>
 </div>
 </body>
 </html>
