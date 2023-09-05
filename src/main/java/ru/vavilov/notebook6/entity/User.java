@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -92,7 +94,9 @@ public class User {
     }
 
     public List<Notebook> getNotes() {
-        return notes;
+        List<Notebook> sortNotes = new ArrayList<>(notes);
+        sortNotes.sort(Comparator.comparingInt(Notebook::getPosition).reversed());
+        return sortNotes;
     }
 
     public void setNotes(List<Notebook> notes) {

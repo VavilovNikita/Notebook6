@@ -10,9 +10,6 @@ import ru.vavilov.notebook6.entity.Notebook;
 import ru.vavilov.notebook6.service.AuthService;
 import ru.vavilov.notebook6.service.NotebookService;
 
-import java.util.Comparator;
-import java.util.List;
-
 
 @Controller
 @RequestMapping("/notebook")
@@ -20,19 +17,18 @@ public class NotebookController {
     private final NotebookService notebookService;
     private final AuthService authService;
 
+
+
     @Autowired
     public NotebookController(NotebookService notebookService, AuthService authService) {
         this.notebookService = notebookService;
         this.authService = authService;
     }
-
     @GetMapping()
-    public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes,@RequestParam(defaultValue = "",required = false)String searchWord) {
+    public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes) {
         model.addAttribute("authUser", authService.getUser());
         if(allNotes.isBlank()){
-            List<Notebook> notesList = authService.getUser().getNotes();
-            notesList.sort(Comparator.comparingInt(Notebook::getPosition).reversed());
-            model.addAttribute("notebook", notesList);
+            model.addAttribute("notebook", authService.getUser().getNotes());
         }else{
             model.addAttribute("notebook", notebookService.findAll());
         }
@@ -41,8 +37,7 @@ public class NotebookController {
 
     @GetMapping("/{id}")
     public String noteInfo(@PathVariable("id") int id, Model model) {
-        Notebook notebook = notebookService.findById(id);
-        model.addAttribute("notebook", notebook);
+        model.addAttribute("notebook", notebookService.findById(id));
         model.addAttribute("authUser", authService.getUser());
         return "notebook/noteInfoPage";
     }

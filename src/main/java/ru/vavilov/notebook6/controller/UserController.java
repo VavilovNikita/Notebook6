@@ -24,15 +24,14 @@ public class UserController {
 
     @GetMapping("/profile")
     public String getAuthUserInfo(Model model) {
-        User user = userService.findById(authService.getUser().getId());
-        model.addAttribute("authUser", user);
-        model.addAttribute("notes", user.getNotes());
+        model.addAttribute("authUser", authService.getUser());
+        model.addAttribute("notes", authService.getUser().getNotes());
         return "notebook/userInfoPage";
     }
 
     @GetMapping("/{id}/edit")
     public String updateAuthUser(Model model) {
-        model.addAttribute("authUser", userService.findById(authService.getUser().getId()));
+        model.addAttribute("authUser", authService.getUser());
         return "notebook/updateUserPage";
     }
 
@@ -41,7 +40,6 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "notebook/updateUserPage";
         }
-        user.setRole(authService.getUser().getRole());
         userService.saveUser(user);
         return "redirect:/user/profile";
     }
