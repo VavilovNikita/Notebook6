@@ -34,8 +34,8 @@
 
             <div class="col-1 text-center">
                 <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id}">
-                <a class="nav-item" th:onclick="'copyText(\'' + ${notebook.id} + '\')'"><i
-                        class="fa-solid fa-copy"></i></a>
+                <button class="btn btn-outline-primary" th:onclick="'copyText(\'' + ${notebook.id} + '\')'"><i
+                        class="fa-solid fa-copy"></i></button>
                 <script th:inline="javascript">
                     function copyText(id) {
                         const textArea = document.createElement("textarea");
