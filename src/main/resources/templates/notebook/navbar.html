@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body>
 <div th:fragment="navbar" class="row align-items-center">
     <div class="col-1"></div>
-    <div class="col-11 text-center">
+    <div class="col-10 text-center">
         <nav class="navbar navbar-expand-md navbar-light">
             <div class="container-fluid">
                 <img th:src="@{/images/notebook.png}" alt="NOTEBOOK"/>
@@ -39,7 +39,5 @@
     </div>
     <div class="col-1"></div>
 </div>
-<!--/*/ <th:block th:insert="~{footers/footer.html :: footer}">
-  </th:block> /*/-->
 </body>
 </html>
