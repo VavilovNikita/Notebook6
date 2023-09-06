@@ -28,7 +28,7 @@ public class UserValidator implements Validator {
             errors.rejectValue("email", "", "Этот email уже зарегестрирован");
         }
         if (userService.findByUserName(user.getUsername()).isPresent()) {
-            errors.rejectValue("username", "", "Этот имя пользователя уже зарегестрирован");
+            errors.rejectValue("username", "", "Этот имя пользователя уже зарегестрировано");
         }
 
     }
