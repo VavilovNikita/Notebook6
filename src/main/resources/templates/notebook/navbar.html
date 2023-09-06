@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 <div th:fragment="navbar" class="row align-items-center">
     <div class="col-1"></div>
     <div class="col-11 text-center">
@@ -39,5 +39,7 @@
     </div>
     <div class="col-1"></div>
 </div>
+<!--/*/ <th:block th:insert="~{footers/footer.html :: footer}">
+  </th:block> /*/-->
 </body>
 </html>
