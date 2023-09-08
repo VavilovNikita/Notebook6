@@ -5,9 +5,9 @@
     <title>Title</title>
 </head>
 <body>
-<div th:fragment="navbar" class="row">
+<div th:fragment="navbar" class="row align-items-center">
     <div class="col-1"></div>
-    <div class="col-11">
+    <div class="col-10 text-center">
         <nav class="navbar navbar-expand-md navbar-light">
             <div class="container-fluid">
                 <img th:src="@{/images/notebook.png}" alt="NOTEBOOK"/>
@@ -35,11 +35,9 @@
                     </ul>
                 </div>
             </div>
-
         </nav>
     </div>
+    <div class="col-1"></div>
 </div>
-<div class="col-1"></div>
-
 </body>
 </html>

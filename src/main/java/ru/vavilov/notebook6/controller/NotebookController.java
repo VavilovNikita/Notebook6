@@ -17,14 +17,15 @@ public class NotebookController {
     private final NotebookService notebookService;
     private final AuthService authService;
 
+
+
     @Autowired
     public NotebookController(NotebookService notebookService, AuthService authService) {
         this.notebookService = notebookService;
         this.authService = authService;
     }
-
     @GetMapping()
-    public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes,@RequestParam(defaultValue = "",required = false)String searchWord) {
+    public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes) {
         model.addAttribute("authUser", authService.getUser());
         if(allNotes.isBlank()){
             model.addAttribute("notebook", authService.getUser().getNotes());
@@ -36,8 +37,7 @@ public class NotebookController {
 
     @GetMapping("/{id}")
     public String noteInfo(@PathVariable("id") int id, Model model) {
-        Notebook notebook = notebookService.findById(id);
-        model.addAttribute("notebook", notebook);
+        model.addAttribute("notebook", notebookService.findById(id));
         model.addAttribute("authUser", authService.getUser());
         return "notebook/noteInfoPage";
     }

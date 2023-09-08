@@ -8,7 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface NotebookRepository extends CrudRepository<Notebook, Integer> {
-    Optional<Notebook> findByText(String text);
-
-    Optional<Notebook> findByTitle(String title);
+    Iterable<Notebook> findAllByOrderByPositionDesc();
 }

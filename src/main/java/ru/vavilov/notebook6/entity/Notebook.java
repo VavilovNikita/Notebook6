@@ -2,13 +2,12 @@ package ru.vavilov.notebook6.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "notebook")
-public class Notebook {
+public class Notebook{
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -23,6 +22,8 @@ public class Notebook {
     @Column(name = "text", columnDefinition="text")
     @NotEmpty(message = "Поле текст не может быть пустым")
     private String text;
+    @Column(name = "position")
+    private int position;
     @Column(name = "created_at")
     @Temporal(TemporalType.DATE)
     private LocalDate createdAt;
@@ -94,5 +95,13 @@ public class Notebook {
                 ", head='" + title + '\'' +
                 ", text='" + text + '\'' +
                 '}';
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }
