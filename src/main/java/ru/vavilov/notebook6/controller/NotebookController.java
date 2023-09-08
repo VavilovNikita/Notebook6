@@ -2,6 +2,7 @@ package ru.vavilov.notebook6.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,12 +26,16 @@ public class NotebookController {
         this.authService = authService;
     }
     @GetMapping()
-    public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes) {
+    public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes,
+                           @RequestParam(defaultValue = "0",required = false) Integer page,
+                           @RequestParam(defaultValue = "15",required = false)Integer size) {
         model.addAttribute("authUser", authService.getUser());
         if(allNotes.isBlank()){
             model.addAttribute("notebook", authService.getUser().getNotes());
         }else{
-            model.addAttribute("notebook", notebookService.findAll());
+            model.addAttribute("notebook", notebookService.findAll(PageRequest.of(page, size)));
+            model.addAttribute("allNones",allNotes);
+            model.addAttribute("page",page);
         }
         return "notebook/allNotesPage";
     }

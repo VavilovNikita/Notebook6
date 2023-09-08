@@ -1,6 +1,7 @@
 package ru.vavilov.notebook6.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.vavilov.notebook6.entity.Notebook;
 import ru.vavilov.notebook6.repository.NotebookRepository;
@@ -19,8 +20,8 @@ public class NotebookService {
         this.authService = authService;
     }
 
-    public Iterable<Notebook> findAll() {
-        return notebookRepository.findAllByOrderByPositionDesc();
+    public Iterable<Notebook> findAll(PageRequest pageRequest) {
+        return notebookRepository.findAll(pageRequest);
     }
 
 
