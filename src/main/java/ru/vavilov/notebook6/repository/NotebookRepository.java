@@ -4,7 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.vavilov.notebook6.entity.Notebook;
 
+import java.util.List;
+
 @Repository
 public interface NotebookRepository extends JpaRepository<Notebook, Integer> {
-    Iterable<Notebook> findAllByOrderByPositionDesc();
+
+    List<Notebook> findAllByTitleContainingIgnoreCase(String s);
+    List<Notebook> findAllByTextContainingIgnoreCase(String s);
 }
