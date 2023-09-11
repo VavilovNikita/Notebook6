@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.vavilov.notebook6.entity.User;
+import ru.vavilov.notebook6.search.SearchField;
 import ru.vavilov.notebook6.service.AuthService;
 import ru.vavilov.notebook6.service.UserService;
 
@@ -24,6 +25,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public String getAuthUserInfo(Model model) {
+        model.addAttribute("search", new SearchField());
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("notes", authService.getUser().getNotes());
         return "notebook/userInfoPage";

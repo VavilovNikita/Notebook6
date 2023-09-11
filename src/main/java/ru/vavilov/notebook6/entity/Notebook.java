@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "notebook")
@@ -103,5 +104,18 @@ public class Notebook{
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Notebook notebook = (Notebook) o;
+        return id == notebook.id && position == notebook.position && Objects.equals(user, notebook.user) && Objects.equals(title, notebook.title) && Objects.equals(text, notebook.text) && Objects.equals(createdAt, notebook.createdAt) && Objects.equals(updatedAt, notebook.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, user, title, text, position, createdAt, updatedAt);
     }
 }

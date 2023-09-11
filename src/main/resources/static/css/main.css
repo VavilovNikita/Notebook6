@@ -11,6 +11,10 @@ body {
     background-color: #fff;
     min-width: 320px;
 }
+.row-list:nth-child(2n) {
+    background-color: #ccc;
+}
+
 
 li {
     list-style-type: none; /* Убираем маркеры */
