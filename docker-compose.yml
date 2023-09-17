@@ -24,4 +24,4 @@ services:
       - pg_db
     environment:
       SPRING_DATASOURCE_URL: 'jdbc:postgresql://pg_db:5432/notebook'
-      JAVA_OPTS: '-Xmx650m'
+      JAVA_OPTS: '-Xmx512m'
