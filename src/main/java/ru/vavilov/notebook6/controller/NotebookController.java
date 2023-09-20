@@ -32,7 +32,7 @@ public class NotebookController {
     @GetMapping()
     public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes,
                            @RequestParam(defaultValue = "0",required = false) Integer page,
-                           @RequestParam(defaultValue = "15",required = false)Integer size) {
+                           @RequestParam(defaultValue = "20",required = false)Integer size) {
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("search", new SearchField());
         if(allNotes.isBlank()){
