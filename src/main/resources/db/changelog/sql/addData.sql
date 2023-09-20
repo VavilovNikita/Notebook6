@@ -2,7 +2,7 @@ ALTER TABLE notebook ALTER COLUMN created_at SET DEFAULT NOW();
 ALTER TABLE notebook ALTER COLUMN updated_at SET DEFAULT NOW();
 
 INSERT INTO users(role_id, user_name, password, first_name, last_name, email, date_of_birth)
-VALUES (1, 'Яна', '$2a$10$mPy4.EttH3ld6fNSZK1A0eMznADiBm2y4qb/pImTmS214f3.SqgFO', 'Яна', 'Яна', 'admin@mail.ru', '2023-08-15');
+VALUES (1, 'Яна', '$2a$10$PdB02QnELakJPmY9.RbPxerR5PubkIRpUBLsibpwIwHX.YetF0m5G', 'Яна', 'Яна', 'admin@mail.ru', '2023-08-15');
 
 INSERT INTO notebook(user_id, title, text,  position)
 VALUES (
