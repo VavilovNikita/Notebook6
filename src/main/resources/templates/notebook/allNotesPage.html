@@ -10,6 +10,33 @@
 <!--/*/ <th:block th:insert="~{notebook/navbar.html :: navbar}">
       </th:block> /*/-->
 <hr/>
+<script th:inline="javascript">
+    function copyText(id) {
+        const textArea = document.createElement("textarea");
+        const copyText = document.getElementById(id);
+        textArea.value = copyText.value;
+        textArea.style.position = 'fixed'; // Скрыть элемент за пределами экрана
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+
+        // Сохранение текущего элемента с фокусом
+        const currentFocusedElement = document.activeElement;
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Unable to copy to clipboard', err);
+        }
+        document.body.removeChild(textArea);
+
+        // Восстановление фокуса на предыдущий элемент
+        if (currentFocusedElement) {
+            currentFocusedElement.focus();
+        }
+    }
+</script>
+
 <div class="row align-items-center">
     <div class="col-1"></div>
     <div class="col-10">
@@ -33,26 +60,10 @@
             </li>
 
             <div class="col-1 text-center">
-                <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id}">
-                <button class="btn btn-outline-primary" th:onclick="'copyText(\'' + ${notebook.id} + '\')'"><i
+                <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id} + 'copy'">
+                <button class="btn btn-outline-primary" th:onclick="'copyText(\'' + ${notebook.id} + 'copy' + '\')'"><i
                         class="fa-solid fa-copy"></i></button>
-                <script th:inline="javascript">
-                    function copyText(id) {
-                        const textArea = document.createElement("textarea");
-                        const copyText = document.getElementById(id)
-                        copyText.select()
-                        textArea.value = copyText.value;
-                        document.body.appendChild(textArea);
-                        textArea.focus();
-                        textArea.select();
-                        try {
-                            document.execCommand('copy');
-                        } catch (err) {
-                            console.error('Unable to copy to clipboard', err);
-                        }
-                        document.body.removeChild(textArea);
-                    }
-                </script>
+
                 <form th:id="${notebook.id} + 'delete'" th:method="DELETE"
                       th:action="@{/notebook/{id}(id=${notebook.id})}">
                 </form>
