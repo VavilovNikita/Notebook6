@@ -80,9 +80,11 @@ public class NotebookController {
 
     @GetMapping("/{id}/edit")
     public String editNote(Model model, @PathVariable("id") int id) {
-        model.addAttribute("notebook", notebookService.findById(id));
+        Notebook notebook = notebookService.findById(id);
+        model.addAttribute("notebook", notebook);
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("search", new SearchField());
+        if(!notebook.getUser().equals(authService.getUser()))return "error/4xx";
         return "notebook/changeNotePage";
     }
 
