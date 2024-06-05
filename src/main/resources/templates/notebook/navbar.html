@@ -30,22 +30,26 @@
                         <li class="nav-item" th:if="${authUser.role.getRole() == 'ROLE_ADMIN'}">
                             <a class="nav-link" href="/admin">Админ</a>
                         </li>
-                        <form class="form-inline" th:method="GET" th:action="@{/notebook/search}" th:object="${search}">
-                            <div class="row">
-                                <div class="col-7">
-                                    <input class="form-control mr-sm-2" type="search" placeholder="Поиск по записям" aria-label="Search" th:field="*{text}">
+                        <li class="nav-item" th:if="${URL == '/notebook'}">
+                            <form class="form-inline" th:method="GET" th:action="@{/notebook/search}"
+                                  th:object="${search}">
+                                <div class="row">
+                                    <div class="col-7">
+                                        <input class="form-control mr-sm-2" type="search" placeholder="Поиск по записям"
+                                               aria-label="Search" th:field="*{text}">
                                     </div>
-                                <div class="col-3">
-                                    <button class="btn btn-outline-primary" type="submit">Найти</button>
+                                    <div class="col-5">
+                                        <button class="btn btn-outline-primary" type="submit">Найти</button>
+                                    </div>
                                 </div>
-                                <div class="col-2">
-                                    <!--/*/ <th:block th:insert="~{userDropdownMenu/dropDownMenu.html :: dropDownMenu}">
-          </th:block> /*/-->
-                                </div>
-                            </div>
-                        </form>
-
+                            </form>
                     </ul>
+                    <div class="row">
+                        <div class="col">
+                            <!--/*/ <th:block th:insert="~{userDropdownMenu/dropDownMenu.html :: dropDownMenu}">
+    </th:block> /*/-->
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>

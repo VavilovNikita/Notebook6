@@ -6,7 +6,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.vavilov.notebook6.entity.Notebook;
 import ru.vavilov.notebook6.search.SearchField;
 import ru.vavilov.notebook6.service.AuthService;
@@ -20,7 +27,7 @@ public class NotebookController {
     private final NotebookService notebookService;
     private final AuthService authService;
     private final SearchService searchService;
-
+    private final String URL = "/notebook";
 
 
     @Autowired
@@ -29,24 +36,26 @@ public class NotebookController {
         this.authService = authService;
         this.searchService = searchService;
     }
+
     @GetMapping()
-    public String getNotes(Model model,@RequestParam(defaultValue = "",required = false)String allNotes,
-                           @RequestParam(defaultValue = "0",required = false) Integer page,
-                           @RequestParam(defaultValue = "20",required = false)Integer size) {
+    public String getNotes(Model model, @RequestParam(defaultValue = "", required = false) String allNotes,
+                           @RequestParam(defaultValue = "0", required = false) Integer page,
+                           @RequestParam(defaultValue = "20", required = false) Integer size) {
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("search", new SearchField());
-        if(allNotes.isBlank()){
+        model.addAttribute("URL", URL);
+        if (allNotes.isBlank()) {
             model.addAttribute("notebook", authService.getUser().getNotes());
-        }else{
+        } else {
             model.addAttribute("notebook", notebookService.findAll(PageRequest.of(page, size)));
-            model.addAttribute("allNones",allNotes);
-            model.addAttribute("page",page);
+            model.addAttribute("allNones", allNotes);
+            model.addAttribute("page", page);
         }
         return "notebook/allNotesPage";
     }
 
     @GetMapping("/search")
-    public String noteInfo(@ModelAttribute("search")SearchField searchField, Model model) {
+    public String noteInfo(@ModelAttribute("search") SearchField searchField, Model model) {
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("notebook", searchService.getNotesByTitleOrText(searchField.getText()));
         return "notebook/allNotesPage";
@@ -61,14 +70,14 @@ public class NotebookController {
     }
 
     @GetMapping("/new")
-    public String newNote(@ModelAttribute("notebook") Notebook notebook,Model model) {
+    public String newNote(@ModelAttribute("notebook") Notebook notebook, Model model) {
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("search", new SearchField());
         return "notebook/createNotePage";
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult,Model model) {
+    public String create(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult, Model model) {
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("search", new SearchField());
         if (bindingResult.hasErrors()) {
@@ -84,12 +93,12 @@ public class NotebookController {
         model.addAttribute("notebook", notebook);
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("search", new SearchField());
-        if(!notebook.getUser().equals(authService.getUser()))return "error/4xx";
+        if (!notebook.getUser().equals(authService.getUser())) return "error/4xx";
         return "notebook/changeNotePage";
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult,Model model) {
+    public String update(@ModelAttribute("notebook") @Valid Notebook notebook, BindingResult bindingResult, Model model) {
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("search", new SearchField());
         if (bindingResult.hasErrors()) {
