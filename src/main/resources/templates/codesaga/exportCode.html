@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Экспорт кода из репозитория</title>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    .nav a {
+      margin-right: 2rem;
+      text-decoration: none;
+      font-weight: bold;
+      color: #333;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+    }
+    .export-result {
+      margin-top: 1rem;
+      border: 1px solid #ccc;
+      background: #f8f8f8;
+      padding: 1rem;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="/" th:href="@{/codesaga/}">Главная</a>
+  <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
+  <a href="/codesaga/export" th:href="@{/codesaga/export}">Экспорт кода</a>
+  <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+</div>
+
+<h1>Экспорт кода из Git-репозитория</h1>
+
+<form th:action="@{/codesaga/export}" method="post">
+  <label for="repoUrl">Ссылка на репозиторий:</label>
+  <input type="text" id="repoUrl" name="repoUrl" placeholder="https://github.com/user/repo" required />
+
+  <button type="submit">Экспортировать</button>
+</form>
+
+<div th:if="${exportedCode}">
+  <h3>Результат:</h3>
+  <button onclick="copyToClipboard()">Скопировать в буфер обмена</button>
+  <pre class="export-result" id="exportedCode" th:text="${exportedCode}"></pre>
+</div>
+
+<script>
+  function copyToClipboard() {
+    const codeElement = document.getElementById("exportedCode");
+    const range = document.createRange();
+    range.selectNode(codeElement);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand("copy");
+    window.getSelection().removeAllRanges();
+    alert("Код скопирован в буфер обмена!");
+  }
+</script>
+
+</body>
+</html>

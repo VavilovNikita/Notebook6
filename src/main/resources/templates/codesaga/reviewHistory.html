@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>История запросов</title>
+    <meta charset="UTF-8" />
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        .nav a {
+            margin-right: 2rem;
+            text-decoration: none;
+            font-weight: bold;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            vertical-align: top;
+        }
+        th {
+            background: #eee;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <a href="/" th:href="@{/codesaga/}">Главная</a>
+    <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
+    <a href="/export" th:href="@{/codesaga/export}">Экспорт кода</a>
+    <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+</div>
+
+<h1>История рекомендаций</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Входной текст</th>
+        <th>Issue</th>
+        <th>Description</th>
+        <th>Suggestion</th>
+        <th>Example</th>
+        <th>Note</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="rec : ${recommendations}">
+        <td th:text="${rec.id}"></td>
+        <td>
+            <a th:href="@{/review/{id}(id=${rec.requestedData.id})}"
+               th:text="'Запрос #' + ${rec.requestedData.id}"></a>
+        </td>
+        <td><pre th:text="${rec.issue}"></pre></td>
+        <td><pre th:text="${rec.description}"></pre></td>
+        <td><pre th:text="${rec.suggestion}"></pre></td>
+        <td><pre th:text="${rec.example}"></pre></td>
+        <td><pre th:text="${rec.note}"></pre></td>
+    </tr>
+    </tbody>
+
+</table>
+</body>
+</html>

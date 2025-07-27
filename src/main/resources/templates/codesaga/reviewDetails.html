@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Детали запроса</title>
+    <meta charset="UTF-8" />
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        .nav a {
+            margin-right: 2rem;
+            text-decoration: none;
+            font-weight: bold;
+            color: #333;
+        }
+        pre {
+            background-color: #f8f8f8;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            white-space: pre-wrap;
+        }
+        .actions {
+            margin-top: 1rem;
+        }
+        .actions button {
+            margin-right: 1rem;
+            padding: 0.5rem 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav">
+    <a href="/" th:href="@{/codesaga/}">Главная</a>
+    <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
+    <a href="/export" th:href="@{/codesaga/export}">Экспорт кода</a>
+    <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+</div>
+
+<h1>Детали запроса</h1>
+
+<h3>ID: <span th:text="${requestedData.id}"></span></h3>
+
+<h4>Входной текст:</h4>
+<pre th:text="${requestedData.requestedData}"></pre>
+
+<div class="actions">
+    <button onclick="window.location.href='/'">Создать новый</button>
+</div>
+
+</body>
+</html>

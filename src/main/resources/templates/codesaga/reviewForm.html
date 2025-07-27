@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>AI-Powered Code & Log Assistant</title>
+    <meta charset="UTF-8" />
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        textarea, input[type="text"] { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
+        label { font-weight: bold; margin-top: 1rem; display: block; }
+        button { margin-top: 1rem; padding: 0.5rem 1rem; }
+        .message { margin-top: 1rem; color: green; font-weight: bold; }
+        .hidden { display: none; }
+        .nav { margin-bottom: 2rem; }
+        .nav a {
+            margin-right: 2rem;
+            text-decoration: none;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav">
+    <a href="/" th:href="@{/codesaga/}">Главная</a>
+    <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
+    <a href="/export" th:href="@{/codesaga/export}">Экспорт кода</a>
+    <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+</div>
+
+<h1>AI-Powered Code & Log Assistant</h1>
+
+<form th:action="@{/codesaga/submitReview}" method="post">
+    <label>Выберите режим:</label>
+    <label><input type="radio" name="mode" value="LOGS" checked onchange="toggleInput()"> Ввести логи</label>
+    <label><input type="radio" name="mode" value="PR" onchange="toggleInput()"> Ввести ссылку на PR</label>
+    <label><input type="radio" name="mode" value="CODE" onchange="toggleInput()"> Ввести код</label>
+
+    <div id="logsSection">
+        <label for="codeAndLogs">Введите логи для проверки:</label>
+        <textarea id="codeAndLogs" name="inputText" required></textarea>
+    </div>
+
+    <div id="prSection" class="hidden">
+        <label for="pullRequestUrl">Ссылка на Pull Request для ревью:</label>
+        <input type="text" id="pullRequestUrl" name="inputText" placeholder="https://github.com/user/repo/pull/123" />
+    </div>
+
+    <div id="codeSection" class="hidden">
+        <label for="codeInput">Введите код для анализа:</label>
+        <textarea id="codeInput" name="inputText" placeholder="public class Example { ... }"></textarea>
+    </div>
+
+    <button type="submit">Отправить</button>
+</form>
+
+<div th:if="${message}">
+    <pre th:text="${message}"></pre>
+</div>
+
+<script>
+    function toggleInput() {
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+
+        const logsSection = document.getElementById('logsSection');
+        const prSection = document.getElementById('prSection');
+        const codeSection = document.getElementById('codeSection');
+
+        logsSection.classList.add('hidden');
+        prSection.classList.add('hidden');
+        codeSection.classList.add('hidden');
+
+        document.getElementById('codeAndLogs').removeAttribute('required');
+        document.getElementById('pullRequestUrl').removeAttribute('required');
+        document.getElementById('codeInput').removeAttribute('required');
+
+        if (mode === 'LOGS') {
+            logsSection.classList.remove('hidden');
+            document.getElementById('codeAndLogs').setAttribute('required', 'required');
+        } else if (mode === 'PR') {
+            prSection.classList.remove('hidden');
+            document.getElementById('pullRequestUrl').setAttribute('required', 'required');
+        } else if (mode === 'CODE') {
+            codeSection.classList.remove('hidden');
+            document.getElementById('codeInput').setAttribute('required', 'required');
+        }
+    }
+
+    // trigger toggle once on load
+    toggleInput();
+</script>
+</body>
+</html>
