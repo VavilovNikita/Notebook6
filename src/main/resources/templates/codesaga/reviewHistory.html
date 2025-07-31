@@ -56,7 +56,7 @@
     <tr th:each="rec : ${recommendations}">
         <td th:text="${rec.id}"></td>
         <td>
-            <a th:href="@{/review/{id}(id=${rec.requestedData.id})}"
+            <a th:href="@{/codesaga/review/{id}(id=${rec.requestedData.id})}"
                th:text="'Запрос #' + ${rec.requestedData.id}"></a>
         </td>
         <td><pre th:text="${rec.issue}"></pre></td>
