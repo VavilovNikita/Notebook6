@@ -5,9 +5,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.vavilov.notebook6.entity.User;
-import ru.vavilov.notebook6.repository.UserRepository;
-import ru.vavilov.notebook6.service.AdminService;
+import ru.vavilov.notebook6.notebook.entity.User;
+import ru.vavilov.notebook6.notebook.repository.UserRepository;
+import ru.vavilov.notebook6.notebook.service.AdminService;
 
 @SpringBootTest(classes = AdminService.class)
 public class AdminServiceTest {
