@@ -1,4 +1,4 @@
-package ru.vavilov.notebook6.notebook.config;
+package ru.vavilov.notebook6.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
