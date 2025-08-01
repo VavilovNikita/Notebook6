@@ -21,7 +21,11 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.
                 authorizeHttpRequests((request) -> request
-                        .requestMatchers("/register", "/error","/images/**","/codesaga/**")
+                        .requestMatchers("/register",
+                            "/error",
+                            "/images/**",
+                            "/codesaga/**",
+                            "/subeditor/**")
                         .permitAll()
                         .anyRequest().hasAnyRole("USER", "ADMIN"))
                 .formLogin((form) -> form
