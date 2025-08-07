@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,11 +58,81 @@ public class GitExportService {
         }
     }
 
+    public String exportCodeFromZip(MultipartFile zipFile) {
+        Path tempDir = null;
+        try {
+            tempDir = Files.createTempDirectory("zip-extract-");
+
+            File zip = File.createTempFile("upload-", ".zip");
+            zipFile.transferTo(zip);
+
+            unzip(zip, tempDir.toFile());
+
+            StringBuilder codeBuilder = new StringBuilder();
+            Files.walk(tempDir)
+                .filter(path -> Files.isRegularFile(path) && path.toString().endsWith(".java"))
+                .forEach(path -> {
+                    codeBuilder.append("// ").append(path.getFileName()).append("\n");
+                    try {
+                        String content = Files.readAllLines(path).stream()
+                            .collect(Collectors.joining("\n"));
+                        codeBuilder.append(content).append("\n\n");
+                    } catch (IOException e) {
+                        log.warn("Не удалось прочитать файл: {}", path, e);
+                    }
+                });
+
+            return codeBuilder.length() > 0 ? codeBuilder.toString() : "Java-файлы не найдены в архиве";
+
+        } catch (IOException e) {
+            log.error("Ошибка при обработке архива", e);
+            return "Ошибка при обработке архива: " + e.getMessage();
+        } finally {
+            if (tempDir != null) {
+                try {
+                    deleteDirectoryRecursively(tempDir);
+                } catch (IOException e) {
+                    log.warn("Не удалось удалить временную директорию", e);
+                }
+            }
+        }
+    }
+
     private void deleteDirectoryRecursively(Path path) throws IOException {
         if (Files.notExists(path)) return;
         Files.walk(path)
             .sorted(Comparator.reverseOrder())
             .map(Path::toFile)
             .forEach(File::delete);
+    }
+
+    private void unzip(File zipFile, File destDir) throws IOException {
+        try (java.util.zip.ZipInputStream zipIn = new java.util.zip.ZipInputStream(Files.newInputStream(zipFile.toPath()))) {
+            java.util.zip.ZipEntry entry;
+            while ((entry = zipIn.getNextEntry()) != null) {
+                File outFile = new File(destDir, entry.getName());
+
+                if (entry.isDirectory()) {
+                    if (!outFile.isDirectory() && !outFile.mkdirs()) {
+                        throw new IOException("Не удалось создать директорию: " + outFile);
+                    }
+                } else {
+                    File parent = outFile.getParentFile();
+                    if (parent != null && !parent.exists()) {
+                        if (!parent.mkdirs()) {
+                            throw new IOException("Не удалось создать директорию: " + parent);
+                        }
+                    }
+                    try (java.io.OutputStream outStream = Files.newOutputStream(outFile.toPath())) {
+                        byte[] buffer = new byte[4096];
+                        int len;
+                        while ((len = zipIn.read(buffer)) > 0) {
+                            outStream.write(buffer, 0, len);
+                        }
+                    }
+                }
+                zipIn.closeEntry();
+            }
+        }
     }
 }

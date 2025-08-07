@@ -40,9 +40,12 @@
 
 <h1>Экспорт кода из Git-репозитория</h1>
 
-<form th:action="@{/codesaga/export}" method="post">
+<form th:action="@{/codesaga/export}" method="post" enctype="multipart/form-data">
   <label for="repoUrl">Ссылка на репозиторий:</label>
-  <input type="text" id="repoUrl" name="repoUrl" placeholder="https://github.com/user/repo" required />
+  <input type="text" id="repoUrl" name="repoUrl" placeholder="https://github.com/user/repo" />
+
+  <label for="file">или загрузите архив .zip с Java-файлами:</label>
+  <input type="file" id="file" name="file" accept=".zip" />
 
   <button type="submit">Экспортировать</button>
 </form>
