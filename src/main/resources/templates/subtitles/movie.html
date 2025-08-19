@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Фильм: ' + ${movie.name}">Фильм</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{../css/main.css}">
+</head>
+<body>
+<header>
+    <div class="header-content">
+        <div class="logo">
+            <i class="fas fa-film"></i>
+            <span>SubFinder</span>
+        </div>
+        <a href="#" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Назад к каталогу
+        </a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="movie-card">
+        <div class="movie-header">
+            <h1 class="movie-title" th:text="${movie.name}">Название фильма</h1>
+        </div>
+
+        <div class="subtitles-section">
+            <h2 class="section-title">
+                <i class="fas fa-closed-captioning"></i>
+                Доступные языки субтитров
+            </h2>
+            <ul class="language-list">
+                <li class="language-item" th:each="urlObj : ${movie.urls}">
+                    <div class="language-name">
+                        <img src="https://flagcdn.com/w40/ru.png" class="language-flag" alt="Флаг языка">
+                        <span th:text="${urlObj.language}">Русский</span>
+                    </div>
+                    <a th:href="${urlObj.url}" class="btn" target="_blank">
+                        <i class="fas fa-download"></i>
+                        Скачать
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -25,6 +25,7 @@ public class WebSecurityConfig {
                             "/error",
                             "/images/**",
                             "/codesaga/**",
+                            "/subtitles/**",
                             "/subeditor/**")
                         .permitAll()
                         .anyRequest().hasAnyRole("USER", "ADMIN"))

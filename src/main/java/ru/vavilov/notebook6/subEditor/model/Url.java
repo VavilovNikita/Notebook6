@@ -1,33 +1,25 @@
 package ru.vavilov.notebook6.subEditor.model;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.checkerframework.common.aliasing.qual.Unique;
-
-import java.util.List;
+import lombok.experimental.Accessors;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Movie {
-
+@Accessors(chain = true)
+public class Url {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Unique
-    private String name;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Url> urls;
-
-    @Transient
-    private List<SubtitleEntry> subtitles;
+    @Column(columnDefinition = "TEXT")
+    private String url;
+    private String language;
 }

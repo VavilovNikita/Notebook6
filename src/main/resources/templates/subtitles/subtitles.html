@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование субтитров</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{../css/main.css}">
+</head>
+<body>
+<header>
+    <div class="header-content">
+        <div class="logo">
+            <i class="fas fa-film"></i>
+            <span>SubEditor</span>
+        </div>
+        <a href="/subeditor/movies" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Назад к фильмам
+        </a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="movie-card">
+        <div class="movie-header">
+            <h1 class="movie-title" th:text="${movie.name}">Название фильма</h1>
+        </div>
+
+        <div class="subtitles-section">
+            <div class="controls">
+                <input type="number" id="shiftSeconds" value="0" class="form-control" placeholder="Смещение времени (секунды)" style="max-width: 250px;">
+                <button type="button" onclick="shiftAll()" class="btn">
+                    <i class="fas fa-clock"></i>
+                    Сместить все тайминги
+                </button>
+                <button type="button" onclick="downloadFile()" class="btn btn-accent">
+                    <i class="fas fa-download"></i>
+                    Скачать файл
+                </button>
+            </div>
+
+            <table id="subtitleTable" class="subtitle-table">
+                <tr>
+                    <th>Начало</th>
+                    <th>Конец</th>
+                    <th>Текст</th>
+                </tr>
+                <tr th:each="entry, iterStat : ${subtitles}">
+                    <td><input type="text" th:value="${entry.start}" class="form-control" /></td>
+                    <td><input type="text" th:value="${entry.end}" class="form-control" /></td>
+                    <td><input type="text" th:value="${entry.text}" class="form-control" /></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function parseTime(str) {
+        let parts = str.split(/[:.]/);
+        if(parts.length < 3) return 0;
+        let h = parseInt(parts[0]);
+        let m = parseInt(parts[1]);
+        let s = parseInt(parts[2]);
+        let ms = parts[3] ? parseInt(parts[3].padEnd(3,'0')) : 0;
+        return ((h*60 + m)*60 + s)*1000 + ms;
+    }
+
+    function formatTime(ms) {
+        let totalSec = Math.floor(ms / 1000);
+        let h = Math.floor(totalSec / 3600);
+        let m = Math.floor((totalSec % 3600) / 60);
+        let s = totalSec % 60;
+        let milli = ms % 1000;
+        return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}.${milli.toString().padStart(3,'0')}`;
+    }
+
+    function shiftAll() {
+        let seconds = parseFloat(document.getElementById("shiftSeconds").value);
+        let table = document.getElementById("subtitleTable");
+        for(let i=1; i<table.rows.length; i++){
+            let row = table.rows[i];
+            let start = parseTime(row.cells[0].children[0].value);
+            let end = parseTime(row.cells[1].children[0].value);
+            start += seconds*1000;
+            end += seconds*1000;
+            row.cells[0].children[0].value = formatTime(start);
+            row.cells[1].children[0].value = formatTime(end);
+        }
+    }
+
+    function downloadFile() {
+        let table = document.getElementById("subtitleTable");
+        let content = "Dialogue:\n";
+        for(let i=1; i<table.rows.length; i++){
+            let row = table.rows[i];
+            content += `${row.cells[0].children[0].value} --> ${row.cells[1].children[0].value} : ${row.cells[2].children[0].value}\n`;
+        }
+        let blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = "subtitles_modified.ass";
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
+</body>
+</html>

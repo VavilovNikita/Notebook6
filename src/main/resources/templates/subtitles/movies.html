@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список фильмов</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{../css/main.css}">
+</head>
+<body>
+<header>
+    <div class="header-content">
+        <div class="logo">
+            <i class="fas fa-film"></i>
+            <span>SubEditor</span>
+        </div>
+        <a href="/subeditor/upload" class="back-btn">
+            <i class="fas fa-upload"></i>
+            Загрузить субтитры
+        </a>
+    </div>
+</header>
+
+<div class="container">
+    <h1 class="section-title">
+        <i class="fas fa-list"></i>
+        Список фильмов
+    </h1>
+
+    <ul class="movies-list">
+        <li th:each="movie : ${movies}">
+            <a th:text="${movie.name}" th:href="@{/subeditor/movie/{id}(id=${movie.id})}"></a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
