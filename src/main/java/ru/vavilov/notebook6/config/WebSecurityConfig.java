@@ -23,6 +23,7 @@ public class WebSecurityConfig {
                 authorizeHttpRequests((request) -> request
                         .requestMatchers("/register",
                             "/error",
+                            "/css/**",
                             "/images/**",
                             "/codesaga/**",
                             "/subtitles/**",
