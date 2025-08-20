@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="'Фильм: ' + ${movie.name}">Фильм</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/subEditor.css}">
 </head>
 <body>
 <header>
@@ -42,7 +42,7 @@
                         <img src="https://flagcdn.com/w40/ru.png" class="language-flag" alt="Флаг языка">
                         <span th:text="${urlObj.language}">Русский</span>
                     </div>
-                    <a th:href="${urlObj.url}" class="btn" target="_blank">
+                    <a th:href="${urlObj.downloadUrl}" class="btn" target="_blank">
                         <i class="fas fa-download"></i>
                         Скачать
                     </a>

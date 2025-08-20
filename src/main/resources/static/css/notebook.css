@@ -1,0 +1,45 @@
+html {
+    font-size: 16px;
+}
+
+body {
+    margin: 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: #000;
+    background-color: #fff;
+    min-width: 320px;
+}
+.row-list:nth-child(2n) {
+    background-color: #ccc;
+}
+
+
+li {
+    list-style-type: none; /* Убираем маркеры */
+}
+ul {
+    margin-left: 0; /* Отступ слева в браузере IE и Opera */
+    padding-left: 0; /* Отступ слева в браузере Firefox, Safari, Chrome */
+}
+
+section {
+    padding: 50px 0;
+}
+
+a {
+    color: #111;
+}
+
+a:hover {
+    color: #555;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: #111;
+    font-weight: 500;
+}
+.col{
+    text-align: center;
+}

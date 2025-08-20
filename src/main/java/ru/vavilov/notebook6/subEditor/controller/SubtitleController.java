@@ -1,10 +1,6 @@
 package ru.vavilov.notebook6.subEditor.controller;
 
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,32 +9,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import ru.vavilov.notebook6.notebook.entity.User;
 import ru.vavilov.notebook6.subEditor.model.Movie;
-import ru.vavilov.notebook6.subEditor.model.SubtitleEntry;
 import ru.vavilov.notebook6.subEditor.service.MovieService;
-import ru.vavilov.notebook6.subEditor.service.SubParser;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/subeditor")
 public class SubtitleController {
 
     @Autowired
-    private MinioClient minioClient;
-
-    @Autowired
     private MovieService movieService;
-
-    @Value("${minio.bucket}")
-    private String bucket;
-
-    @Value("${minio.url}")
-    private String minioUrl;
 
     @PostMapping("/upload")
     public String uploadSubtitle(@RequestParam("file") MultipartFile file, Model model) {
@@ -48,39 +30,10 @@ public class SubtitleController {
         }
 
         try {
-            String originalFilename = file.getOriginalFilename();
-            byte[] bytes = file.getBytes();  // Читаем байты один раз
+           Movie movie = movieService.saveMovie(file);
 
-            // Для MinIO
-            InputStream uploadStream = new java.io.ByteArrayInputStream(bytes);
-            minioClient.putObject(
-                PutObjectArgs.builder()
-                    .bucket(bucket)
-                    .object(originalFilename)
-                    .stream(uploadStream, bytes.length, -1)
-                    .contentType(file.getContentType())
-                    .build()
-            );
-
-            String fileUrl = minioClient.getPresignedObjectUrl(
-                io.minio.GetPresignedObjectUrlArgs.builder()
-                    .method(Method.GET)
-                    .bucket(bucket)
-                    .object(originalFilename)
-                    .extraQueryParams(Map.of("response-content-disposition", "attachment"))
-                    .build()
-            );
-
-            // Для парсера
-            InputStream parseStream = new java.io.ByteArrayInputStream(bytes);
-            List<SubtitleEntry> subtitles = SubParser.parseASS(parseStream);
-
-            // Сохраняем в БД
-            Movie movie = movieService.saveMovie(originalFilename, fileUrl, subtitles);
-
-            // Добавляем в модель
             model.addAttribute("movie", movie);
-            model.addAttribute("subtitles", subtitles);
+            model.addAttribute("subtitles", movie.getSubtitles());
 
             return "subtitles/subtitles";
 
@@ -90,7 +43,6 @@ public class SubtitleController {
         }
     }
 
-    // Если нужна отдельная GET для загрузки
     @GetMapping("/upload")
     public String uploadPage() {
         return "subtitles/upload";
