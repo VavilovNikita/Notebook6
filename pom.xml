@@ -119,10 +119,11 @@
             <version>6.8.0.202311291450-r</version>
         </dependency>
         <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
-            <version>8.5.12</version>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <version>77.1</version>
         </dependency>
+
     </dependencies>
 
     <build>

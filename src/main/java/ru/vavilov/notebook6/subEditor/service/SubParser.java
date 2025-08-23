@@ -1,5 +1,6 @@
 package ru.vavilov.notebook6.subEditor.service;
 
+import ru.vavilov.notebook6.subEditor.model.Subtitle;
 import ru.vavilov.notebook6.subEditor.model.SubtitleEntry;
 
 import java.io.BufferedReader;
@@ -8,69 +9,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SubParser {
 
-    public static List<SubtitleEntry> parseSRT(InputStream inputStream) throws IOException {
-        List<SubtitleEntry> entries = new ArrayList<>();
+    public static List<SubtitleEntry> parseASS(InputStream inputStream, String language) throws IOException {
+        List<Subtitle> entries = new ArrayList<>();
+        List<SubtitleEntry> result = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
-        StringBuilder textBuilder = new StringBuilder();
-        LocalTime start = null;
-        LocalTime end = null;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss,SSS");
-
-        while ((line = reader.readLine()) != null) {
-            line = line.trim();
-            if (line.isEmpty()) {
-                if (start != null && end != null && textBuilder.length() > 0) {
-                    entries.add(new SubtitleEntry(start, end, textBuilder.toString().trim()));
-                    textBuilder.setLength(0);
-                    start = null;
-                    end = null;
-                }
-                continue;
-            }
-
-            // Номер строки — пропускаем
-            if (line.matches("\\d+")) {
-                continue;
-            }
-
-            // Временная строка: start --> end
-            if (line.contains("-->")) {
-                String[] times = line.split("-->");
-                start = LocalTime.parse(times[0].trim(), formatter);
-                end = LocalTime.parse(times[1].trim(), formatter);
-                continue;
-            }
-
-            // Текст
-            textBuilder.append(line).append("\n");
-        }
-
-        // Последняя запись
-        if (start != null && end != null && textBuilder.length() > 0) {
-            entries.add(new SubtitleEntry(start, end, textBuilder.toString().trim()));
-        }
-
-        return entries;
-    }
-
-    public static List<SubtitleEntry> parseASS(InputStream inputStream) throws IOException {
-        List<SubtitleEntry> entries = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm:ss.SS");
 
         int startIndex = 0;
         int endIndex = 0;
         int textIndex = 0;
+
         while ((line = reader.readLine()) != null) {
             line = line.trim();
             if (line.startsWith("Format:")) {
@@ -97,18 +50,61 @@ public class SubParser {
             String text = parts[textIndex].trim();
 
             try {
-                LocalTime start = LocalTime.parse(startStr, formatter);
-                LocalTime end = LocalTime.parse(endStr, formatter);
+                // Парсим время в миллисекунды
+                long startMillis = parseTimeToMillis(startStr);
+                long endMillis = parseTimeToMillis(endStr);
 
                 text = text.replaceAll("\\{.*?\\}", "");
                 text = text.replace("\\N", "\n");
 
-                entries.add(new SubtitleEntry(start, end, text));
+                Subtitle subtitle = new Subtitle()
+                    .setStartMillis(startMillis)
+                    .setEndMillis(endMillis)
+                    .setText(text);
+
+                entries.add(subtitle);
             } catch (Exception e) {
-                System.err.println("Ошибка парсинга строки: " + line + e);
+                System.err.println("Ошибка парсинга строки: " + line + " " + e);
             }
         }
 
-        return entries;
+        SubtitleEntry entry = new SubtitleEntry()
+            .setLanguage(language);
+
+        for (Subtitle subtitle : entries) {
+            subtitle.setSubtitleEntry(entry);
+            entry.getSubtitles().add(subtitle);
+        }
+
+        result.add(entry);
+        return result;
+    }
+
+    // Вспомогательный метод для парсинга времени в миллисекунды
+    private static long parseTimeToMillis(String timeStr) {
+        // Формат: 0:00:00.00 или 0:00:00.000
+        String[] parts = timeStr.split("[:.]");
+
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Invalid time format: " + timeStr);
+        }
+
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int seconds = Integer.parseInt(parts[2]);
+        int milliseconds = 0;
+
+        if (parts.length > 3) {
+            String msPart = parts[3];
+            if (msPart.length() == 1) {
+                milliseconds = Integer.parseInt(msPart) * 100;
+            } else if (msPart.length() == 2) {
+                milliseconds = Integer.parseInt(msPart) * 10;
+            } else {
+                milliseconds = Integer.parseInt(msPart.substring(0, 3));
+            }
+        }
+
+        return ((hours * 3600L) + (minutes * 60L) + seconds) * 1000L + milliseconds;
     }
 }

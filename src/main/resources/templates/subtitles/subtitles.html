@@ -46,11 +46,13 @@
                     <th>Конец</th>
                     <th>Текст</th>
                 </tr>
-                <tr th:each="entry, iterStat : ${subtitles}">
-                    <td><input type="text" th:value="${entry.start}" class="form-control" /></td>
-                    <td><input type="text" th:value="${entry.end}" class="form-control" /></td>
-                    <td><input type="text" th:value="${entry.text}" class="form-control" /></td>
-                </tr>
+                <th:block th:each="subtitleEntry : ${movie.subtitles}">
+                    <tr th:each="subtitle : ${subtitleEntry.subtitles}">
+                        <td><input type="text" th:value="${subtitle.startFormatted}" class="form-control" /></td>
+                        <td><input type="text" th:value="${subtitle.endFormatted}" class="form-control" /></td>
+                        <td><input type="text" th:value="${subtitle.text}" class="form-control" /></td>
+                    </tr>
+                </th:block>
             </table>
         </div>
     </div>
@@ -92,7 +94,7 @@
 
     function downloadFile() {
         let table = document.getElementById("subtitleTable");
-        let content = "Dialogue:\n";
+        let content = "";
         for(let i=1; i<table.rows.length; i++){
             let row = table.rows[i];
             content += `${row.cells[0].children[0].value} --> ${row.cells[1].children[0].value} : ${row.cells[2].children[0].value}\n`;
@@ -101,7 +103,7 @@
         let url = URL.createObjectURL(blob);
         let a = document.createElement("a");
         a.href = url;
-        a.download = "subtitles_modified.ass";
+        a.download = "subtitles_modified.txt";
         a.click();
         URL.revokeObjectURL(url);
     }

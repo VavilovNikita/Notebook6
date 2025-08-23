@@ -36,18 +36,35 @@
                 <i class="fas fa-closed-captioning"></i>
                 Доступные языки субтитров
             </h2>
+
             <ul class="language-list">
-                <li class="language-item" th:each="urlObj : ${movie.urls}">
+                <!-- Простой цикл по SubtitleEntry -->
+                <li class="language-item" th:each="subtitleEntry : ${movie.subtitles}">
                     <div class="language-name">
-                        <img src="https://flagcdn.com/w40/ru.png" class="language-flag" alt="Флаг языка">
-                        <span th:text="${urlObj.language}">Русский</span>
+                        <!-- Простой флаг (можно заменить на иконку или убрать) -->
+                        <i class="fas fa-globe"></i>
+                        <span th:text="${subtitleEntry.language}">Язык</span>
                     </div>
-                    <a th:href="${urlObj.downloadUrl}" class="btn" target="_blank">
+                    <!-- Ссылка для скачивания -->
+                    <a th:href="@{'/subeditor/movies/' + ${movie.id} + '/subtitles/' + ${subtitleEntry.id} + '/download'}"
+                       class="btn" target="_blank">
                         <i class="fas fa-download"></i>
                         Скачать
                     </a>
+                    <!-- Ссылка для редактирования -->
+                    <a th:href="@{'/subeditor/movies/' + ${movie.id} + '/subtitles/' + ${subtitleEntry.id} + '/edit'}"
+                       class="btn btn-edit">
+                        <i class="fas fa-edit"></i>
+                        Редактировать
+                    </a>
                 </li>
             </ul>
+
+            <!-- Сообщение если нет субтитров -->
+            <div th:if="${#lists.isEmpty(movie.subtitles)}" class="no-subtitles">
+                <i class="fas fa-exclamation-circle"></i>
+                Нет доступных субтитров для этого фильма
+            </div>
         </div>
     </div>
 </div>

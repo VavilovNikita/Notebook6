@@ -1,19 +1,13 @@
 package ru.vavilov.notebook6.subEditor.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Transient;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 import lombok.experimental.Accessors;
-import org.checkerframework.common.aliasing.qual.Unique;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -25,11 +19,32 @@ public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Unique
-    private String name;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Url> urls;
 
-    @Transient
-    private List<SubtitleEntry> subtitles;
+    @NotBlank(message = "Movie name cannot be empty")
+    private String name;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SubtitleEntry> subtitles = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        String subtitlesStr = "none";
+        if (subtitles != null && !subtitles.isEmpty()) {
+            SubtitleEntry firstEntry = subtitles.get(0);
+            subtitlesStr = String.format("SubtitleEntry[language=%s, subtitles=%s]",
+                firstEntry.getLanguage(),
+                firstEntry.getSubtitles().stream()
+                    .map(sub -> String.format("Subtitle[id=%s, text=%s]", sub.getId(), sub.getText()))
+                    .collect(Collectors.joining(", ")));
+        }
+        return String.format("Movie[id=%s, name=%s, subtitles=[%s]]", id, name, subtitlesStr);
+    }
+
+    public void addSubtitleEntries(List<SubtitleEntry> entries) {
+        for (SubtitleEntry subtitleEntry : entries) {
+            this.subtitles.add(subtitleEntry);
+            subtitleEntry.setMovie(this);
+        }
+    }
+
 }

@@ -14,6 +14,7 @@ import ru.vavilov.notebook6.subEditor.service.MovieService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/subeditor")
@@ -30,11 +31,14 @@ public class SubtitleController {
         }
 
         try {
-           Movie movie = movieService.saveMovie(file);
+           Movie movie = movieService.parseSubtitles(file);
 
             model.addAttribute("movie", movie);
             model.addAttribute("subtitles", movie.getSubtitles());
-
+            model.addAttribute("flagCodes", Map.of(
+                "russian", "ru",
+                "english", "us"
+            ));
             return "subtitles/subtitles";
 
         } catch (Exception e) {

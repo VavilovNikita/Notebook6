@@ -8,14 +8,19 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.vavilov.notebook6.codesage.model.Recommendation;
 import ru.vavilov.notebook6.codesage.model.RecommendationResponse;
+import ru.vavilov.notebook6.subEditor.model.Movie;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -23,6 +28,8 @@ public class DeepSeekApi {
     private static final String BASE_URL = "https://api.deepseek.com";
     private final String apiKey;
     private final OkHttpClient client;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public DeepSeekApi(@Value("${deepseek.api.key}") String apiKey) {
         this.apiKey = apiKey;
@@ -34,6 +41,14 @@ public class DeepSeekApi {
     public RecommendationResponse chatCompletion(JSONObject requestBody) {
         try {
             return post("/chat/completions", requestBody);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Movie chatCompletionTranslator(JSONObject requestBody) {
+        try {
+            return postMovie("/chat/completions", requestBody);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -65,6 +80,42 @@ public class DeepSeekApi {
                 .getString("content").toString());
         }
     }
+
+    public Movie postMovie(String endpoint, JSONObject jsonBody) throws IOException {
+
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
+
+        Request request = new Request.Builder()
+            .url(BASE_URL + endpoint)
+            .addHeader("Authorization", "Bearer " + apiKey)
+            .post(body)
+            .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                String errorMessage = "API error: " + response.code() + " - " + response.message();
+                throw new IOException(errorMessage);
+            }
+
+            String responseBody = response.body() != null ? response.body().string() : "";
+
+            try {
+                JSONObject jsonResponse = new JSONObject(responseBody);
+                String content = jsonResponse
+                    .getJSONArray("choices")
+                    .getJSONObject(0)
+                    .getJSONObject("message")
+                    .getString("content");
+
+                Movie movie = objectMapper.readValue(content, Movie.class);
+                return movie;
+            } catch (JSONException | IOException e) {
+                throw new IOException("Failed to parse or deserialize API response", e);
+            }
+        }
+    }
+
     public RecommendationResponse parseRecommendationResponse(String rawContent) throws IOException {
         String cleaned = rawContent.replaceAll("(?s)```json\\s*|\\s*```", "").trim();
         int start = cleaned.indexOf('{');
