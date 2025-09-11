@@ -1,6 +1,7 @@
 package ru.vavilov.notebook6.codesage.api;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import okhttp3.MediaType;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import ru.vavilov.notebook6.codesage.model.Recommendation;
 import ru.vavilov.notebook6.codesage.model.RecommendationResponse;
 import ru.vavilov.notebook6.subEditor.model.Movie;
+import ru.vavilov.notebook6.subEditor.model.SubtitleEntry;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class DeepSeekApi {
     public DeepSeekApi(@Value("${deepseek.api.key}") String apiKey) {
         this.apiKey = apiKey;
         this.client = new OkHttpClient.Builder()
-            .readTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(300, TimeUnit.SECONDS)
             .build();
     }
 
@@ -46,9 +48,9 @@ public class DeepSeekApi {
         }
     }
 
-    public Movie chatCompletionTranslator(JSONObject requestBody) {
+    public SubtitleEntry chatCompletionTranslator(List<JSONObject> requestBody, SubtitleEntry subtitleEntry) {
         try {
-            return postMovie("/chat/completions", requestBody);
+            return postMovie("/chat/completions", requestBody, subtitleEntry);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -81,40 +83,55 @@ public class DeepSeekApi {
         }
     }
 
-    public Movie postMovie(String endpoint, JSONObject jsonBody) throws IOException {
-
+    public SubtitleEntry postMovie(String endpoint, List<JSONObject> requests, SubtitleEntry subtitleEntry) throws IOException {
+        List<String> allTranslatedTexts = new ArrayList<>();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
 
-        Request request = new Request.Builder()
-            .url(BASE_URL + endpoint)
-            .addHeader("Authorization", "Bearer " + apiKey)
-            .post(body)
-            .build();
+        for (JSONObject jsonBody : requests) {
+            RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                String errorMessage = "API error: " + response.code() + " - " + response.message();
-                throw new IOException(errorMessage);
+            Request request = new Request.Builder()
+                .url(BASE_URL + endpoint)
+                .addHeader("Authorization", "Bearer " + apiKey)
+                .post(body)
+                .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    String errorMessage = "API error for batch: " + response.code() + " - " + response.message();
+                    throw new IOException(errorMessage);
+                }
+
+                String responseBody = response.body() != null ? response.body().string() : "";
+
+                try {
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+                    String content = jsonResponse
+                        .getJSONArray("choices")
+                        .getJSONObject(0)
+                        .getJSONObject("message")
+                        .getString("content");
+
+                    List<String> translatedBatch = objectMapper.readValue(content, new TypeReference<List<String>>() {});
+
+                    allTranslatedTexts.addAll(translatedBatch);
+
+                } catch (JSONException | IOException e) {
+                    throw new IOException("Failed to parse or deserialize API response for batch", e);
+                }
             }
-
-            String responseBody = response.body() != null ? response.body().string() : "";
 
             try {
-                JSONObject jsonResponse = new JSONObject(responseBody);
-                String content = jsonResponse
-                    .getJSONArray("choices")
-                    .getJSONObject(0)
-                    .getJSONObject("message")
-                    .getString("content");
-
-                Movie movie = objectMapper.readValue(content, Movie.class);
-                return movie;
-            } catch (JSONException | IOException e) {
-                throw new IOException("Failed to parse or deserialize API response", e);
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Request was interrupted", e);
             }
         }
+
+        return subtitleEntry.setSubtitlesByTranslatedArray(allTranslatedTexts);
     }
+
 
     public RecommendationResponse parseRecommendationResponse(String rawContent) throws IOException {
         String cleaned = rawContent.replaceAll("(?s)```json\\s*|\\s*```", "").trim();

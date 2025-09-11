@@ -7,8 +7,12 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.vavilov.notebook6.codesage.api.DeepSeekApi;
+import ru.vavilov.notebook6.subEditor.model.Language;
 import ru.vavilov.notebook6.subEditor.model.Movie;
+import ru.vavilov.notebook6.subEditor.model.SubtitleEntry;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 @Service("subEditorDeepSeekService")
 @RequiredArgsConstructor
@@ -31,45 +35,59 @@ public class DeepSeekService {
     @Value("${deepseek.user.role}")
     private String userRole;
 
-    @Value("${subEditor.deepseek.api.example}")
-    private String example;
-
     @Value("${subEditor.deepseek.api.you-analysis-assistant}")
     private String you;
 
+    private static final int batchSize = 120;
 
 
-    public Movie chatCompletionString(Movie movie) {
-        return deepSeekApi.chatCompletionTranslator(createRequestWithContent(movie, null));
+
+    public SubtitleEntry chatCompletionString(SubtitleEntry subtitleEntry, Language language) {
+        return deepSeekApi.chatCompletionTranslator(createRequestsWithContent(subtitleEntry, language), subtitleEntry);
     }
 
-    public JSONObject createRequestWithContent(Movie movie, Locale locale) {
-        JSONObject request = new JSONObject();
-        try {
-            request.put("model", model);
-            request.put("stream", stream);
+    public List<JSONObject> createRequestsWithContent(SubtitleEntry subtitleEntry, Language language) {
+        List<JSONObject> requests = new ArrayList<>();
+        List<String> textLines = subtitleEntry.getListWithText();
 
-            JSONArray messages = new JSONArray();
+        for (int i = 0; i < textLines.size(); i += batchSize) {
+            int fromIndex = i;
+            int toIndex = Math.min(i + batchSize, textLines.size());
 
-            JSONObject systemMessage = new JSONObject();
-            systemMessage.put("role", systemRole);
-            systemMessage.put("content", you + " " + getLocale(locale) + " " + systemContent);
+            List<String> batchLines = textLines.subList(fromIndex, toIndex);
 
-            JSONObject userMessage = new JSONObject();
-            userMessage.put("role", userRole);
-            userMessage.put("content", movie.toString() + " " + example);
+            String batchContent = String.join("\n", batchLines);
 
-            messages.put(systemMessage);
-            messages.put(userMessage);
+            try {
+                JSONObject request = new JSONObject();
+                request.put("model", model);
+                request.put("stream", stream);
 
-            request.put("messages", messages);
-        } catch (JSONException e) {
-            throw new RuntimeException("Failed to create JSON request", e);
+                JSONArray messages = new JSONArray();
+
+                JSONObject systemMessage = new JSONObject();
+                systemMessage.put("role", systemRole);
+                systemMessage.put("content", you + " " + language.getNameNative() + " " + systemContent);
+
+                JSONObject userMessage = new JSONObject();
+                userMessage.put("role", userRole);
+                userMessage.put("content", "Translate from "
+                    + subtitleEntry.getLanguage() + " to "
+                    + language.getNameNative() + ". Translate only the following lines "
+                    + (fromIndex + 1) + " to " + toIndex + ":\n"
+                    + batchContent);
+
+                messages.put(systemMessage);
+                messages.put(userMessage);
+
+                request.put("messages", messages);
+
+                requests.add(request);
+
+            } catch (JSONException e) {
+                throw new RuntimeException("Failed to create JSON request for batch " + fromIndex + "-" + toIndex, e);
+            }
         }
-        return request;
-    }
-
-    private String getLocale(Locale locale) {
-        return locale != null ? locale.getDisplayName() : "";
+        return requests;
     }
 }

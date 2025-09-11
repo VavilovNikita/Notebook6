@@ -3,57 +3,52 @@
 <head>
   <title>Экспорт кода из репозитория</title>
   <meta charset="UTF-8" />
-  <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; }
-    .nav a {
-      margin-right: 2rem;
-      text-decoration: none;
-      font-weight: bold;
-      color: #333;
-    }
-    textarea, input[type="text"] {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    button {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-    }
-    .export-result {
-      margin-top: 1rem;
-      border: 1px solid #ccc;
-      background: #f8f8f8;
-      padding: 1rem;
-      white-space: pre-wrap;
-    }
-  </style>
+  <link rel="stylesheet" th:href="@{/css/codeSaga.css}">
 </head>
 <body>
-
-<div class="nav">
-  <a href="/" th:href="@{/codesaga/}">Главная</a>
-  <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
-  <a href="/codesaga/export" th:href="@{/codesaga/export}">Экспорт кода</a>
-  <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+<div class="header">
+  <div class="header-content">
+    <div class="logo">
+      <i>⚡</i> CodeSaga - Экспорт кода
+    </div>
+  </div>
 </div>
 
-<h1>Экспорт кода из Git-репозитория</h1>
+<div class="container">
+  <div class="nav">
+    <a href="/" th:href="@{/codesaga/}">Главная</a>
+    <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
+    <a href="/export" th:href="@{/codesaga/export}">Экспорт кода</a>
+    <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+  </div>
 
-<form th:action="@{/codesaga/export}" method="post" enctype="multipart/form-data">
-  <label for="repoUrl">Ссылка на репозиторий:</label>
-  <input type="text" id="repoUrl" name="repoUrl" placeholder="https://github.com/user/repo" />
+  <div class="card">
+    <div class="card-header">
+      <h1 class="card-title">Экспорт кода из Git-репозитория</h1>
+    </div>
+    <div class="card-body">
+      <form th:action="@{/codesaga/export}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="repoUrl" class="form-label">Ссылка на репозиторий:</label>
+          <input type="text" id="repoUrl" name="repoUrl" class="form-control"
+                 placeholder="https://github.com/user/repo" />
+        </div>
 
-  <label for="file">или загрузите архив .zip с Java-файлами:</label>
-  <input type="file" id="file" name="file" accept=".zip" />
+        <div class="form-group">
+          <label class="form-label">или загрузите архив .zip с Java-файлами:</label>
+          <input type="file" id="file" name="file" class="form-control" accept=".zip" />
+        </div>
 
-  <button type="submit">Экспортировать</button>
-</form>
+        <button type="submit" class="btn">Экспортировать</button>
+      </form>
 
-<div th:if="${exportedCode}">
-  <h3>Результат:</h3>
-  <button onclick="copyToClipboard()">Скопировать в буфер обмена</button>
-  <pre class="export-result" id="exportedCode" th:text="${exportedCode}"></pre>
+      <div th:if="${exportedCode}" class="mt-3">
+        <h3>Результат:</h3>
+        <button onclick="copyToClipboard()" class="btn btn-success">Скопировать в буфер обмена</button>
+        <pre class="export-result" id="exportedCode" th:text="${exportedCode}"></pre>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -68,6 +63,5 @@
     alert("Код скопирован в буфер обмена!");
   }
 </script>
-
 </body>
 </html>

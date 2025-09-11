@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import ru.vavilov.notebook6.subEditor.model.Language;
 import ru.vavilov.notebook6.subEditor.model.Movie;
 import ru.vavilov.notebook6.subEditor.service.MovieService;
+import ru.vavilov.notebook6.subEditor.service.SubtitleService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +25,9 @@ public class SubtitleController {
 
     @Autowired
     private MovieService movieService;
+
+    @Autowired
+    private SubtitleService subtitleService;
 
     @PostMapping("/upload")
     public String uploadSubtitle(@RequestParam("file") MultipartFile file, Model model) {
@@ -47,6 +53,14 @@ public class SubtitleController {
         }
     }
 
+    @GetMapping("/subtitles/{id}/edit")
+    public String editSubtitle(@PathVariable("id") Long id, Model model) {
+           Movie movie = new Movie().setSubtitles(new ArrayList<>(Collections.singletonList(
+               subtitleService.getSubtitleById(id))));
+            model.addAttribute("movie", movie);
+            return "subtitles/subtitles";
+    }
+
     @GetMapping("/upload")
     public String uploadPage() {
         return "subtitles/upload";
@@ -55,6 +69,7 @@ public class SubtitleController {
     @GetMapping("/movie/{id}")
     public String getMovieById(Model model, @PathVariable("id") Long id) {
         model.addAttribute("movie", movieService.getMovieById(id));
+        model.addAttribute("languages", Language.values());
         return "subtitles/movie";
     }
 
@@ -64,5 +79,14 @@ public class SubtitleController {
         if (movies == null) movies = new ArrayList<>();
         model.addAttribute("movies", movies);
         return "subtitles/movies";
+    }
+
+    @PostMapping("/translate/{movieId}/{languageId}")
+    public String translateText(Model model,
+                                @PathVariable("movieId") Long movieId,
+                                @PathVariable("languageId") Long languageId) {
+        Movie movie = movieService.translateAndSaveMovie(movieId, languageId);
+        model.addAttribute("movie", movie);
+        return "subtitles/subtitles";
     }
 }

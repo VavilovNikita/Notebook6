@@ -1,71 +1,153 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Фильм: ' + ${movie.name}">Фильм</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/subEditor.css}">
+    <title>Фильм: <span th:text="${movie.name}"></span></title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" th:href="@{/css/codeSaga.css}">
+    <style>
+        .translation-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            border: 1px solid #e9ecef;
+        }
+
+        .language-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .language-form {
+            display: contents; /* Форма внутри каждой карточки */
+        }
+
+        .language-btn {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .language-btn:hover {
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .language-btn:active {
+            border-color: var(--success);
+            background: #f0fff4;
+        }
+
+        .language-flag {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .language-name {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .language-native {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .movie-info {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .subtitles-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+    </style>
 </head>
 <body>
-<header>
+<div class="header">
     <div class="header-content">
         <div class="logo">
-            <i class="fas fa-film"></i>
-            <span>SubEditor</span>
+            <i>🎬</i> Subeditor - Фильм
         </div>
-        <a href="/subeditor/upload" class="back-btn">
-            <i class="fas fa-upload"></i>
-            Загрузить субтитры
-        </a>
-        <a href="/subeditor/movies" class="back-btn">
-            <i class="fas fa-list"></i>
-            Все фильмы
-        </a>
     </div>
-</header>
+</div>
 
 <div class="container">
-    <div class="movie-card">
-        <div class="movie-header">
-            <h1 class="movie-title" th:text="${movie.name}">Название фильма</h1>
+    <div class="nav">
+        <a href="/">Главная</a>
+        <a href="/subeditor/upload">Загрузить фильм</a>
+        <a href="/subeditor/movies">Все фильмы</a>
+    </div>
+
+    <div class="movie-info">
+        <h1 th:text="${movie.name}">Название фильма</h1>
+        <p><strong>ID:</strong> <span th:text="${movie.id}"></span></p>
+    </div>
+
+    <!-- Секция перевода -->
+    <div class="translation-section">
+        <h2>Выберите язык для перевода</h2>
+        <p>Нажмите на язык для автоматического перевода</p>
+
+        <div class="language-grid">
+            <th:block th:each="lang : ${languages}">
+                <form th:action="@{/subeditor/translate/__${movie.id}__/__${lang.id}__}"
+                      method="post"
+                      class="language-form">
+                    <input type="hidden" name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="language-btn">
+                        <div class="language-flag" th:text="${lang.flag}">🇺🇸</div>
+                        <div class="language-name" th:text="${lang.nameRu}">Английский</div>
+                        <div class="language-native" th:text="${lang.nameNative}">English</div>
+                    </button>
+                </form>
+            </th:block>
         </div>
+    </div>
 
-        <div class="subtitles-section">
-            <h2 class="section-title">
-                <i class="fas fa-closed-captioning"></i>
-                Доступные языки субтитров
-            </h2>
-
-            <ul class="language-list">
-                <!-- Простой цикл по SubtitleEntry -->
-                <li class="language-item" th:each="subtitleEntry : ${movie.subtitles}">
-                    <div class="language-name">
-                        <!-- Простой флаг (можно заменить на иконку или убрать) -->
-                        <i class="fas fa-globe"></i>
-                        <span th:text="${subtitleEntry.language}">Язык</span>
-                    </div>
-                    <!-- Ссылка для скачивания -->
-                    <a th:href="@{'/subeditor/movies/' + ${movie.id} + '/subtitles/' + ${subtitleEntry.id} + '/download'}"
-                       class="btn" target="_blank">
-                        <i class="fas fa-download"></i>
-                        Скачать
-                    </a>
-                    <!-- Ссылка для редактирования -->
-                    <a th:href="@{'/subeditor/movies/' + ${movie.id} + '/subtitles/' + ${subtitleEntry.id} + '/edit'}"
-                       class="btn btn-edit">
-                        <i class="fas fa-edit"></i>
-                        Редактировать
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Сообщение если нет субтитров -->
-            <div th:if="${#lists.isEmpty(movie.subtitles)}" class="no-subtitles">
-                <i class="fas fa-exclamation-circle"></i>
-                Нет доступных субтитров для этого фильма
-            </div>
+    <!-- Секция субтитров -->
+    <div class="subtitles-section" th:if="${movie.subtitles != null and !movie.subtitles.empty}">
+        <h2>Доступные субтитры</h2>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Язык</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="subtitle : ${movie.subtitles}">
+                    <td th:text="${subtitle.language}">Язык</td>
+                    <td>
+                        <a th:href="@{/subeditor/subtitles/__${subtitle.id}__/edit}" class="btn">Изменить</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
+
+    <div class="actions">
+        <a th:href="@{/subeditor/movies}" class="btn">Назад к списку фильмов</a>
     </div>
 </div>
 </body>

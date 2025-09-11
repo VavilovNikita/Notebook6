@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.vavilov.notebook6.subEditor.model.Language;
 import ru.vavilov.notebook6.subEditor.model.Movie;
 import ru.vavilov.notebook6.subEditor.model.SubType;
 import ru.vavilov.notebook6.subEditor.model.SubtitleEntry;
@@ -12,8 +13,10 @@ import ru.vavilov.notebook6.subEditor.repository.MovieRepository;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -68,8 +71,22 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
-    @Async
-    public void translateAndSaveMovie(Movie movie) {
-        movieRepository.save(deepSeekService.chatCompletionString(movie));
+    public Movie translateAndSaveMovie(Long movieId, Long  languageId) {
+        Optional<Movie> movie = movieRepository.findById(movieId);
+        if (movie.isPresent()) {
+            Language language = Language.getById(languageId);
+            Movie transletedMovie = new Movie().setSubtitles(
+                Collections.singletonList(deepSeekService.chatCompletionString(
+                    movie.get().getOneSubtitle(), language)
+                )
+            );
+            SubtitleEntry subtitleEntry = transletedMovie.getOneSubtitle();
+            subtitleEntry.setMovie(movie.get());
+            subtitleEntry.setLanguage(language.getCode());
+            movie.get().getSubtitles().add(subtitleEntry);
+            movieRepository.save(movie.get());
+            return transletedMovie;
+        }
+        return new Movie();
     }
 }

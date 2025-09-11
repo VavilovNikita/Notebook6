@@ -23,6 +23,10 @@ public class Movie {
     @NotBlank(message = "Movie name cannot be empty")
     private String name;
 
+    public SubtitleEntry getOneSubtitle() {
+        return subtitles != null || subtitles.get(0) != null ? subtitles.get(0) : new SubtitleEntry();
+    }
+
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubtitleEntry> subtitles = new ArrayList<>();
 

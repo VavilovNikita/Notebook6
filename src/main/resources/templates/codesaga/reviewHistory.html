@@ -3,70 +3,282 @@
 <head>
     <title>История запросов</title>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" th:href="@{/css/codeSaga.css}">
     <style>
-        body { font-family: Arial, sans-serif; margin: 2rem; }
-        .nav a {
-            margin-right: 2rem;
-            text-decoration: none;
-            font-weight: bold;
-            color: #333;
+        /* Дополнительные стили для таблицы */
+        .table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
+
+        .table {
+            min-width: 1000px;
         }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 0.5rem;
+
+        .table th,
+        .table td {
             vertical-align: top;
+            max-width: 300px;
         }
-        th {
-            background: #eee;
-        }
-        pre {
+
+        .table pre {
+            max-height: 150px;
+            overflow-y: auto;
             margin: 0;
-            white-space: pre-wrap;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .table td:nth-child(3), /* Issue */
+        .table td:nth-child(4), /* Description */
+        .table td:nth-child(5), /* Suggestion */
+        .table td:nth-child(6), /* Example */
+        .table td:nth-child(7)  /* Note */ {
+            max-width: 250px;
+            word-wrap: break-word;
+        }
+
+        .table td:first-child {
+            max-width: 80px;
+        }
+
+        .table td:nth-child(2) {
+            max-width: 120px;
+        }
+
+        /* Стили для скролла */
+        .table pre::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table pre::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .table pre::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .table pre::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1200px) {
+            .table {
+                min-width: 1200px;
+            }
+
+            .table td:nth-child(3),
+            .table td:nth-child(4),
+            .table td:nth-child(5),
+            .table td:nth-child(6),
+            .table td:nth-child(7) {
+                max-width: 200px;
+            }
+        }
+
+        /* Кнопки действий для ячеек */
+        .cell-actions {
+            display: none;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: white;
+            padding: 2px;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .table td {
+            position: relative;
+        }
+
+        .table td:hover .cell-actions {
+            display: flex;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px 5px;
+            font-size: 12px;
+            color: var(--secondary);
+        }
+
+        .expand-btn:hover {
+            color: var(--primary);
+        }
+
+        /* Модальное окно для полного текста */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--accent);
         }
     </style>
 </head>
 <body>
-<div class="nav">
-    <a href="/" th:href="@{/codesaga/}">Главная</a>
-    <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
-    <a href="/export" th:href="@{/codesaga/export}">Экспорт кода</a>
-    <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+<div class="header">
+    <div class="header-content">
+        <div class="logo">
+            <i>⚡</i> CodeSaga - История
+        </div>
+    </div>
 </div>
 
-<h1>История рекомендаций</h1>
+<div class="container">
+    <div class="nav">
+        <a href="/" th:href="@{/codesaga/}">Главная</a>
+        <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
+        <a href="/export" th:href="@{/codesaga/export}">Экспорт кода</a>
+        <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+    </div>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Входной текст</th>
-        <th>Issue</th>
-        <th>Description</th>
-        <th>Suggestion</th>
-        <th>Example</th>
-        <th>Note</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="rec : ${recommendations}">
-        <td th:text="${rec.id}"></td>
-        <td>
-            <a th:href="@{/codesaga/review/{id}(id=${rec.requestedData.id})}"
-               th:text="'Запрос #' + ${rec.requestedData.id}"></a>
-        </td>
-        <td><pre th:text="${rec.issue}"></pre></td>
-        <td><pre th:text="${rec.description}"></pre></td>
-        <td><pre th:text="${rec.suggestion}"></pre></td>
-        <td><pre th:text="${rec.example}"></pre></td>
-        <td><pre th:text="${rec.note}"></pre></td>
-    </tr>
-    </tbody>
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">История рекомендаций</h1>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Запрос</th>
+                        <th>Issue</th>
+                        <th>Description</th>
+                        <th>Suggestion</th>
+                        <th>Example</th>
+                        <th>Note</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="rec : ${recommendations}">
+                        <td th:text="${rec.id}"></td>
+                        <td>
+                            <a th:href="@{/codesaga/review/{id}(id=${rec.requestedData.id})}"
+                               th:text="'#' + ${rec.requestedData.id}"></a>
+                        </td>
+                        <td>
+                            <pre th:text="${rec.issue}"></pre>
+                            <div class="cell-actions">
+                                <button class="expand-btn" onclick="showFullText('issue', ${rec.id}, ${rec.issue})">📄</button>
+                            </div>
+                        </td>
+                        <td>
+                            <pre th:text="${rec.description}"></pre>
+                            <div class="cell-actions">
+                                <button class="expand-btn" onclick="showFullText('description', ${rec.id}, ${rec.description})">📄</button>
+                            </div>
+                        </td>
+                        <td>
+                            <pre th:text="${rec.suggestion}"></pre>
+                            <div class="cell-actions">
+                                <button class="expand-btn" onclick="showFullText('suggestion', ${rec.id}, ${rec.suggestion})">📄</button>
+                            </div>
+                        </td>
+                        <td>
+                            <pre th:text="${rec.example}"></pre>
+                            <div class="cell-actions">
+                                <button class="expand-btn" onclick="showFullText('example', ${rec.id}, ${rec.example})">📄</button>
+                            </div>
+                        </td>
+                        <td>
+                            <pre th:text="${rec.note}"></pre>
+                            <div class="cell-actions">
+                                <button class="expand-btn" onclick="showFullText('note', ${rec.id}, ${rec.note})">📄</button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
 
-</table>
+            <div th:if="${recommendations.empty}" class="text-center mt-3">
+                <p>Нет данных для отображения</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для полного текста -->
+<div id="textModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle"></h3>
+        <pre id="modalContent" style="white-space: pre-wrap; background: #f8f9fa; padding: 1rem; border-radius: 4px;"></pre>
+    </div>
+</div>
+
+<script>
+    function showFullText(type, id, text) {
+        const modal = document.getElementById('textModal');
+        const title = document.getElementById('modalTitle');
+        const content = document.getElementById('modalContent');
+
+        const typeNames = {
+            'issue': 'Issue',
+            'description': 'Description',
+            'suggestion': 'Suggestion',
+            'example': 'Example',
+            'note': 'Note'
+        };
+
+        title.textContent = `${typeNames[type]} - Запрос #${id}`;
+        content.textContent = text;
+        modal.style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('textModal').style.display = 'none';
+    }
+
+    // Закрытие модального окна при клике вне его
+    window.onclick = function(event) {
+        const modal = document.getElementById('textModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // Закрытие модального окна по ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+</script>
 </body>
 </html>
