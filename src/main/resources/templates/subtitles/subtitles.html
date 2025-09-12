@@ -29,7 +29,13 @@
 
         <div class="subtitles-section">
             <div class="controls">
-                <input type="number" id="shiftSeconds" value="0" class="form-control" placeholder="Смещение времени (секунды)" style="max-width: 250px;">
+                <small class="text-muted">
+                    Положительное: вперед │ Отрицательное: назад
+                </small>
+                <div style="max-width: 250px;">
+                    <input type="number" id="shiftSeconds" value="0" class="form-control"
+                           placeholder="Смещение времени (секунды)">
+                </div>
                 <button type="button" onclick="shiftAll()" class="btn">
                     <i class="fas fa-clock"></i>
                     Сместить все тайминги

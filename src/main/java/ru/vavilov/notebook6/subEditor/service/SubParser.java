@@ -48,7 +48,6 @@ public class SubParser {
             String text = parts[textIndex].trim();
 
             try {
-                // Парсим время в миллисекунды
                 long startMillis = parseTimeToMillis(startStr);
                 long endMillis = parseTimeToMillis(endStr);
 
@@ -78,9 +77,80 @@ public class SubParser {
         return result;
     }
 
-    // Вспомогательный метод для парсинга времени в миллисекунды
+    public static List<SubtitleEntry> parseSRT(InputStream inputStream, String language) throws IOException {
+        List<Subtitle> entries = new ArrayList<>();
+        List<SubtitleEntry> result = new ArrayList<>();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "Windows-1251"));
+        String line;
+
+        StringBuilder currentText = new StringBuilder();
+        long startMillis = 0;
+        long endMillis = 0;
+        boolean readingText = false;
+
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+
+            if (line.isEmpty()) {
+                if (readingText && currentText.length() > 0) {
+                    Subtitle subtitle = new Subtitle()
+                        .setStartMillis(startMillis)
+                        .setEndMillis(endMillis)
+                        .setText(currentText.toString().trim());
+
+                    entries.add(subtitle);
+
+                    currentText = new StringBuilder();
+                    readingText = false;
+                }
+                continue;
+            }
+
+            if (line.matches("^\\d+$")) {
+                continue;
+            }
+
+            if (line.contains("-->")) {
+                String[] timeParts = line.split("-->");
+                if (timeParts.length == 2) {
+                    startMillis = parseSRTTimeToMillis(timeParts[0].trim());
+                    endMillis = parseSRTTimeToMillis(timeParts[1].trim());
+                    readingText = true;
+                }
+                continue;
+            }
+
+            if (readingText) {
+                if (currentText.length() > 0) {
+                    currentText.append("\n");
+                }
+                currentText.append(fixEncoding(line));
+            }
+        }
+
+        if (currentText.length() > 0) {
+            Subtitle subtitle = new Subtitle()
+                .setStartMillis(startMillis)
+                .setEndMillis(endMillis)
+                .setText(currentText.toString().trim());
+
+            entries.add(subtitle);
+        }
+
+        SubtitleEntry entry = new SubtitleEntry()
+            .setLanguage(language);
+
+        for (Subtitle subtitle : entries) {
+            subtitle.setSubtitleEntry(entry);
+            entry.getSubtitles().add(subtitle);
+        }
+
+        result.add(entry);
+        return result;
+    }
+
     private static long parseTimeToMillis(String timeStr) {
-        // Формат: 0:00:00.00 или 0:00:00.000
         String[] parts = timeStr.split("[:.]");
 
         if (parts.length < 3) {
@@ -104,5 +174,42 @@ public class SubParser {
         }
 
         return ((hours * 3600L) + (minutes * 60L) + seconds) * 1000L + milliseconds;
+    }
+
+    private static long parseSRTTimeToMillis(String timeStr) {
+        String normalizedTime = timeStr.replace(',', '.');
+        String[] parts = normalizedTime.split("[:.]");
+
+        if (parts.length != 4) {
+            throw new IllegalArgumentException("Invalid SRT time format: " + timeStr);
+        }
+
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int seconds = Integer.parseInt(parts[2]);
+        int milliseconds = Integer.parseInt(parts[3]);
+
+        return ((hours * 3600L) + (minutes * 60L) + seconds) * 1000L + milliseconds;
+    }
+
+    private static String fixEncoding(String text) {
+        try {
+            String[] encodings = {"windows-1251", "ISO-8859-5", "KOI8-R", "UTF-8"};
+
+            for (String encoding : encodings) {
+                try {
+                    byte[] bytes = text.getBytes("ISO-8859-1");
+                    String fixed = new String(bytes, encoding);
+
+                    if (fixed.matches(".*[А-Яа-я].*")) {
+                        return fixed;
+                    }
+                } catch (Exception e) {
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        return text;
     }
 }

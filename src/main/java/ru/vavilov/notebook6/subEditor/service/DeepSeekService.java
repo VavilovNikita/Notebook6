@@ -1,6 +1,7 @@
 package ru.vavilov.notebook6.subEditor.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +15,8 @@ import ru.vavilov.notebook6.subEditor.model.SubtitleEntry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+@Slf4j
 @Service("subEditorDeepSeekService")
 @RequiredArgsConstructor
 public class DeepSeekService {
@@ -38,8 +41,7 @@ public class DeepSeekService {
     @Value("${subEditor.deepseek.api.you-analysis-assistant}")
     private String you;
 
-    private static final int batchSize = 120;
-
+    private static final int batchSize = 150;
 
 
     public SubtitleEntry chatCompletionString(SubtitleEntry subtitleEntry, Language language) {
@@ -49,6 +51,7 @@ public class DeepSeekService {
     public List<JSONObject> createRequestsWithContent(SubtitleEntry subtitleEntry, Language language) {
         List<JSONObject> requests = new ArrayList<>();
         List<String> textLines = subtitleEntry.getListWithText();
+        log.info("lines size is " + textLines.size());
 
         for (int i = 0; i < textLines.size(); i += batchSize) {
             int fromIndex = i;
@@ -56,32 +59,39 @@ public class DeepSeekService {
 
             List<String> batchLines = textLines.subList(fromIndex, toIndex);
 
-            String batchContent = String.join("\n", batchLines);
-
             try {
                 JSONObject request = new JSONObject();
                 request.put("model", model);
                 request.put("stream", stream);
+                request.put("max_tokens", 8000);
 
                 JSONArray messages = new JSONArray();
 
                 JSONObject systemMessage = new JSONObject();
                 systemMessage.put("role", systemRole);
-                systemMessage.put("content", you + " " + language.getNameNative() + " " + systemContent);
+                systemMessage.put("content", "Translate Russian to " + language.getNameNative() +
+                    ". Input is JSON array. Output MUST be JSON array with SAME number of elements. Do not modify structure.");
 
                 JSONObject userMessage = new JSONObject();
                 userMessage.put("role", userRole);
-                userMessage.put("content", "Translate from "
-                    + subtitleEntry.getLanguage() + " to "
-                    + language.getNameNative() + ". Translate only the following lines "
-                    + (fromIndex + 1) + " to " + toIndex + ":\n"
-                    + batchContent);
+
+                // Преобразуем строки в JSON массив для запроса
+                JSONArray inputArray = new JSONArray(batchLines);
+                String userContent = String.format(
+                    "Translate from %s to %s. Input JSON array has %d elements. Output MUST be JSON array with EXACTLY %d elements:\n%s",
+                    subtitleEntry.getLanguage(),
+                    language.getNameNative(),
+                    batchLines.size(),
+                    batchLines.size(),
+                    inputArray.toString()
+                );
+
+                userMessage.put("content", userContent);
 
                 messages.put(systemMessage);
                 messages.put(userMessage);
 
                 request.put("messages", messages);
-
                 requests.add(request);
 
             } catch (JSONException e) {

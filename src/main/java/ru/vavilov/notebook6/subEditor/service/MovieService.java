@@ -38,7 +38,9 @@ public class MovieService {
                 }
             }
             case SRT -> {
-
+                try (InputStream parseStream = new ByteArrayInputStream(fileBytes)) {
+                    subtitles = SubParser.parseSRT(parseStream, "ru");
+                }
             }
             case SSA -> {
 
@@ -49,7 +51,7 @@ public class MovieService {
             default -> throw new IOException("Unknown file type");
         }
         Movie existMovie = movieRepository.getMovieByName(originalFilename);
-        if (existMovie != null){
+        if (existMovie != null) {
             return existMovie;
         } else {
             Movie movie = new Movie()
@@ -71,7 +73,7 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
-    public Movie translateAndSaveMovie(Long movieId, Long  languageId) {
+    public Movie translateAndSaveMovie(Long movieId, Long languageId) {
         Optional<Movie> movie = movieRepository.findById(movieId);
         if (movie.isPresent()) {
             Language language = Language.getById(languageId);
@@ -82,7 +84,7 @@ public class MovieService {
             );
             SubtitleEntry subtitleEntry = transletedMovie.getOneSubtitle();
             subtitleEntry.setMovie(movie.get());
-            subtitleEntry.setLanguage(language.getCode());
+            subtitleEntry.setLanguage(language.getNameNative());
             movie.get().getSubtitles().add(subtitleEntry);
             movieRepository.save(movie.get());
             return transletedMovie;

@@ -59,4 +59,9 @@ public class Subtitle {
 
         return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, remainingMillis);
     }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

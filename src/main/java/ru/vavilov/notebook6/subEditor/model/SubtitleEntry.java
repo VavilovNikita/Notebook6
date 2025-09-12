@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +33,7 @@ public class SubtitleEntry {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "subtitle_entry_id")
+    @jakarta.persistence.OrderBy("startMillis ASC")
     private List<Subtitle> subtitles = new ArrayList<>();
 
     @NotNull(message = "Language cannot be null")
@@ -47,19 +49,29 @@ public class SubtitleEntry {
             .toList();
     }
 
-    public SubtitleEntry setSubtitlesByTranslatedArray(List<String> texts) {
-        SubtitleEntry subtitleEntry;
-        try {
-            subtitleEntry = (SubtitleEntry) this.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
+    public SubtitleEntry setSubtitlesByTranslatedArray(List<String> translatedTexts) {
+        if (translatedTexts == null || translatedTexts.size() != this.subtitles.size()) {
+            throw new IllegalArgumentException("Subtitle size mismatch. Original: " +
+                this.subtitles.size() + ", Translated: " +
+                (translatedTexts != null ? translatedTexts.size() : "null"));
         }
-        if (texts == null || texts.size() != this.subtitles.size()) {
-            throw new IllegalArgumentException("Subtitle size mismatch");
+
+        SubtitleEntry translatedEntry = new SubtitleEntry()
+            .setSubtitles(new ArrayList<>());
+
+        for (int i = 0; i < this.subtitles.size(); i++) {
+            Subtitle originalSubtitle = this.subtitles.get(i);
+            String translatedText = translatedTexts.get(i);
+
+            Subtitle translatedSubtitle = new Subtitle()
+                .setStartMillis(originalSubtitle.getStartMillis())
+                .setEndMillis(originalSubtitle.getEndMillis())
+                .setText(translatedText)
+                .setSubtitleEntry(translatedEntry);
+
+            translatedEntry.getSubtitles().add(translatedSubtitle);
         }
-        for (int i = 0; i < texts.size(); i++) {
-            subtitleEntry.getSubtitles().get(i).setText(texts.get(i));
-        }
-        return subtitleEntry;
+
+        return translatedEntry;
     }
 }
