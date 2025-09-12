@@ -181,6 +181,12 @@ public class DeepSeekApi {
             .replace("```", "")
             .trim();
 
+        cleaned = cleaned.replaceAll("\\.\"", "\"")
+            .replaceAll("\"\\.", "\"")
+            .replaceAll(",\\.", ",")
+            .replaceAll("\\.\\]", "]")
+            .replaceAll("\\.\\[", "[");
+
         if (!cleaned.startsWith("[")) {
             throw new IOException("Invalid JSON response: " + (cleaned.length() > 100 ?
                 cleaned.substring(0, 100) + "..." : cleaned));
