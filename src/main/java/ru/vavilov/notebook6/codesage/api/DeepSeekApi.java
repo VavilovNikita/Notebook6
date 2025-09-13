@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class DeepSeekApi {
-    private static final String BASE_URL = "https://openrouter.ai/api/v1";
+    private static final String BASE_URL = "https://api.deepseek.com";
     private final String apiKey;
     private final OkHttpClient client;
 
