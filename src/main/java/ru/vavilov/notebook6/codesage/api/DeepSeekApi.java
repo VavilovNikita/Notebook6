@@ -1,6 +1,7 @@
 package ru.vavilov.notebook6.codesage.api;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
@@ -177,21 +178,101 @@ public class DeepSeekApi {
     }
 
     private String validateAndCleanJson(String content) throws IOException {
+        // Удаляем маркеры code block если они есть
         String cleaned = content.replace("```json", "")
             .replace("```", "")
             .trim();
 
-        cleaned = cleaned.replaceAll("\\.\"", "\"")
-            .replaceAll("\"\\.", "\"")
-            .replaceAll(",\\.", ",")
-            .replaceAll("\\.\\]", "]")
-            .replaceAll("\\.\\[", "[");
+        try {
+            // Пытаемся распарсить JSON чтобы проверить его валидность
+            new ObjectMapper().readTree(cleaned);
+            return cleaned; // Если парсинг успешен, возвращаем как есть
+        } catch (JsonProcessingException e) {
+            // Если JSON невалидный, пытаемся почистить структуру
+            return cleanInvalidJson(cleaned);
+        }
+    }
 
-        if (!cleaned.startsWith("[")) {
-            throw new IOException("Invalid JSON response: " + (cleaned.length() > 100 ?
-                cleaned.substring(0, 100) + "..." : cleaned));
+    private String cleanInvalidJson(String content) throws IOException {
+        StringBuilder result = new StringBuilder();
+        String[] lines = content.split("\\r?\\n");
+        boolean inArray = false;
+        boolean inString = false;
+        boolean escapeNext = false;
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+            if (line.isEmpty()) continue;
+
+            if (!inArray && line.startsWith("[")) {
+                inArray = true;
+                result.append("[\n");
+                continue;
+            }
+
+            if (inArray) {
+                if (line.startsWith("\"") || (inString && !line.startsWith("]"))) {
+                    // Обрабатываем строки
+                    if (!inString) {
+                        inString = true;
+                        result.append("  ");
+                    }
+
+                    // Чистим лишние точки в начале/конце строки
+                    String cleanedLine = line.replaceAll("^\\.+", "")
+                        .replaceAll("\\.+$", "");
+
+                    result.append(cleanedLine);
+
+                    // Если строка заканчивается на кавычку (не экранированную)
+                    if (cleanedLine.endsWith("\"") && !cleanedLine.endsWith("\\\"")) {
+                        inString = false;
+                        if (i < lines.length - 1 && !lines[i + 1].trim().startsWith("]")) {
+                            result.append(",");
+                        }
+                        result.append("\n");
+                    } else {
+                        result.append(" ");
+                    }
+                } else if (line.startsWith("]")) {
+                    inArray = false;
+                    result.append("]\n");
+                } else if (line.startsWith(",")) {
+                    // Пропускаем лишние запятые
+                    continue;
+                } else {
+                    // Оборачиваем неправильно оформленные строки в кавычки
+                    if (!inString) {
+                        result.append("  \"");
+                        inString = true;
+                    }
+
+                    String cleanedLine = line.replaceAll("^\\.+", "")
+                        .replaceAll("\\.+$", "")
+                        .replace("\"", "\\\"");
+
+                    result.append(cleanedLine);
+
+                    // Если это последняя строка или следующая строка - закрывающая скобка
+                    if (i == lines.length - 1 || lines[i + 1].trim().startsWith("]")) {
+                        result.append("\"\n");
+                        inString = false;
+                    } else {
+                        result.append(" ");
+                    }
+                }
+            }
         }
 
-        return cleaned;
+        String finalJson = result.toString();
+
+        // Финальная проверка
+        try {
+            new ObjectMapper().readTree(finalJson);
+            return finalJson;
+        } catch (JsonProcessingException e) {
+            throw new IOException("Failed to clean JSON: " +
+                (finalJson.length() > 100 ? finalJson.substring(0, 100) + "..." : finalJson));
+        }
     }
 }

@@ -34,12 +34,12 @@ public class MovieService {
         switch (SubType.getTypeFromName(originalFilename)) {
             case ASS -> {
                 try (InputStream parseStream = new ByteArrayInputStream(fileBytes)) {
-                    subtitles = SubParser.parseASS(parseStream, "ru");
+                    subtitles = SubParser.parseASS(parseStream, "Русский");
                 }
             }
             case SRT -> {
                 try (InputStream parseStream = new ByteArrayInputStream(fileBytes)) {
-                    subtitles = SubParser.parseSRT(parseStream, "ru");
+                    subtitles = SubParser.parseSRT(parseStream, "Русский");
                 }
             }
             case SSA -> {
