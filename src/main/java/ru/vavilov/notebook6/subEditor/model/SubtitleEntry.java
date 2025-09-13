@@ -50,14 +50,29 @@ public class SubtitleEntry {
     }
 
     public SubtitleEntry setSubtitlesByTranslatedArray(List<String> translatedTexts) {
-        if (translatedTexts == null || translatedTexts.size() != this.subtitles.size()) {
-            throw new IllegalArgumentException("Subtitle size mismatch. Original: " +
-                this.subtitles.size() + ", Translated: " +
-                (translatedTexts != null ? translatedTexts.size() : "null"));
+        if (translatedTexts == null) {
+            throw new IllegalArgumentException("Translated texts cannot be null");
         }
 
         SubtitleEntry translatedEntry = new SubtitleEntry()
             .setSubtitles(new ArrayList<>());
+
+        if (translatedTexts.size() != this.subtitles.size()) {
+            System.err.println("WARNING: Subtitle size mismatch. Using original text for missing translations.");
+            System.err.println("Original: " + this.subtitles.size() + ", Translated: " + translatedTexts.size());
+
+            List<String> fixedTexts = new ArrayList<>();
+            for (int i = 0; i < this.subtitles.size(); i++) {
+                if (i < translatedTexts.size() && translatedTexts.get(i) != null) {
+                    fixedTexts.add(translatedTexts.get(i));
+                } else {
+                    // Используем оригинальный текст для пропущенных переводов
+                    fixedTexts.add(this.subtitles.get(i).getText());
+                    System.err.println("Using original text for subtitle #" + i);
+                }
+            }
+            translatedTexts = fixedTexts;
+        }
 
         for (int i = 0; i < this.subtitles.size(); i++) {
             Subtitle originalSubtitle = this.subtitles.get(i);
