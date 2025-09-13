@@ -26,6 +26,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Component
@@ -121,7 +123,8 @@ public class DeepSeekApi {
                                 .getString("content");
                             String cleanedContent = validateAndCleanJson(content);
                             List<String> translatedBatch = objectMapper.readValue(cleanedContent,
-                                new TypeReference<List<String>>() {});
+                                new TypeReference<List<String>>() {
+                                });
 
                             translatedBatches[batchIndex] = translatedBatch;
 
@@ -183,83 +186,44 @@ public class DeepSeekApi {
             new ObjectMapper().readTree(cleaned);
             return cleaned;
         } catch (JsonProcessingException e) {
-            return cleanInvalidJson(cleaned);
+            // Исправляем невалидные escape-последовательности
+            return fixInvalidEscapes(cleaned);
         }
     }
 
-    private String cleanInvalidJson(String content) throws IOException {
-        StringBuilder result = new StringBuilder();
-        String[] lines = content.split("\\r?\\n");
-        boolean inArray = false;
-        boolean inString = false;
-        boolean escapeNext = false;
-
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i].trim();
-            if (line.isEmpty()) continue;
-
-            if (!inArray && line.startsWith("[")) {
-                inArray = true;
-                result.append("[\n");
-                continue;
-            }
-
-            if (inArray) {
-                if (line.startsWith("\"") || (inString && !line.startsWith("]"))) {
-                    if (!inString) {
-                        inString = true;
-                        result.append("  ");
-                    }
-
-                    String cleanedLine = line.replaceAll("^\\.+", "")
-                        .replaceAll("\\.+$", "");
-
-                    result.append(cleanedLine);
-
-                    if (cleanedLine.endsWith("\"") && !cleanedLine.endsWith("\\\"")) {
-                        inString = false;
-                        if (i < lines.length - 1 && !lines[i + 1].trim().startsWith("]")) {
-                            result.append(",");
-                        }
-                        result.append("\n");
-                    } else {
-                        result.append(" ");
-                    }
-                } else if (line.startsWith("]")) {
-                    inArray = false;
-                    result.append("]\n");
-                } else if (line.startsWith(",")) {
-                    continue;
-                } else {
-                    if (!inString) {
-                        result.append("  \"");
-                        inString = true;
-                    }
-
-                    String cleanedLine = line.replaceAll("^\\.+", "")
-                        .replaceAll("\\.+$", "")
-                        .replace("\"", "\\\"");
-
-                    result.append(cleanedLine);
-
-                    if (i == lines.length - 1 || lines[i + 1].trim().startsWith("]")) {
-                        result.append("\"\n");
-                        inString = false;
-                    } else {
-                        result.append(" ");
-                    }
-                }
-            }
-        }
-
-        String finalJson = result.toString();
+    private String fixInvalidEscapes(String json) throws IOException {
+        // Заменяем невалидные escape-последовательности
+        String fixed = json.replaceAll("\\\\([^\"\\\\/bfnrtu])", "\\\\\\\\$1");
 
         try {
-            new ObjectMapper().readTree(finalJson);
-            return finalJson;
+            new ObjectMapper().readTree(fixed);
+            return fixed;
         } catch (JsonProcessingException e) {
-            throw new IOException("Failed to clean JSON: " +
-                (finalJson.length() > 100 ? finalJson.substring(0, 100) + "..." : finalJson));
+            // Если все еще невалидно, создаем массив вручную
+            return createValidJsonFromContent(json);
+        }
+    }
+
+    private String createValidJsonFromContent(String content) throws IOException {
+        // Извлекаем строки и создаем валидный JSON
+        Pattern pattern = Pattern.compile("\"((?:\\\\\"|[^\"])*)\"");
+        Matcher matcher = pattern.matcher(content);
+        List<String> items = new ArrayList<>();
+
+        while (matcher.find()) {
+            String item = matcher.group(1);
+            // Правильно экранируем кавычки
+            item = item.replace("\"", "\\\"");
+            // Заменяем невалидные escapes
+            item = item.replaceAll("\\\\([^\"\\\\/bfnrtu])", "\\\\\\\\$1");
+            items.add(item);
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(items);
+        } catch (JsonProcessingException e) {
+            throw new IOException("Failed to create valid JSON from problematic content");
         }
     }
 }

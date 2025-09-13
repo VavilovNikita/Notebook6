@@ -32,14 +32,8 @@ public class DeepSeekService {
     @Value("${deepseek.system.role}")
     private String systemRole;
 
-    @Value("${subEditor.deepseek.api.system-content}")
-    private String systemContent;
-
     @Value("${deepseek.user.role}")
     private String userRole;
-
-    @Value("${subEditor.deepseek.api.you-analysis-assistant}")
-    private String you;
 
     private static final int batchSize = 150;
 
@@ -70,8 +64,20 @@ public class DeepSeekService {
                 JSONObject systemMessage = new JSONObject();
                 systemMessage.put("role", systemRole);
                 systemMessage.put("content", "Translate Russian to " + language.getNameNative() +
-                    ". Input is JSON array. Output MUST be JSON array with SAME number of elements. Do not modify structure.");
-
+                    ". You will receive a JSON array containing " + batchLines.size() + " strings.\n\n" +
+                    "CRITICAL JSON ESCAPING RULES:\n" +
+                    "1. Preserve original \\n, \\t, \\\", \\\\ exactly as is\n" +
+                    "2. ONLY these escape sequences are valid in JSON: \\\", \\\\, \\/, \\b, \\f, \\n, \\r, \\t\n" +
+                    "3. NEVER use \\a, \\x, \\u (unless it's a valid \\uXXXX unicode sequence)\n" +
+                    "4. Escape quotes in translated text: \" becomes \\\"\n" +
+                    "5. If you need to use backslash, escape it: \\ becomes \\\\\n\n" +
+                    "STRICT REQUIREMENTS:\n" +
+                    "• Output must be valid JSON array with exactly " + batchLines.size() + " elements\n" +
+                    "• Maintain original element order\n" +
+                    "• All escape sequences must be valid JSON escapes\n" +
+                    "• The output must pass JSON.parse() validation\n\n" +
+                    "INVALID EXAMPLE: \"text\\a\" (\\a is not a valid JSON escape)\n" +
+                    "VALID EXAMPLE: \"text with\\nnewline and \\\"quotes\\\"\"");
                 JSONObject userMessage = new JSONObject();
                 userMessage.put("role", userRole);
 

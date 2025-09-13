@@ -77,18 +77,34 @@ public class MovieService {
         Optional<Movie> movie = movieRepository.findById(movieId);
         if (movie.isPresent()) {
             Language language = Language.getById(languageId);
-            Movie transletedMovie = new Movie().setSubtitles(
-                Collections.singletonList(deepSeekService.chatCompletionString(
-                    movie.get().getOneSubtitle(), language)
-                )
-            );
-            SubtitleEntry subtitleEntry = transletedMovie.getOneSubtitle();
-            subtitleEntry.setMovie(movie.get());
-            subtitleEntry.setLanguage(language.getNameNative());
-            movie.get().getSubtitles().add(subtitleEntry);
-            movieRepository.save(movie.get());
-            return transletedMovie;
+            SubtitleEntry existSubtitle = getExistSubtitle(movie, language);
+            if (existSubtitle == null) {
+                Movie transletedMovie = new Movie().setSubtitles(
+                    Collections.singletonList(deepSeekService.chatCompletionString(
+                        movie.get().getOneSubtitle(), language)
+                    )
+                );
+                SubtitleEntry subtitleEntry = transletedMovie.getOneSubtitle();
+                subtitleEntry.setMovie(movie.get());
+                subtitleEntry.setLanguage(language.getNameNative());
+                movie.get().getSubtitles().add(subtitleEntry);
+                movieRepository.save(movie.get());
+                return transletedMovie;
+            } else {
+                return new Movie().setSubtitles(
+                    Collections.singletonList(existSubtitle)
+                );
+            }
         }
         return new Movie();
+    }
+
+    private SubtitleEntry getExistSubtitle(Optional<Movie> movie, Language language) {
+        for (SubtitleEntry entry : movie.get().getSubtitles()) {
+            if (entry.getLanguage().equals(language.getNameNative())) {
+                return entry;
+            }
+        }
+        return null;
     }
 }
