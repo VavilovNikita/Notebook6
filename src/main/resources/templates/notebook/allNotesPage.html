@@ -15,11 +15,10 @@
         const textArea = document.createElement("textarea");
         const copyText = document.getElementById(id);
         textArea.value = copyText.value;
-        textArea.style.position = 'fixed'; // Скрыть элемент за пределами экрана
+        textArea.style.position = 'fixed';
         textArea.style.left = '-9999px';
         document.body.appendChild(textArea);
 
-        // Сохранение текущего элемента с фокусом
         const currentFocusedElement = document.activeElement;
         textArea.focus();
         textArea.select();
@@ -30,7 +29,6 @@
         }
         document.body.removeChild(textArea);
 
-        // Восстановление фокуса на предыдущий элемент
         if (currentFocusedElement) {
             currentFocusedElement.focus();
         }

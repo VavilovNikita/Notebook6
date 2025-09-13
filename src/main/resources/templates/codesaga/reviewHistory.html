@@ -265,7 +265,6 @@
         document.getElementById('textModal').style.display = 'none';
     }
 
-    // Закрытие модального окна при клике вне его
     window.onclick = function(event) {
         const modal = document.getElementById('textModal');
         if (event.target === modal) {
@@ -273,7 +272,6 @@
         }
     }
 
-    // Закрытие модального окна по ESC
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closeModal();

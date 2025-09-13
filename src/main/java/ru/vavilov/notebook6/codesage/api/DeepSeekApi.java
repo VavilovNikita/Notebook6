@@ -123,7 +123,6 @@ public class DeepSeekApi {
                             List<String> translatedBatch = objectMapper.readValue(cleanedContent,
                                 new TypeReference<List<String>>() {});
 
-                            // Сохраняем результат в нужную позицию массива
                             translatedBatches[batchIndex] = translatedBatch;
 
                             System.out.printf("Completed batch %d/%d%n", batchIndex + 1, requests.size());
@@ -139,14 +138,12 @@ public class DeepSeekApi {
             });
         }
 
-        // Ждем завершения всех задач
         if (!latch.await(30, TimeUnit.MINUTES)) {
             throw new IOException("Timeout waiting for batch completion");
         }
 
         executor.shutdown();
 
-        // Собираем результаты в правильном порядке
         List<String> allTranslatedTexts = new ArrayList<>();
         for (List<String> batch : translatedBatches) {
             if (batch != null) {
@@ -178,17 +175,14 @@ public class DeepSeekApi {
     }
 
     private String validateAndCleanJson(String content) throws IOException {
-        // Удаляем маркеры code block если они есть
         String cleaned = content.replace("```json", "")
             .replace("```", "")
             .trim();
 
         try {
-            // Пытаемся распарсить JSON чтобы проверить его валидность
             new ObjectMapper().readTree(cleaned);
-            return cleaned; // Если парсинг успешен, возвращаем как есть
+            return cleaned;
         } catch (JsonProcessingException e) {
-            // Если JSON невалидный, пытаемся почистить структуру
             return cleanInvalidJson(cleaned);
         }
     }
@@ -212,19 +206,16 @@ public class DeepSeekApi {
 
             if (inArray) {
                 if (line.startsWith("\"") || (inString && !line.startsWith("]"))) {
-                    // Обрабатываем строки
                     if (!inString) {
                         inString = true;
                         result.append("  ");
                     }
 
-                    // Чистим лишние точки в начале/конце строки
                     String cleanedLine = line.replaceAll("^\\.+", "")
                         .replaceAll("\\.+$", "");
 
                     result.append(cleanedLine);
 
-                    // Если строка заканчивается на кавычку (не экранированную)
                     if (cleanedLine.endsWith("\"") && !cleanedLine.endsWith("\\\"")) {
                         inString = false;
                         if (i < lines.length - 1 && !lines[i + 1].trim().startsWith("]")) {
@@ -238,10 +229,8 @@ public class DeepSeekApi {
                     inArray = false;
                     result.append("]\n");
                 } else if (line.startsWith(",")) {
-                    // Пропускаем лишние запятые
                     continue;
                 } else {
-                    // Оборачиваем неправильно оформленные строки в кавычки
                     if (!inString) {
                         result.append("  \"");
                         inString = true;
@@ -253,7 +242,6 @@ public class DeepSeekApi {
 
                     result.append(cleanedLine);
 
-                    // Если это последняя строка или следующая строка - закрывающая скобка
                     if (i == lines.length - 1 || lines[i + 1].trim().startsWith("]")) {
                         result.append("\"\n");
                         inString = false;
@@ -266,7 +254,6 @@ public class DeepSeekApi {
 
         String finalJson = result.toString();
 
-        // Финальная проверка
         try {
             new ObjectMapper().readTree(finalJson);
             return finalJson;

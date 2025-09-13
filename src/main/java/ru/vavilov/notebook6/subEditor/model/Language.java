@@ -33,7 +33,6 @@ public enum Language {
         this.flag = flag;
     }
 
-    // геттеры
     public Long getId() { return id; }
     public String getCode() { return code; }
     public String getNameRu() { return nameRu; }

@@ -75,7 +75,6 @@ public class DeepSeekService {
                 JSONObject userMessage = new JSONObject();
                 userMessage.put("role", userRole);
 
-                // Преобразуем строки в JSON массив для запроса
                 JSONArray inputArray = new JSONArray(batchLines);
                 String userContent = String.format(
                     "Translate from %s to %s. Input JSON array has %d elements. Output MUST be JSON array with EXACTLY %d elements:\n%s",

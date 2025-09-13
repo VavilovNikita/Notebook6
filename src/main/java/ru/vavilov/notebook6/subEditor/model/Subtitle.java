@@ -41,7 +41,6 @@ public class Subtitle {
     @JoinColumn(name = "subtitle_entry_id", nullable = false)
     private SubtitleEntry subtitleEntry;
 
-    // Вспомогательные методы для удобства
     public String getStartFormatted() {
         return formatMillisToTime(startMillis);
     }

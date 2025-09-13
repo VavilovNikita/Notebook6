@@ -119,26 +119,22 @@
         const overlay = document.getElementById('loadingOverlay');
         overlay.classList.remove('hidden');
 
-        // Блокируем кнопки чтобы предотвратить множественные нажатия
         const buttons = document.querySelectorAll('.language-btn');
         buttons.forEach(btn => {
             btn.disabled = true;
             btn.classList.add('loading');
         });
 
-        // Показываем сообщение о том, что можно уйти со страницы
         setTimeout(() => {
             overlay.querySelector('.loading-note').textContent +=
                 ' Процесс продолжается в фоновом режиме.';
         }, 5000);
     }
 
-    // Если страница загружается после редиректа, скрываем индикатор
     document.addEventListener('DOMContentLoaded', function() {
         const overlay = document.getElementById('loadingOverlay');
         overlay.classList.add('hidden');
 
-        // Восстанавливаем кнопки если страница перезагрузилась
         const buttons = document.querySelectorAll('.language-btn');
         buttons.forEach(btn => {
             btn.disabled = false;
