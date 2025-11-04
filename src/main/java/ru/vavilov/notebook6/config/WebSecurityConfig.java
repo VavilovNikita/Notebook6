@@ -19,15 +19,17 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.
-                authorizeHttpRequests((request) -> request
+        http
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/translator/**"))
+            .authorizeHttpRequests(request -> request
                         .requestMatchers("/register",
                             "/error",
                             "/css/**",
                             "/images/**",
                             "/codesaga/**",
                             "/subtitles/**",
-                            "/subeditor/**")
+                            "/subeditor/**",
+                            "/translator/**")
                         .permitAll()
                         .anyRequest().hasAnyRole("USER", "ADMIN"))
                 .formLogin((form) -> form

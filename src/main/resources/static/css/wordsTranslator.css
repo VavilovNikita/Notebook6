@@ -1,0 +1,207 @@
+/* ====== Общие базовые стили ====== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #e67e22;
+    --light: #f4f6f8;
+    --dark: #2c3e50;
+    --success: #2ecc71;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+    --radius: 10px;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--dark);
+    background: linear-gradient(120deg, #eef2f3 0%, #dfe9f3 100%);
+    min-height: 100vh;
+}
+
+/* ====== Шапка ====== */
+.header {
+    background: var(--primary);
+    color: white;
+    padding: 1.2rem 0;
+    box-shadow: var(--shadow);
+}
+
+.header-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo i {
+    color: var(--accent);
+}
+
+/* ====== Контейнер ====== */
+.container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+/* ====== Навигация ====== */
+.nav {
+    background: white;
+    border-radius: var(--radius);
+    padding: 1rem 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.nav a {
+    text-decoration: none;
+    color: var(--primary);
+    font-weight: 600;
+    margin-right: 1.5rem;
+    transition: var(--transition);
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius);
+}
+
+.nav a:hover,
+.nav a.active {
+    background: var(--secondary);
+    color: white;
+}
+
+/* ====== Карточка ====== */
+.card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(to right, var(--secondary), var(--primary));
+    color: white;
+    padding: 1.2rem 1.5rem;
+}
+
+.card-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* ====== Таблица ====== */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    font-size: 0.95rem;
+}
+
+.styled-table thead {
+    background: var(--secondary);
+    color: white;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 0.9rem 1rem;
+    text-align: left;
+}
+
+.styled-table tbody tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.styled-table tbody tr:hover {
+    background: #ecf0f1;
+}
+
+/* ====== Кнопки ====== */
+.btn {
+    background: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.7rem 1.4rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+}
+
+.btn:hover {
+    background: var(--primary);
+    transform: translateY(-2px);
+}
+
+.btn-accent {
+    background: var(--accent);
+}
+
+.btn-accent:hover {
+    background: #d35400;
+}
+
+.actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+/* ====== Текст ====== */
+p {
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+/* ====== Адаптив ====== */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    .nav {
+        text-align: center;
+    }
+
+    .nav a {
+        display: inline-block;
+        margin: 0.4rem;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 0.6rem;
+    }
+}

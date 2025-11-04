@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Переводчик</title>
+    <link rel="stylesheet" th:href="@{/css/wordsTranslator.css}">
+    <script>
+        async function sendClipboardText() {
+            try {
+                // Получаем текст из буфера обмена
+                const text = await navigator.clipboard.readText();
+                if (!text) {
+                    alert("Буфер обмена пуст!");
+                    return;
+                }
+
+                // Создаем форму для отправки POST-запроса
+                const formData = new FormData();
+                formData.append("word", text);
+
+                const response = await fetch("/translator/translate", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    alert("Ошибка при отправке: " + response.status);
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Не удалось получить текст из буфера обмена. Разрешите доступ к буферу.");
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="header">
+    <div class="header-content">
+        <div class="logo">
+            <i>⚡</i> wordsTranslator
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="nav">
+        <a href="/" th:href="@{/translator/words}">Слова</a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">Перевод слова из буфера обмена</h1>
+        </div>
+        <div class="card-body">
+            <p>Нажми кнопку, чтобы взять текст из буфера обмена и отправить его на перевод.</p>
+            <div class="actions">
+                <button class="btn" onclick="sendClipboardText()">📋 Перевести из буфера</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

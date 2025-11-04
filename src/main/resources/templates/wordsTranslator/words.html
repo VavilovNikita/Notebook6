@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Все слова</title>
+  <link rel="stylesheet" th:href="@{/css/wordsTranslator.css}">
+  <script>
+    async function deleteWord(id) {
+      try {
+        const response = await fetch(`/translator/delete/${id}`, {
+          method: "POST"
+        });
+
+        if (response.ok) {
+          // Перезагружаем страницу, чтобы обновить список
+          location.reload();
+        } else {
+          alert("Ошибка при удалении слова: " + response.status);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Не удалось удалить слово");
+      }
+    }
+  </script>
+</head>
+<body>
+<div class="header">
+  <div class="header-content">
+    <div class="logo">
+      <i>⚡</i> wordsTranslator
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="nav">
+    <a href="/" th:href="@{/translator}">Главная</a>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h1 class="card-title">Все переведённые слова</h1>
+    </div>
+    <div class="card-body">
+      <table class="styled-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Слово</th>
+          <th>Перевод</th>
+          <th>Действие</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="word : ${words}">
+          <td th:text="${word.id}"></td>
+          <td th:text="${word.word}"></td>
+          <td th:text="${word.translate}"></td>
+          <td>
+            <button class="btn btn-accent"
+                    th:onclick="'deleteWord(' + ${word.id} + ')'">🗑</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <div class="actions" style="margin-top: 20px;">
+        <a class="btn" th:href="@{/translator}">➕ Добавить новое слово</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
