@@ -3,63 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Прямая Трансляция с Камеры</title>
-
+    <title>Камера 1 – прямая трансляция</title>
     <link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
-
     <style>
-        /* Центрирование и адаптивность */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #1a1a1a;
-            color: #f0f0f0;
-            padding: 20px;
-        }
-        .video-wrapper {
-            max-width: 900px; /* Максимальная ширина плеера */
-            margin: 0 auto; /* Центрирование */
-            background: #000;
-        }
-        /* Стиль для центрирования кнопки проигрывания */
-        .vjs-big-play-centered {
-            text-align: center;
-        }
+        #status { transition: all 0.5s; }
+        .click-to-play { background: #000; color: #fff; padding: 30px; font-size: 24px; text-align: center; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="video-wrapper">
-    <h2>Live Stream: Камера 1</h2>
+<div style="max-width: 960px; margin: 20px auto;">
+    <h2>Live: Камера 1</h2>
+    <div id="status" class="click-to-play">Нажмите или коснитесь экрана для запуска трансляции</div>
+    <div id="error" style="color:red; display:none; margin:10px 0;"></div>
 
-    <video id="camera-player"
-           class="video-js vjs-default-skin vjs-big-play-centered"
-           controls
-           preload="auto"
-           width="100%"
-           data-setup='{"fluid": true, "liveui": true}'>
-
+    <video id="player" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="auto">
         <source src="https://notebook6.ru/hls/camera1.m3u8" type="application/x-mpegURL">
-
-        <p class="vjs-no-js">
-            Для просмотра видео включите JavaScript и рассмотрите возможность обновления до веб-браузера, поддерживающего HTML5-видео.
-        </p>
     </video>
 </div>
 
 <script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10"></script>
 
 <script>
-    // Инициализация плеера
-    var player = videojs('camera-player');
+    const video = document.getElementById('player');
+    const status = document.getElementById('status');
+    const errorDiv = document.getElementById('error');
+    const url = 'https://notebook6.ru/hls/camera1.m3u8';
 
-    // Установка опций (если нужны специфичные настройки)
-    player.ready(function() {
-        // Опция для улучшения отображения в реальном времени
-        this.liveTracker.on('liveedgechange', function() {
-            this.liveSeeker.seekToLiveEdge();
-        });
-    });
+    let player, hls;
+    let unlocked = false;
+
+    // Один раз — разблокируем автоплей после любого взаимодействия
+    const unlock = () => {
+        if (unlocked) return;
+        unlocked = true;
+        status.textContent = 'Запускаем стрим…';
+        status.classList.remove('click-to-play');
+        document.removeEventListener('click', unlock);
+        document.removeEventListener('touchstart', unlock);
+        document.removeEventListener('keydown', unlock);
+        initPlayer();
+    };
+    document.addEventListener('click', unlock, { once: true });
+    document.addEventListener('touchstart', unlock, { once: true });
+    document.addEventListener('keydown', unlock, { once: true });
+
+    function initPlayer() {
+        player = videojs(video, { fluid: true, liveui: true });
+
+        if (Hls.isSupported()) {
+            hls = new Hls({ liveSyncDuration: 3, liveMaxLatencyDuration: 8 });
+            hls.loadSource(url);
+            hls.attachMedia(video);
+
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                status.textContent = 'Идёт трансляция';
+                player.play();
+            });
+
+            hls.on(Hls.Events.ERROR, (e, data) => {
+                if (data.fatal) {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'Ошибка соединения: ' + data.type;
+                }
+            });
+
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = url;
+            video.play();
+        }
+    }
 </script>
 
 </body>

@@ -24,6 +24,7 @@ public class WebSecurityConfig {
             .authorizeHttpRequests(request -> request
                         .requestMatchers("/register",
                             "/error",
+                            "/cam",
                             "/css/**",
                             "/images/**",
                             "/codesaga/**",
