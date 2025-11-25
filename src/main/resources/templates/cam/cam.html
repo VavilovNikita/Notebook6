@@ -8,22 +8,33 @@
     <style>
         #status { transition: all 0.5s; }
         .click-to-play { background: #000; color: #fff; padding: 30px; font-size: 24px; text-align: center; cursor: pointer; }
+        body { margin: 0; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 960px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div style="max-width: 960px; margin: 20px auto;">
+<div class="container">
     <h2>Live: Камера 1</h2>
-    <div id="status" class="click-to-play">Нажмите или коснитесь экрана для запуска трансляции</div>
+    <div id="status" class="click-to-play">Нажмите для запуска трансляции</div>
     <div id="error" style="color:red; display:none; margin:10px 0;"></div>
 
-    <video id="player" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="auto">
+    <video
+            id="player"
+            class="video-js vjs-default-skin"
+            controls
+            preload="auto"
+            width="100%"
+            height="auto"
+            playsinline
+            webkit-playsinline
+            muted>
         <source src="https://notebook6.ru/hls/camera1.m3u8" type="application/x-mpegURL">
     </video>
 </div>
 
 <script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
 
 <script>
     const video = document.getElementById('player');
@@ -34,46 +45,118 @@
     let player, hls;
     let unlocked = false;
 
-    // Один раз — разблокируем автоплей после любого взаимодействия
+    // Функция разблокировки воспроизведения
     const unlock = () => {
         if (unlocked) return;
         unlocked = true;
         status.textContent = 'Запускаем стрим…';
-        status.classList.remove('click-to-play');
+        status.style.display = 'none';
+
         document.removeEventListener('click', unlock);
         document.removeEventListener('touchstart', unlock);
         document.removeEventListener('keydown', unlock);
+
         initPlayer();
     };
+
+    // Вешаем обработчики на разные события
     document.addEventListener('click', unlock, { once: true });
     document.addEventListener('touchstart', unlock, { once: true });
     document.addEventListener('keydown', unlock, { once: true });
 
     function initPlayer() {
-        player = videojs(video, { fluid: true, liveui: true });
+        const options = {
+            fluid: true,
+            liveui: true,
+            autoplay: true,
+            muted: true, // Важно для автоплея на iOS
+            playsinline: true,
+            preload: 'auto',
+            html5: {
+                vhs: {
+                    overrideNative: true
+                },
+                nativeAudioTracks: false,
+                nativeVideoTracks: false
+            }
+        };
 
+        player = videojs(video, options);
+
+        // Проверяем поддержку HLS
         if (Hls.isSupported()) {
-            hls = new Hls({ liveSyncDuration: 3, liveMaxLatencyDuration: 8 });
+            hls = new Hls({
+                enableWorker: true,
+                lowLatencyMode: true,
+                backBufferLength: 90,
+                liveSyncDuration: 3,
+                liveMaxLatencyDuration: 8,
+                maxMaxBufferLength: 10
+            });
+
             hls.loadSource(url);
             hls.attachMedia(video);
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                status.textContent = 'Идёт трансляция';
-                player.play();
+                console.log('Manifest parsed, starting playback');
+                status.style.display = 'none';
+
+                // Пытаемся запустить воспроизведение
+                player.play().catch(error => {
+                    console.log('Autoplay failed:', error);
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'Нажмите кнопку play для запуска';
+                });
             });
 
             hls.on(Hls.Events.ERROR, (e, data) => {
+                console.error('HLS error:', data);
                 if (data.fatal) {
-                    errorDiv.style.display = 'block';
-                    errorDiv.textContent = 'Ошибка соединения: ' + data.type;
+                    switch(data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            errorDiv.style.display = 'block';
+                            errorDiv.textContent = 'Ошибка сети. Попробуйте обновить страницу.';
+                            hls.startLoad();
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            errorDiv.style.display = 'block';
+                            errorDiv.textContent = 'Ошибка медиа. Перезагружаем...';
+                            hls.recoverMediaError();
+                            break;
+                        default:
+                            errorDiv.style.display = 'block';
+                            errorDiv.textContent = 'Неизвестная ошибка. Перезапустите трансляцию.';
+                            hls.destroy();
+                            break;
+                    }
                 }
             });
 
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // Для Safari на iOS (нативный HLS)
             video.src = url;
-            video.play();
+
+            video.addEventListener('loadedmetadata', () => {
+                status.style.display = 'none';
+                video.play().catch(error => {
+                    console.log('iOS native play failed:', error);
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'Нажмите кнопку play для запуска';
+                });
+            });
+        } else {
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = 'Ваш браузер не поддерживает воспроизведение видео.';
         }
     }
+
+    // Дополнительная проверка через несколько секунд
+    setTimeout(() => {
+        if (player && player.readyState() === 0) {
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = 'Трансляция не запущена. Нажмите play или обновите страницу.';
+        }
+    }, 10000);
 </script>
 
 </body>
