@@ -2,139 +2,79 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Камера 1 – прямая трансляция</title>
-
-    <!-- Последняя версия Video.js (2025) -->
-    <link href="https://vjs.zencdn.net/8.12.0/video-js.css" rel="stylesheet" />
+    <link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
     <style>
-        body { margin:0; background:#000; font-family: Arial, sans-serif; }
-        .container { max-width: 960px; margin: 20px auto; padding: 0 10px; }
-        h2 { color: #fff; text-align: center; }
-        #status {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            padding: 20px 40px;
-            font-size: 24px;
-            border-radius: 12px;
-            z-index: 10;
-            text-align: center;
-            transition: opacity 0.5s;
-        }
-        .video-js { width: 100%; height: auto; aspect-ratio: 16/9; background: #000; }
-        .vjs-big-play-button { font-size: 3em !important; line-height: 1.5 !important; }
+        #status { transition: all 0.5s; }
+        .click-to-play { background: #000; color: #fff; padding: 30px; font-size: 24px; text-align: center; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div style="max-width: 960px; margin: 20px auto;">
     <h2>Live: Камера 1</h2>
-    <div id="status">Нажмите для запуска трансляции</div>
+    <div id="status" class="click-to-play">Нажмите или коснитесь экрана для запуска трансляции</div>
+    <div id="error" style="color:red; display:none; margin:10px 0;"></div>
 
-    <video
-            id="player"
-            class="video-js vjs-default-skin"
-            controls
-            preload="auto"
-            playsinline
-            muted
-            width="100%"
-            height="auto">
+    <video id="player" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="auto">
         <source src="https://notebook6.ru/hls/camera1.m3u8" type="application/x-mpegURL">
     </video>
 </div>
 
-<!-- Video.js + Hls.js -->
-<script src="https://vjs.zencdn.net/8.12.0/video.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10"></script>
 
 <script>
     const video = document.getElementById('player');
     const status = document.getElementById('status');
+    const errorDiv = document.getElementById('error');
     const url = 'https://notebook6.ru/hls/camera1.m3u8';
 
     let player, hls;
-    let hasInteracted = false;
+    let unlocked = false;
 
-    // Разблокировка автоплея после любого пользовательского действия
-    function unlockAndPlay() {
-        if (hasInteracted) return;
-        hasInteracted = true;
-
-        status.textContent = 'Загрузка трансляции…';
-
-        // Убираем оверлей через секунду после начала воспроизведения
-        setTimeout(() => {
-            status.style.opacity = '0';
-            setTimeout(() => status.remove(), 600);
-        }, 1000);
-
+    // Один раз — разблокируем автоплей после любого взаимодействия
+    const unlock = () => {
+        if (unlocked) return;
+        unlocked = true;
+        status.textContent = 'Запускаем стрим…';
+        status.classList.remove('click-to-play');
+        document.removeEventListener('click', unlock);
+        document.removeEventListener('touchstart', unlock);
+        document.removeEventListener('keydown', unlock);
         initPlayer();
-    }
-
-    // Слушаем первое взаимодействие пользователя
-    ['click', 'touchstart', 'keydown'].forEach(evt => {
-        document.addEventListener(evt, unlockAndPlay, { once: true, passive: true });
-    });
+    };
+    document.addEventListener('click', unlock, { once: true });
+    document.addEventListener('touchstart', unlock, { once: true });
+    document.addEventListener('keydown', unlock, { once: true });
 
     function initPlayer() {
-        player = videojs('player', {
-            fluid: true,
-            responsive: true,
-            liveui: true,
-            html5: {
-                vhs: { overrideNative: true },
-                nativeVideoTracks: false,
-                nativeAudioTracks: false,
-                nativeTextTracks: false
-            }
-        });
+        player = videojs(video, { fluid: true, liveui: true });
 
-        // На iOS Safari используем нативную поддержку HLS (самый надёжный способ)
-        if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = url;
-            video.addEventListener('canplay', () => {
-                video.play().catch(e => console.log("iOS play prevented:", e));
-            });
-        }
-        // На всех остальных — Hls.js
-        else if (Hls.isSupported()) {
-            hls = new Hls({
-                liveSyncDuration: 3,
-                liveMaxLatencyDuration: 10,
-                maxBufferLength: 10
-            });
+        if (Hls.isSupported()) {
+            hls = new Hls({ liveSyncDuration: 3, liveMaxLatencyDuration: 8 });
             hls.loadSource(url);
             hls.attachMedia(video);
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                video.play();
+                status.textContent = 'Идёт трансляция';
+                player.play();
             });
 
-            hls.on(Hls.Events.ERROR, (event, data) => {
+            hls.on(Hls.Events.ERROR, (e, data) => {
                 if (data.fatal) {
-                    console.error('HLS Fatal error', data);
-                    status.textContent = 'Ошибка потока. Перезагрузите страницу.';
-                    status.style.opacity = '1';
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'Ошибка соединения: ' + data.type;
                 }
             });
-        }
-        // Если ничего не поддерживается (очень старый Android)
-        else {
-            status.textContent = 'Ваш браузер не поддерживает воспроизведение.';
-            status.style.opacity = '1';
+
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = url;
+            video.play();
         }
     }
-
-    // Попытка автозапуска после загрузки (на десктопе может сработать)
-    window.addEventListener('load', () => {
-        if (!/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-            unlockAndPlay();
-        }
-    });
 </script>
+
 </body>
 </html>
