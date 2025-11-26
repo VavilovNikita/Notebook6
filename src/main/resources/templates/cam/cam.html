@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Камера 1 – прямая трансляция</title>
+    <link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
     <style>
-        body { margin: 0; padding: 20px; background: #f0f0f0; font-family: Arial, sans-serif; }
-        .container { max-width: 960px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; text-align: center; }
+        body { margin: 0; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 960px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
         #status {
-            background: #007bff;
-            color: white;
-            padding: 20px;
-            font-size: 20px;
+            background: #000;
+            color: #fff;
+            padding: 30px;
+            font-size: 24px;
+            text-align: center;
+            cursor: pointer;
             border-radius: 10px;
             margin-bottom: 20px;
-            cursor: pointer;
         }
         #error {
             color: red;
@@ -24,132 +26,209 @@
             background: #ffe6e6;
             border-radius: 5px;
         }
-        video {
-            width: 100%;
-            max-width: 800px;
-            border-radius: 10px;
-            background: black;
-        }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Live: Камера 1</h2>
-    <div id="status">▶️ НАЖМИТЕ ДЛЯ ЗАПУСКА ТРАНСЛЯЦИИ</div>
+    <div id="status">Нажмите для запуска трансляции</div>
     <div id="error"></div>
 
-    <video
-            id="videoPlayer"
-            controls
-            playsinline
-            webkit-playsinline
-            preload="none"
-            style="display: none;">
-        Ваш браузер не поддерживает воспроизведение видео.
-    </video>
+    <div id="playerContainer" class="hidden">
+        <video
+                id="player"
+                class="video-js"
+                controls
+                preload="auto"
+                width="100%"
+                height="auto"
+                playsinline
+                webkit-playsinline>
+            <source src="https://notebook6.ru/hls/camera1.m3u8" type="application/x-mpegURL">
+            Ваш браузер не поддерживает воспроизведение видео.
+        </video>
+    </div>
 </div>
+
+<script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
 
 <script>
     const status = document.getElementById('status');
     const errorDiv = document.getElementById('error');
-    const video = document.getElementById('videoPlayer');
+    const playerContainer = document.getElementById('playerContainer');
     const url = 'https://notebook6.ru/hls/camera1.m3u8';
 
-    let isPlaying = false;
+    let player = null;
+    let isInitialized = false;
 
     function showError(message) {
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
         status.style.display = 'block';
-        status.textContent = '❌ ' + message + ' - Нажмите для повторной попытки';
+        status.textContent = 'Ошибка. Нажмите для повторной попытки';
+        playerContainer.classList.add('hidden');
     }
 
     function hideError() {
         errorDiv.style.display = 'none';
     }
 
-    function startPlayback() {
-        if (isPlaying) return;
-
-        status.textContent = '🔄 Загружаем трансляцию...';
-        hideError();
-
-        // Для iOS используем нативный HLS
-        video.style.display = 'block';
-        video.src = url;
-
-        // Ждем когда видео будет готово
-        video.addEventListener('loadedmetadata', function() {
-            console.log('Video metadata loaded');
+    function initializePlayer() {
+        if (isInitialized) {
+            // Если уже инициализирован, просто показываем и запускаем
+            playerContainer.classList.remove('hidden');
             status.style.display = 'none';
-            isPlaying = true;
-
-            // Пытаемся запустить воспроизведение
-            video.play().then(() => {
-                console.log('Video started playing');
-                hideError();
-            }).catch(error => {
-                console.log('Autoplay blocked:', error);
-                // На iOS автоплей блокируется - показываем кнопку play
-                showError('Нажмите кнопку PLAY в плеере');
+            player.play().catch(e => {
+                console.log('Play failed:', e);
             });
+            return;
+        }
+
+        status.textContent = 'Запускаем плеер...';
+
+        // Создаем плеер
+        player = videojs('player', {
+            fluid: true,
+            liveui: true,
+            controls: true,
+            preload: 'auto',
+            playsinline: true,
+            html5: {
+                vhs: {
+                    overrideNative: true,
+                    enableLowInitialPlaylist: true,
+                    smoothQualityChange: true,
+                    fastQualityChange: true
+                },
+                nativeAudioTracks: false,
+                nativeVideoTracks: false
+            }
         });
 
-        // Обработчики ошибок
-        video.addEventListener('error', function(e) {
-            console.error('Video error:', e);
-            showError('Ошибка загрузки видео. Проверьте подключение');
+        // Обработчики событий плеера
+        player.ready(() => {
+            console.log('Player ready');
+
+            if (Hls.isSupported()) {
+                console.log('HLS.js supported');
+                const hls = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    backBufferLength: 90,
+                    maxBufferLength: 30,
+                    liveSyncDuration: 3,
+                    liveMaxLatencyDuration: 8,
+                    maxMaxBufferLength: 10,
+                    debug: false
+                });
+
+                hls.loadSource(url);
+                hls.attachMedia(player.tech().el());
+
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    console.log('Manifest parsed');
+                    hideError();
+                    playerContainer.classList.remove('hidden');
+                    status.style.display = 'none';
+                    isInitialized = true;
+
+                    // Пытаемся запустить воспроизведение
+                    player.play().catch(error => {
+                        console.log('Autoplay blocked:', error);
+                        // На iOS автоплей часто блокируется - это нормально
+                        // Пользователь нажмет play сам
+                    });
+                });
+
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS error:', data);
+
+                    if (data.fatal) {
+                        switch(data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                showError('Проблемы с сетью. Переподключаемся...');
+                                hls.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                showError('Ошибка видео. Восстанавливаем...');
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                showError('Ошибка воспроизведения. Перезагрузите страницу.');
+                                hls.destroy();
+                                break;
+                        }
+                    }
+                });
+
+            } else if (player.tech().el().canPlayType('application/vnd.apple.mpegurl')) {
+                // Нативный HLS (Safari)
+                console.log('Native HLS supported');
+                player.src({ type: 'application/x-mpegURL', src: url });
+
+                player.one('loadedmetadata', () => {
+                    console.log('Native HLS loaded');
+                    hideError();
+                    playerContainer.classList.remove('hidden');
+                    status.style.display = 'none';
+                    isInitialized = true;
+
+                    player.play().catch(error => {
+                        console.log('Native autoplay blocked:', error);
+                    });
+                });
+            } else {
+                showError('Ваш браузер не поддерживает формат трансляции');
+            }
         });
 
-        video.addEventListener('waiting', function() {
-            console.log('Video waiting for data...');
+        // Обработчики ошибок Video.js
+        player.on('error', () => {
+            const error = player.error();
+            console.error('Video.js error:', error);
+            showError('Ошибка видео: ' + (error?.message || 'Неизвестная ошибка'));
         });
 
-        video.addEventListener('playing', function() {
-            console.log('Video playing');
+        player.on('waiting', () => {
+            console.log('Player waiting for data...');
+        });
+
+        player.on('playing', () => {
+            console.log('Player started playing');
             hideError();
         });
-
-        // Таймаут - если долго грузит
-        setTimeout(() => {
-            if (video.readyState < 1) {
-                showError('Долгая загрузка. Проверьте интернет');
-            }
-        }, 10000);
     }
 
-    // Запуск по клику
-    status.addEventListener('click', startPlayback);
+    // Обработчик клика по статусу
+    status.addEventListener('click', function() {
+        initializePlayer();
+    });
 
-    // Также запускаем при любом касании (для iOS)
-    document.addEventListener('touchstart', function() {
-        if (!isPlaying) {
-            startPlayback();
+    // Также запускаем при любом взаимодействии с документом
+    document.addEventListener('click', function() {
+        if (!isInitialized) {
+            initializePlayer();
         }
     }, { once: true });
 
     // Проверяем доступность потока
-    function checkStream() {
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/vnd.apple.mpegurl, */*'
-            }
-        })
+    function checkStreamAvailability() {
+        fetch(url, { method: 'HEAD' })
             .then(response => {
                 if (!response.ok) {
                     showError('Трансляция временно недоступна');
                 }
             })
             .catch(() => {
-                showError('Не удалось подключиться к серверу');
+                showError('Не удалось подключиться к трансляции');
             });
     }
 
-    // Проверяем при загрузке
-    checkStream();
+    // Проверяем поток при загрузке
+    checkStreamAvailability();
 </script>
 
 </body>
