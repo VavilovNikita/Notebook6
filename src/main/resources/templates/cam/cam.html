@@ -46,8 +46,6 @@
                 height="auto"
                 playsinline
                 webkit-playsinline>
-            <source src="https://notebook6.ru/hls/camera1.m3u8" type="application/x-mpegURL">
-            Ваш браузер не поддерживает воспроизведение видео.
         </video>
     </div>
 </div>
@@ -77,158 +75,74 @@
     }
 
     function initializePlayer() {
-        if (isInitialized) {
-            // Если уже инициализирован, просто показываем и запускаем
-            playerContainer.classList.remove('hidden');
-            status.style.display = 'none';
-            player.play().catch(e => {
-                console.log('Play failed:', e);
+        if (isInitialized) return;
+
+        status.textContent = 'Запуск...';
+        status.style.display = 'none';
+        hideError();
+
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        playerContainer.classList.remove('hidden');
+
+        // ---- iPhone / iPad — НАТИВНЫЙ HLS ----
+        if (isIOS) {
+            console.log("iOS detected → using native HLS");
+
+            const video = document.getElementById("player");
+            video.src = url;
+            video.load();
+
+            video.play().catch(() => {
+                status.style.display = 'block';
+                status.textContent = 'Нажмите для начала воспроизведения';
             });
+
+            isInitialized = true;
             return;
         }
 
-        status.textContent = 'Запускаем плеер...';
+        // ---- ПК / Android — video.js + Hls.js ----
+        console.log("Desktop/Android → using Video.js + HLS.js");
 
-        // Создаем плеер
         player = videojs('player', {
             fluid: true,
             liveui: true,
             controls: true,
             preload: 'auto',
-            playsinline: true,
-            html5: {
-                vhs: {
-                    overrideNative: true,
-                    enableLowInitialPlaylist: true,
-                    smoothQualityChange: true,
-                    fastQualityChange: true
-                },
-                nativeAudioTracks: false,
-                nativeVideoTracks: false
-            }
+            playsinline: true
         });
 
-        // Обработчики событий плеера
         player.ready(() => {
-            console.log('Player ready');
-
             if (Hls.isSupported()) {
-                console.log('HLS.js supported');
                 const hls = new Hls({
-                    enableWorker: true,
                     lowLatencyMode: true,
-                    backBufferLength: 90,
-                    maxBufferLength: 30,
-                    liveSyncDuration: 3,
-                    liveMaxLatencyDuration: 8,
-                    maxMaxBufferLength: 10,
-                    debug: false
+                    enableWorker: true
                 });
 
                 hls.loadSource(url);
                 hls.attachMedia(player.tech().el());
 
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    console.log('Manifest parsed');
                     hideError();
-                    playerContainer.classList.remove('hidden');
-                    status.style.display = 'none';
-                    isInitialized = true;
-
-                    // Пытаемся запустить воспроизведение
-                    player.play().catch(error => {
-                        console.log('Autoplay blocked:', error);
-                        // На iOS автоплей часто блокируется - это нормально
-                        // Пользователь нажмет play сам
-                    });
+                    player.play().catch(() => {});
                 });
 
                 hls.on(Hls.Events.ERROR, (event, data) => {
-                    console.error('HLS error:', data);
-
-                    if (data.fatal) {
-                        switch(data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                showError('Проблемы с сетью. Переподключаемся...');
-                                hls.startLoad();
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                showError('Ошибка видео. Восстанавливаем...');
-                                hls.recoverMediaError();
-                                break;
-                            default:
-                                showError('Ошибка воспроизведения. Перезагрузите страницу.');
-                                hls.destroy();
-                                break;
-                        }
-                    }
+                    console.error('HLS.js error:', data);
+                    showError("Ошибка воспроизведения");
                 });
 
-            } else if (player.tech().el().canPlayType('application/vnd.apple.mpegurl')) {
-                // Нативный HLS (Safari)
-                console.log('Native HLS supported');
-                player.src({ type: 'application/x-mpegURL', src: url });
-
-                player.one('loadedmetadata', () => {
-                    console.log('Native HLS loaded');
-                    hideError();
-                    playerContainer.classList.remove('hidden');
-                    status.style.display = 'none';
-                    isInitialized = true;
-
-                    player.play().catch(error => {
-                        console.log('Native autoplay blocked:', error);
-                    });
-                });
             } else {
-                showError('Ваш браузер не поддерживает формат трансляции');
+                player.src({ src: url, type: 'application/x-mpegURL' });
+                player.play().catch(() => {});
             }
         });
 
-        // Обработчики ошибок Video.js
-        player.on('error', () => {
-            const error = player.error();
-            console.error('Video.js error:', error);
-            showError('Ошибка видео: ' + (error?.message || 'Неизвестная ошибка'));
-        });
-
-        player.on('waiting', () => {
-            console.log('Player waiting for data...');
-        });
-
-        player.on('playing', () => {
-            console.log('Player started playing');
-            hideError();
-        });
+        isInitialized = true;
     }
 
-    // Обработчик клика по статусу
-    status.addEventListener('click', function() {
-        initializePlayer();
-    });
-
-    // Также запускаем при любом взаимодействии с документом
-    document.addEventListener('click', function() {
-        if (!isInitialized) {
-            initializePlayer();
-        }
-    }, { once: true });
-
-    // Проверяем доступность потока
-    function checkStreamAvailability() {
-        fetch(url, { method: 'HEAD' })
-            .then(response => {
-                if (!response.ok) {
-                    showError('Трансляция временно недоступна');
-                }
-            })
-            .catch(() => {
-                showError('Не удалось подключиться к трансляции');
-            });
-    }
-
-    // Проверяем поток при загрузке
-    checkStreamAvailability();
+    status.addEventListener('click', initializePlayer);
 </script>
 
 </body>
