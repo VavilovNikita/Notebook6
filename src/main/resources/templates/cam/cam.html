@@ -57,89 +57,44 @@
     const status = document.getElementById('status');
     const errorDiv = document.getElementById('error');
     const playerContainer = document.getElementById('playerContainer');
-    const url = 'https://notebook6.ru/hls/camera1.m3u8';
+
+    // ГЕНЕРИРУЕМ УНИКАЛЬНЫЙ КЛЮЧ ТОЛЬКО ДЛЯ IOS
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const uniqueKey = isIOS ? 'camera1_' + Date.now() : 'camera1';
+    const url = `https://notebook6.ru/hls/${uniqueKey}.m3u8`;  // ← вот и всё!
 
     let player = null;
     let isInitialized = false;
 
-    function showError(message) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-        status.style.display = 'block';
-        status.textContent = 'Ошибка. Нажмите для повторной попытки';
-        playerContainer.classList.add('hidden');
-    }
-
-    function hideError() {
-        errorDiv.style.display = 'none';
-    }
-
     function initializePlayer() {
         if (isInitialized) return;
+        isInitialized = true;
 
         status.textContent = 'Запуск...';
-        status.style.display = 'none';
-        hideError();
-
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
         playerContainer.classList.remove('hidden');
 
-        // ---- iPhone / iPad — НАТИВНЫЙ HLS ----
-        if (isIOS) {
-            console.log("iOS detected → using native HLS");
+        const video = document.getElementById("player");
 
-            const video = document.getElementById("player");
+        if (isIOS) {
+            console.log("iOS → новый поток:", url);
             video.src = url;
             video.load();
-
-            video.play().catch(() => {
+            video.play().catch(e => {
                 status.style.display = 'block';
-                status.textContent = 'Нажмите для начала воспроизведения';
+                status.textContent = 'Нажмите для воспроизведения';
             });
-
-            isInitialized = true;
-            return;
-        }
-
-        // ---- ПК / Android — video.js + Hls.js ----
-        console.log("Desktop/Android → using Video.js + HLS.js");
-
-        player = videojs('player', {
-            fluid: true,
-            liveui: true,
-            controls: true,
-            preload: 'auto',
-            playsinline: true
-        });
-
-        player.ready(() => {
+        } else {
+            // Для всех остальных — старый надёжный video.js + hls.js
+            player = videojs('player', { fluid: true, liveui: true });
             if (Hls.isSupported()) {
-                const hls = new Hls({
-                    lowLatencyMode: true,
-                    enableWorker: true
-                });
-
-                hls.loadSource(url);
-                hls.attachMedia(player.tech().el());
-
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    hideError();
-                    player.play().catch(() => {});
-                });
-
-                hls.on(Hls.Events.ERROR, (event, data) => {
-                    console.error('HLS.js error:', data);
-                    showError("Ошибка воспроизведения");
-                });
-
+                const hls = new Hls({ lowLatencyMode: true });
+                hls.loadSource('https://notebook6.ru/hls/camera1.m3u8');
+                hls.attachMedia(video);
             } else {
-                player.src({ src: url, type: 'application/x-mpegURL' });
-                player.play().catch(() => {});
+                player.src({ src: 'https://notebook6.ru/hls/camera1.m3u8', type: 'application/x-mpegURL' });
             }
-        });
-
-        isInitialized = true;
+            player.play();
+        }
     }
 
     status.addEventListener('click', initializePlayer);
