@@ -3,159 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Камера 1 – прямая трансляция</title>
+    <title>Камера 1 – тестирование</title>
     <style>
-        body { margin: 0; padding: 20px; background: #f0f0f0; }
-        .container { max-width: 960px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
-        #status {
-            background: #000;
-            color: #fff;
-            padding: 30px;
-            font-size: 24px;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        #error {
-            color: red;
-            display: none;
-            margin: 10px 0;
-            padding: 10px;
-            background: #ffe6e6;
-            border-radius: 5px;
-        }
-        .hidden { display: none !important; }
-        #nativeVideo {
-            width: 100%;
-            max-width: 100%;
-            background: #000;
-        }
+        body { margin: 20px; font-family: Arial, sans-serif; }
+        video { width: 100%; max-width: 800px; background: #000; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .loading { background: #fff3cd; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d1ecf1; color: #0c5460; }
     </style>
 </head>
 <body>
+<h2>Тестирование HLS потока</h2>
 
-<div class="container">
-    <h2>Live: Камера 1</h2>
-    <div id="status">Нажмите для запуска трансляции</div>
-    <div id="error"></div>
+<div id="status" class="status loading">Проверяем поток...</div>
+<button onclick="testStream()">Тестировать поток</button>
+<button onclick="clearCache()">Очистить кэш</button>
 
-    <div id="playerContainer" class="hidden">
-        <!-- Для iOS используем нативный video -->
-        <video
-                id="nativeVideo"
-                controls
-                playsinline
-                webkit-playsinline
-                muted>
-            Ваш браузер не поддерживает видео.
-        </video>
-    </div>
+<div id="player" style="margin-top: 20px;">
+    <video id="video" controls playsinline webkit-playsinline muted></video>
 </div>
 
+<div id="debug" style="margin-top: 20px; font-family: monospace; font-size: 12px;"></div>
+
 <script>
-    const status = document.getElementById('status');
-    const errorDiv = document.getElementById('error');
-    const playerContainer = document.getElementById('playerContainer');
-    const nativeVideo = document.getElementById('nativeVideo');
+    const video = document.getElementById('video');
+    const statusDiv = document.getElementById('status');
+    const debugDiv = document.getElementById('debug');
 
-    const streamUrl = 'https://notebook6.ru/hls/camera1.m3u8';
+    const STREAM_URL = 'https://notebook6.ru/hls/camera1.m3u8';
 
-    function showError(message) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-        status.style.display = 'block';
-        status.textContent = 'Ошибка. Нажмите для повторной попытки';
-        playerContainer.classList.add('hidden');
-    }
+    async function testStream() {
+        statusDiv.className = 'status loading';
+        statusDiv.textContent = 'Проверяем доступность потока...';
+        debugDiv.innerHTML = '';
 
-    function hideError() {
-        errorDiv.style.display = 'none';
-    }
+        try {
+            // Тестируем доступность m3u8
+            const testUrl = STREAM_URL + '?t=' + Date.now();
+            const response = await fetch(testUrl);
 
-    function initializePlayer() {
-        status.textContent = 'Запуск...';
-        hideError();
-        playerContainer.classList.remove('hidden');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
 
-        // ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ КЭША - добавляем случайный параметр
-        const cacheBuster = 't=' + Date.now() + '&r=' + Math.random();
-        const currentStreamUrl = streamUrl + '?' + cacheBuster;
+            const m3u8Content = await response.text();
+            debugDiv.innerHTML += `<strong>M3U8 содержимое:</strong><br><pre>${m3u8Content}</pre>`;
 
-        console.log('Loading stream:', currentStreamUrl);
+            statusDiv.textContent = 'M3U8 доступен. Загружаем видео...';
 
-        // Останавливаем предыдущее видео
-        nativeVideo.pause();
-        nativeVideo.src = '';
+            // Загружаем видео
+            video.src = testUrl;
+            video.load();
 
-        // Устанавливаем новый источник
-        nativeVideo.src = currentStreamUrl;
-        nativeVideo.load();
+            return new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Таймаут загрузки видео'));
+                }, 10000);
 
-        let loadTimeout = setTimeout(() => {
-            console.log('Load timeout - forcing play');
-            nativeVideo.play().catch(e => console.log('Force play error:', e));
-        }, 3000);
+                video.addEventListener('loadeddata', () => {
+                    clearTimeout(timeout);
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = 'Видео загружено!';
+                    resolve();
+                });
 
-        nativeVideo.addEventListener('loadeddata', function() {
-            console.log('Video loaded successfully');
-            clearTimeout(loadTimeout);
-            hideError();
-            status.style.display = 'none';
-        });
-
-        nativeVideo.addEventListener('error', function(e) {
-            console.error('Video error:', nativeVideo.error);
-            clearTimeout(loadTimeout);
-            showError(`Ошибка загрузки видео: ${nativeVideo.error ? nativeVideo.error.message : 'Unknown error'}`);
-        });
-
-        nativeVideo.addEventListener('waiting', function() {
-            console.log('Video waiting for data...');
-        });
-
-        nativeVideo.addEventListener('playing', function() {
-            console.log('Video playing successfully');
-            clearTimeout(loadTimeout);
-            hideError();
-            status.style.display = 'none';
-        });
-
-        // Пытаемся запустить воспроизведение
-        const playPromise = nativeVideo.play();
-
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log('Autoplay failed:', error);
-                status.style.display = 'block';
-                status.textContent = 'Нажмите для начала воспроизведения';
+                video.addEventListener('error', (e) => {
+                    clearTimeout(timeout);
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = `Ошибка видео: ${video.error?.message || 'Unknown error'}`;
+                    reject(e);
+                });
             });
+
+        } catch (error) {
+            statusDiv.className = 'status error';
+            statusDiv.textContent = `Ошибка: ${error.message}`;
+            debugDiv.innerHTML += `<strong>Ошибка:</strong> ${error.message}`;
         }
     }
 
-    // Функция для принудительного обновления потока
-    function forceRefreshStream() {
-        console.log('Force refreshing stream...');
-        if (nativeVideo.src) {
-            const newUrl = nativeVideo.src.split('?')[0] + '?force=' + Date.now();
-            nativeVideo.src = newUrl;
-            nativeVideo.load();
-            nativeVideo.play().catch(e => console.log('Refresh play error:', e));
-        }
+    function clearCache() {
+        video.src = '';
+        video.load();
+        statusDiv.textContent = 'Кэш очищен';
+        debugDiv.innerHTML = '';
     }
 
-    status.addEventListener('click', initializePlayer);
-
-    // Автоматическая попытка инициализации
-    setTimeout(initializePlayer, 1000);
-
-    // Добавляем кнопку для принудительного обновления (для отладки)
-    const refreshBtn = document.createElement('button');
-    refreshBtn.textContent = 'Обновить поток';
-    refreshBtn.style.margin = '10px';
-    refreshBtn.onclick = forceRefreshStream;
-    document.querySelector('.container').appendChild(refreshBtn);
+    // Автотест при загрузке
+    setTimeout(testStream, 1000);
 </script>
-
 </body>
 </html>
