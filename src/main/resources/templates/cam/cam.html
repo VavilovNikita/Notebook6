@@ -55,49 +55,42 @@
 
 <script>
     const status = document.getElementById('status');
-    const errorDiv = document.getElementById('error');
     const playerContainer = document.getElementById('playerContainer');
+    const url = 'https://notebook6.ru/hls/camera1.m3u8';  // ← один и тот же URL везде
 
-    // ГЕНЕРИРУЕМ УНИКАЛЬНЫЙ КЛЮЧ ТОЛЬКО ДЛЯ IOS
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const uniqueKey = isIOS ? 'camera1_' + Date.now() : 'camera1';
-    const url = `https://notebook6.ru/hls/${uniqueKey}.m3u8`;  // ← вот и всё!
-
-    let player = null;
-    let isInitialized = false;
-
-    function initializePlayer() {
-        if (isInitialized) return;
-        isInitialized = true;
-
-        status.textContent = 'Запуск...';
+    function init() {
+        status.style.display = 'none';
         playerContainer.classList.remove('hidden');
 
-        const video = document.getElementById("player");
+        const video = document.getElementById('player');
 
-        if (isIOS) {
-            console.log("iOS → новый поток:", url);
+        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            // iOS — нативный плеер + небольшая задержка
             video.src = url;
             video.load();
-            video.play().catch(e => {
-                status.style.display = 'block';
-                status.textContent = 'Нажмите для воспроизведения';
-            });
+
+            // Ждём 4 секунды, чтобы точно были сегменты
+            setTimeout(() => {
+                video.play().catch(() => {
+                    status.style.display = 'block';
+                    status.textContent = 'Нажмите для воспроизведения';
+                });
+            }, 4000);
         } else {
-            // Для всех остальных — старый надёжный video.js + hls.js
-            player = videojs('player', { fluid: true, liveui: true });
+            // Все остальные — сразу
+            const player = videojs('player', { fluid: true, liveui: true });
             if (Hls.isSupported()) {
                 const hls = new Hls({ lowLatencyMode: true });
-                hls.loadSource('https://notebook6.ru/hls/camera1.m3u8');
+                hls.loadSource(url);
                 hls.attachMedia(video);
             } else {
-                player.src({ src: 'https://notebook6.ru/hls/camera1.m3u8', type: 'application/x-mpegURL' });
+                player.src({ src: url, type: 'application/x-mpegURL' });
             }
             player.play();
         }
     }
 
-    status.addEventListener('click', initializePlayer);
+    status.addEventListener('click', init);
 </script>
 
 </body>
