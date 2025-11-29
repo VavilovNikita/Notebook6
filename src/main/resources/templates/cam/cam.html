@@ -55,42 +55,94 @@
 
 <script>
     const status = document.getElementById('status');
+    const errorDiv = document.getElementById('error');
     const playerContainer = document.getElementById('playerContainer');
-    const url = 'https://notebook6.ru/hls/camera1.m3u8';  // ← один и тот же URL везде
+    const url = 'https://notebook6.ru/hls/camera1.m3u8';
 
-    function init() {
+    let player = null;
+    let isInitialized = false;
+
+    function showError(message) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        status.style.display = 'block';
+        status.textContent = 'Ошибка. Нажмите для повторной попытки';
+        playerContainer.classList.add('hidden');
+    }
+
+    function hideError() {
+        errorDiv.style.display = 'none';
+    }
+
+    function initializePlayer() {
+        if (isInitialized) return;
+
+        status.textContent = 'Запуск...';
         status.style.display = 'none';
+        hideError();
+
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
         playerContainer.classList.remove('hidden');
 
-        const video = document.getElementById('player');
+        // ---- iPhone / iPad — НАТИВНЫЙ HLS ----
+        if (isIOS) {
+            console.log("iOS detected → using native HLS");
 
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            // iOS — нативный плеер + небольшая задержка
+            const video = document.getElementById("player");
             video.src = url;
             video.load();
 
-            // Ждём 4 секунды, чтобы точно были сегменты
-            setTimeout(() => {
-                video.play().catch(() => {
-                    status.style.display = 'block';
-                    status.textContent = 'Нажмите для воспроизведения';
-                });
-            }, 4000);
-        } else {
-            // Все остальные — сразу
-            const player = videojs('player', { fluid: true, liveui: true });
+            video.play().catch(() => {
+                status.style.display = 'block';
+                status.textContent = 'Нажмите для начала воспроизведения';
+            });
+
+            isInitialized = true;
+            return;
+        }
+
+        // ---- ПК / Android — video.js + Hls.js ----
+        console.log("Desktop/Android → using Video.js + HLS.js");
+
+        player = videojs('player', {
+            fluid: true,
+            liveui: true,
+            controls: true,
+            preload: 'auto',
+            playsinline: true
+        });
+
+        player.ready(() => {
             if (Hls.isSupported()) {
-                const hls = new Hls({ lowLatencyMode: true });
+                const hls = new Hls({
+                    lowLatencyMode: true,
+                    enableWorker: true
+                });
+
                 hls.loadSource(url);
-                hls.attachMedia(video);
+                hls.attachMedia(player.tech().el());
+
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    hideError();
+                    player.play().catch(() => {});
+                });
+
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS.js error:', data);
+                    showError("Ошибка воспроизведения");
+                });
+
             } else {
                 player.src({ src: url, type: 'application/x-mpegURL' });
+                player.play().catch(() => {});
             }
-            player.play();
-        }
+        });
+
+        isInitialized = true;
     }
 
-    status.addEventListener('click', init);
+    status.addEventListener('click', initializePlayer);
 </script>
 
 </body>
