@@ -58,9 +58,8 @@
     const errorDiv = document.getElementById('error');
     const playerContainer = document.getElementById('playerContainer');
     const nativeVideo = document.getElementById('nativeVideo');
-    const url = 'https://notebook6.ru/hls/camera1.m3u8?_=' + Date.now();
 
-    let isInitialized = false;
+    const streamUrl = 'https://notebook6.ru/hls/camera1.m3u8';
 
     function showError(message) {
         errorDiv.textContent = message;
@@ -75,39 +74,40 @@
     }
 
     function initializePlayer() {
-        if (isInitialized) {
-            // Перезагрузка потока
-            nativeVideo.src = url + '&t=' + Date.now();
-            nativeVideo.load();
-            nativeVideo.play().catch(e => console.log('Play error:', e));
-            return;
-        }
-
         status.textContent = 'Запуск...';
         hideError();
-
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
         playerContainer.classList.remove('hidden');
 
-        // Для всех устройств используем нативный video элемент
-        console.log("Using native video element");
+        // ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ КЭША - добавляем случайный параметр
+        const cacheBuster = 't=' + Date.now() + '&r=' + Math.random();
+        const currentStreamUrl = streamUrl + '?' + cacheBuster;
 
-        // Добавляем временную метку для избежания кэширования
-        const streamUrl = url + '&t=' + Date.now();
+        console.log('Loading stream:', currentStreamUrl);
 
-        nativeVideo.src = streamUrl;
+        // Останавливаем предыдущее видео
+        nativeVideo.pause();
+        nativeVideo.src = '';
+
+        // Устанавливаем новый источник
+        nativeVideo.src = currentStreamUrl;
         nativeVideo.load();
 
+        let loadTimeout = setTimeout(() => {
+            console.log('Load timeout - forcing play');
+            nativeVideo.play().catch(e => console.log('Force play error:', e));
+        }, 3000);
+
         nativeVideo.addEventListener('loadeddata', function() {
-            console.log('Video loaded - playing...');
+            console.log('Video loaded successfully');
+            clearTimeout(loadTimeout);
             hideError();
             status.style.display = 'none';
         });
 
         nativeVideo.addEventListener('error', function(e) {
-            console.error('Video error:', e);
-            showError("Ошибка загрузки видео");
+            console.error('Video error:', nativeVideo.error);
+            clearTimeout(loadTimeout);
+            showError(`Ошибка загрузки видео: ${nativeVideo.error ? nativeVideo.error.message : 'Unknown error'}`);
         });
 
         nativeVideo.addEventListener('waiting', function() {
@@ -116,6 +116,7 @@
 
         nativeVideo.addEventListener('playing', function() {
             console.log('Video playing successfully');
+            clearTimeout(loadTimeout);
             hideError();
             status.style.display = 'none';
         });
@@ -130,14 +131,30 @@
                 status.textContent = 'Нажмите для начала воспроизведения';
             });
         }
+    }
 
-        isInitialized = true;
+    // Функция для принудительного обновления потока
+    function forceRefreshStream() {
+        console.log('Force refreshing stream...');
+        if (nativeVideo.src) {
+            const newUrl = nativeVideo.src.split('?')[0] + '?force=' + Date.now();
+            nativeVideo.src = newUrl;
+            nativeVideo.load();
+            nativeVideo.play().catch(e => console.log('Refresh play error:', e));
+        }
     }
 
     status.addEventListener('click', initializePlayer);
 
-    // Автоматическая попытка инициализации при загрузке страницы
+    // Автоматическая попытка инициализации
     setTimeout(initializePlayer, 1000);
+
+    // Добавляем кнопку для принудительного обновления (для отладки)
+    const refreshBtn = document.createElement('button');
+    refreshBtn.textContent = 'Обновить поток';
+    refreshBtn.style.margin = '10px';
+    refreshBtn.onclick = forceRefreshStream;
+    document.querySelector('.container').appendChild(refreshBtn);
 </script>
 
 </body>
