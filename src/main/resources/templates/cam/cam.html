@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Камера 1 – прямая трансляция</title>
-    <link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
     <style>
         body { margin: 0; padding: 20px; background: #f0f0f0; }
         .container { max-width: 960px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
@@ -27,6 +26,11 @@
             border-radius: 5px;
         }
         .hidden { display: none !important; }
+        #nativeVideo {
+            width: 100%;
+            max-width: 100%;
+            background: #000;
+        }
     </style>
 </head>
 <body>
@@ -37,29 +41,25 @@
     <div id="error"></div>
 
     <div id="playerContainer" class="hidden">
+        <!-- Для iOS используем нативный video -->
         <video
-                id="player"
-                class="video-js"
+                id="nativeVideo"
                 controls
-                preload="auto"
-                width="100%"
-                height="auto"
                 playsinline
-                webkit-playsinline>
+                webkit-playsinline
+                muted>
+            Ваш браузер не поддерживает видео.
         </video>
     </div>
 </div>
-
-<script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
 
 <script>
     const status = document.getElementById('status');
     const errorDiv = document.getElementById('error');
     const playerContainer = document.getElementById('playerContainer');
-    const url = 'https://notebook6.ru/hls/camera1.m3u8';
+    const nativeVideo = document.getElementById('nativeVideo');
+    const url = 'https://notebook6.ru/hls/camera1.m3u8?_=' + Date.now();
 
-    let player = null;
     let isInitialized = false;
 
     function showError(message) {
@@ -75,74 +75,69 @@
     }
 
     function initializePlayer() {
-        if (isInitialized) return;
+        if (isInitialized) {
+            // Перезагрузка потока
+            nativeVideo.src = url + '&t=' + Date.now();
+            nativeVideo.load();
+            nativeVideo.play().catch(e => console.log('Play error:', e));
+            return;
+        }
 
         status.textContent = 'Запуск...';
-        status.style.display = 'none';
         hideError();
 
         const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
         playerContainer.classList.remove('hidden');
 
-        // ---- iPhone / iPad — НАТИВНЫЙ HLS ----
-        if (isIOS) {
-            console.log("iOS detected → using native HLS");
+        // Для всех устройств используем нативный video элемент
+        console.log("Using native video element");
 
-            const video = document.getElementById("player");
-            video.src = url;
-            video.load();
+        // Добавляем временную метку для избежания кэширования
+        const streamUrl = url + '&t=' + Date.now();
 
-            video.play().catch(() => {
+        nativeVideo.src = streamUrl;
+        nativeVideo.load();
+
+        nativeVideo.addEventListener('loadeddata', function() {
+            console.log('Video loaded - playing...');
+            hideError();
+            status.style.display = 'none';
+        });
+
+        nativeVideo.addEventListener('error', function(e) {
+            console.error('Video error:', e);
+            showError("Ошибка загрузки видео");
+        });
+
+        nativeVideo.addEventListener('waiting', function() {
+            console.log('Video waiting for data...');
+        });
+
+        nativeVideo.addEventListener('playing', function() {
+            console.log('Video playing successfully');
+            hideError();
+            status.style.display = 'none';
+        });
+
+        // Пытаемся запустить воспроизведение
+        const playPromise = nativeVideo.play();
+
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log('Autoplay failed:', error);
                 status.style.display = 'block';
                 status.textContent = 'Нажмите для начала воспроизведения';
             });
-
-            isInitialized = true;
-            return;
         }
-
-        // ---- ПК / Android — video.js + Hls.js ----
-        console.log("Desktop/Android → using Video.js + HLS.js");
-
-        player = videojs('player', {
-            fluid: true,
-            liveui: true,
-            controls: true,
-            preload: 'auto',
-            playsinline: true
-        });
-
-        player.ready(() => {
-            if (Hls.isSupported()) {
-                const hls = new Hls({
-                    lowLatencyMode: true,
-                    enableWorker: true
-                });
-
-                hls.loadSource(url);
-                hls.attachMedia(player.tech().el());
-
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    hideError();
-                    player.play().catch(() => {});
-                });
-
-                hls.on(Hls.Events.ERROR, (event, data) => {
-                    console.error('HLS.js error:', data);
-                    showError("Ошибка воспроизведения");
-                });
-
-            } else {
-                player.src({ src: url, type: 'application/x-mpegURL' });
-                player.play().catch(() => {});
-            }
-        });
 
         isInitialized = true;
     }
 
     status.addEventListener('click', initializePlayer);
+
+    // Автоматическая попытка инициализации при загрузке страницы
+    setTimeout(initializePlayer, 1000);
 </script>
 
 </body>
