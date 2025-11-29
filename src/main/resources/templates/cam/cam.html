@@ -3,95 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Камера 1 – тестирование</title>
+    <title>Камера 1 – прямая трансляция</title>
+    <link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
     <style>
-        body { margin: 20px; font-family: Arial, sans-serif; }
-        video { width: 100%; max-width: 800px; background: #000; }
-        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .loading { background: #fff3cd; }
-        .error { background: #f8d7da; color: #721c24; }
-        .success { background: #d1ecf1; color: #0c5460; }
+        body { margin: 0; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 960px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        #status {
+            background: #000;
+            color: #fff;
+            padding: 30px;
+            font-size: 24px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        #error {
+            color: red;
+            display: none;
+            margin: 10px 0;
+            padding: 10px;
+            background: #ffe6e6;
+            border-radius: 5px;
+        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-<h2>Тестирование HLS потока</h2>
 
-<div id="status" class="status loading">Проверяем поток...</div>
-<button onclick="testStream()">Тестировать поток</button>
-<button onclick="clearCache()">Очистить кэш</button>
+<div class="container">
+    <h2>Live: Камера 1</h2>
+    <div id="status">Нажмите для запуска трансляции</div>
+    <div id="error"></div>
 
-<div id="player" style="margin-top: 20px;">
-    <video id="video" controls playsinline webkit-playsinline muted></video>
+    <div id="playerContainer" class="hidden">
+        <video
+                id="player"
+                class="video-js"
+                controls
+                preload="auto"
+                width="100%"
+                height="auto"
+                playsinline
+                webkit-playsinline>
+        </video>
+    </div>
 </div>
 
-<div id="debug" style="margin-top: 20px; font-family: monospace; font-size: 12px;"></div>
+<script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
 
 <script>
-    const video = document.getElementById('video');
-    const statusDiv = document.getElementById('status');
-    const debugDiv = document.getElementById('debug');
+    const status = document.getElementById('status');
+    const errorDiv = document.getElementById('error');
+    const playerContainer = document.getElementById('playerContainer');
+    const url = 'https://notebook6.ru/hls/camera1.m3u8';
 
-    const STREAM_URL = 'https://notebook6.ru/hls/camera1.m3u8';
+    let player = null;
+    let isInitialized = false;
 
-    async function testStream() {
-        statusDiv.className = 'status loading';
-        statusDiv.textContent = 'Проверяем доступность потока...';
-        debugDiv.innerHTML = '';
+    function showError(message) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        status.style.display = 'block';
+        status.textContent = 'Ошибка. Нажмите для повторной попытки';
+        playerContainer.classList.add('hidden');
+    }
 
-        try {
-            // Тестируем доступность m3u8
-            const testUrl = STREAM_URL + '?t=' + Date.now();
-            const response = await fetch(testUrl);
+    function hideError() {
+        errorDiv.style.display = 'none';
+    }
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
+    function initializePlayer() {
+        if (isInitialized) return;
 
-            const m3u8Content = await response.text();
-            debugDiv.innerHTML += `<strong>M3U8 содержимое:</strong><br><pre>${m3u8Content}</pre>`;
+        status.textContent = 'Запуск...';
+        status.style.display = 'none';
+        hideError();
 
-            statusDiv.textContent = 'M3U8 доступен. Загружаем видео...';
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-            // Загружаем видео
-            video.src = testUrl;
+        playerContainer.classList.remove('hidden');
+
+        // ---- iPhone / iPad — НАТИВНЫЙ HLS ----
+        if (isIOS) {
+            console.log("iOS detected → using native HLS");
+
+            const video = document.getElementById("player");
+            video.src = url;
             video.load();
 
-            return new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    reject(new Error('Таймаут загрузки видео'));
-                }, 10000);
-
-                video.addEventListener('loadeddata', () => {
-                    clearTimeout(timeout);
-                    statusDiv.className = 'status success';
-                    statusDiv.textContent = 'Видео загружено!';
-                    resolve();
-                });
-
-                video.addEventListener('error', (e) => {
-                    clearTimeout(timeout);
-                    statusDiv.className = 'status error';
-                    statusDiv.textContent = `Ошибка видео: ${video.error?.message || 'Unknown error'}`;
-                    reject(e);
-                });
+            video.play().catch(() => {
+                status.style.display = 'block';
+                status.textContent = 'Нажмите для начала воспроизведения';
             });
 
-        } catch (error) {
-            statusDiv.className = 'status error';
-            statusDiv.textContent = `Ошибка: ${error.message}`;
-            debugDiv.innerHTML += `<strong>Ошибка:</strong> ${error.message}`;
+            isInitialized = true;
+            return;
         }
+
+        // ---- ПК / Android — video.js + Hls.js ----
+        console.log("Desktop/Android → using Video.js + HLS.js");
+
+        player = videojs('player', {
+            fluid: true,
+            liveui: true,
+            controls: true,
+            preload: 'auto',
+            playsinline: true
+        });
+
+        player.ready(() => {
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    lowLatencyMode: true,
+                    enableWorker: true
+                });
+
+                hls.loadSource(url);
+                hls.attachMedia(player.tech().el());
+
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    hideError();
+                    player.play().catch(() => {});
+                });
+
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS.js error:', data);
+                    showError("Ошибка воспроизведения");
+                });
+
+            } else {
+                player.src({ src: url, type: 'application/x-mpegURL' });
+                player.play().catch(() => {});
+            }
+        });
+
+        isInitialized = true;
     }
 
-    function clearCache() {
-        video.src = '';
-        video.load();
-        statusDiv.textContent = 'Кэш очищен';
-        debugDiv.innerHTML = '';
-    }
-
-    // Автотест при загрузке
-    setTimeout(testStream, 1000);
+    status.addEventListener('click', initializePlayer);
 </script>
+
 </body>
 </html>
