@@ -116,8 +116,14 @@
         player.ready(() => {
             if (Hls.isSupported()) {
                 const hls = new Hls({
-                    lowLatencyMode: true,
-                    enableWorker: true
+                    // Добавляем настройки для повышения стабильности HLS
+                    lowLatencyMode: false, // Отключаем LL в плеере, если отключили на сервере
+                    enableWorker: true,
+                    // Агрессивные настройки восстановления (для живого стрима)
+                    liveSyncDurationCount: 3,
+                    liveMaxLatencyDurationCount: 5,
+                    levelLoadingRetryDelay: 1000,
+                    manifestLoadingRetryDelay: 1000
                 });
 
                 hls.loadSource(url);
@@ -130,7 +136,22 @@
 
                 hls.on(Hls.Events.ERROR, (event, data) => {
                     console.error('HLS.js error:', data);
-                    showError("Ошибка воспроизведения");
+
+                    if (data.fatal) {
+                        // Если ошибка фатальная, пробуем восстановить поток
+                        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                            // Ошибки сети часто можно восстановить
+                            console.log("HLS.js: Trying to recover from network error...");
+                            hls.recoverMediaError();
+                        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                            console.log("HLS.js: Trying to swap audio/video codecs...");
+                            hls.swapAudioCodec();
+                            hls.recoverMediaError();
+                        } else {
+                            // Если восстановление не помогло, показываем ошибку пользователю
+                            showError("Ошибка воспроизведения. Пожалуйста, перезапустите.");
+                        }
+                    }
                 });
 
             } else {
