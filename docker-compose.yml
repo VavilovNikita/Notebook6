@@ -8,9 +8,9 @@ services:
     image: postgres
     restart: always
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=notebook
+      - POSTGRES_USER=${DB_USERNAME:-user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:?DB_PASSWORD must be set, see .env.example}
+      - POSTGRES_DB=${DB_NAME:-notebook}
     volumes:
       - pg_project_notebook:/var/lib/postgresql/data
     ports:
@@ -24,6 +24,10 @@ services:
     depends_on:
       - pg_db
     environment:
-      DEEPSEEK_API_KEY: 'DEEPSEEK_API_KEY'
-      SPRING_DATASOURCE_URL: 'jdbc:postgresql://pg_db:5432/notebook'
+      DEEPSEEK_API_KEY: '${DEEPSEEK_API_KEY:?DEEPSEEK_API_KEY must be set, see .env.example}'
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://pg_db:5432/${DB_NAME:-notebook}'
+      SPRING_DATASOURCE_USERNAME: '${DB_USERNAME:-user}'
+      SPRING_DATASOURCE_PASSWORD: '${DB_PASSWORD:?DB_PASSWORD must be set, see .env.example}'
+      DEFAULT_ADMIN_USERNAME: '${DEFAULT_ADMIN_USERNAME:-user}'
+      DEFAULT_ADMIN_PASSWORD: '${DEFAULT_ADMIN_PASSWORD:?DEFAULT_ADMIN_PASSWORD must be set, see .env.example}'
       JAVA_OPTS: '-Xmx512m'

@@ -25,11 +25,18 @@ public class UserService {
     public void saveUser(User user) {
         Optional<User> userFromDB = userRepository.findById(user.getId());
         if (userFromDB.isPresent()) {
-            user.setRole(userFromDB.get().getRole());
+            User existingUser = userFromDB.get();
+            user.setRole(existingUser.getRole());
+            if (user.getPassword() == null || user.getPassword().isBlank()
+                    || user.getPassword().equals(existingUser.getPassword())) {
+                user.setPassword(existingUser.getPassword());
+            } else {
+                user.setPassword(encoder.encode(user.getPassword()));
+            }
         } else {
             user.setRole(roleService.getRoleById(1));
+            user.setPassword(encoder.encode(user.getPassword()));
         }
-        user.setPassword(encoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 

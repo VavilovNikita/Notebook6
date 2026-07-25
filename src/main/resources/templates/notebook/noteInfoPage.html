@@ -37,6 +37,21 @@
             </div>
             <hr/>
             <div class="form-group row align-items-center">
+                <label class="col-sm-2 col-form-label">Теги</label>
+                <div class="col-sm-10">
+                    <span class="app-tag-chip" th:each="t : ${notebook.tags}" th:text="${t.name}"></span>
+                    <span th:if="${notebook.tags.empty}" class="text-muted">нет тегов</span>
+                </div>
+            </div>
+            <hr/>
+            <div class="form-group row align-items-center">
+                <label class="col-sm-2 col-form-label">Видимость</label>
+                <div class="col-sm-10">
+                    <span th:text="${notebook.visibility.name() == 'TEAM'} ? 'Общая (библиотека команды)' : 'Личная'"></span>
+                </div>
+            </div>
+            <hr/>
+            <div class="form-group row align-items-center">
                 <label for="dateCreated" class="col-sm-2 col-form-label">Дата создания</label>
                 <div class="col-sm-10">
                     <a th:text="${notebook.createdAt}" id="dateCreated"></a>

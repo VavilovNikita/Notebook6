@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <!-- These tables (movie, subtitle_entry, subtitle, requested_data, recommendation, word)
+         were previously created only by Hibernate's ddl-auto=update, with no Liquibase
+         changesets at all. Each changeset below is guarded by a precondition so that
+         environments where Hibernate already created the table are marked as already
+         applied (no-op), while a genuinely fresh database gets the table created here. -->
+
+    <changeSet id="create-movie-table" author="notebook6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="movie"/>
+            </not>
+        </preConditions>
+        <createTable tableName="movie">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)"/>
+            <column name="session_id" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-requested_data-table" author="notebook6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="requested_data"/>
+            </not>
+        </preConditions>
+        <createTable tableName="requested_data">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="requested_data" type="text"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-recommendation-table" author="notebook6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="recommendation"/>
+            </not>
+        </preConditions>
+        <createTable tableName="recommendation">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="example" type="text"/>
+            <column name="issue" type="text"/>
+            <column name="note" type="text"/>
+            <column name="suggestion" type="text"/>
+            <column name="requested_data_id" type="bigint">
+                <constraints referencedTableName="requested_data" referencedColumnNames="id"
+                             foreignKeyName="fk_recommendation_requested_data"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-subtitle_entry-table" author="notebook6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="subtitle_entry"/>
+            </not>
+        </preConditions>
+        <createTable tableName="subtitle_entry">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="language" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="movie_id" type="bigint">
+                <constraints nullable="false" referencedTableName="movie" referencedColumnNames="id"
+                             foreignKeyName="fk_subtitle_entry_movie"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-subtitle-table" author="notebook6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="subtitle"/>
+            </not>
+        </preConditions>
+        <createTable tableName="subtitle">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="end_time_millis" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time_millis" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="varchar(255)"/>
+            <column name="subtitle_entry_id" type="bigint">
+                <constraints nullable="false" referencedTableName="subtitle_entry" referencedColumnNames="id"
+                             foreignKeyName="fk_subtitle_subtitle_entry"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-word-table" author="notebook6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="word"/>
+            </not>
+        </preConditions>
+        <createTable tableName="word">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="word" type="varchar(255)"/>
+            <column name="translate" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

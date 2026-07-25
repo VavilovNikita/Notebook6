@@ -12,25 +12,37 @@
 <hr/>
 <script th:inline="javascript">
     function copyText(id) {
-        const textArea = document.createElement("textarea");
-        const copyText = document.getElementById(id);
-        textArea.value = copyText.value;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-9999px';
-        document.body.appendChild(textArea);
-
-        const currentFocusedElement = document.activeElement;
-        textArea.focus();
-        textArea.select();
-        try {
-            document.execCommand('copy');
-        } catch (err) {
+        const text = document.getElementById(id).value;
+        navigator.clipboard.writeText(text).catch(err => {
             console.error('Unable to copy to clipboard', err);
-        }
-        document.body.removeChild(textArea);
+        });
+    }
 
-        if (currentFocusedElement) {
-            currentFocusedElement.focus();
+    function confirmDelete(formId) {
+        if (confirm('Удалить эту заметку? Это действие нельзя отменить.')) {
+            document.getElementById(formId).submit();
+        }
+    }
+
+    async function toggleFavorite(id, iconEl) {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+        try {
+            const response = await fetch('/notebook/' + id + '/favorite', {
+                method: 'POST',
+                headers: {[csrfHeader]: csrfToken}
+            });
+            if (!response.ok) {
+                alert('Не удалось изменить избранное');
+                return;
+            }
+            const isFavorite = await response.json();
+            iconEl.classList.toggle('fa-solid', isFavorite);
+            iconEl.classList.toggle('fa-regular', !isFavorite);
+            iconEl.classList.toggle('app-favorite-active', isFavorite);
+        } catch (err) {
+            console.error('Unable to toggle favorite', err);
+            alert('Не удалось изменить избранное');
         }
     }
 </script>
@@ -38,13 +50,59 @@
 <div class="row align-items-center">
     <div class="col-1"></div>
     <div class="col-10">
-        <div class="row align-items-center" style="height: 100px;">
+        <div class="row justify-content-end" style="margin-bottom: 1rem;">
+            <div class="col-auto">
+                <a class="btn btn-primary" th:href="@{/notebook/new}">
+                    <i class="fa-solid fa-plus"></i> Добавить запись
+                </a>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" style="margin-bottom: 1rem;">
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${view == 'mine'} ? 'active'" th:href="@{/notebook(view='mine')}">Мои заметки</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${view == 'favorites'} ? 'active'" th:href="@{/notebook(view='favorites')}">
+                    <i class="fa-solid fa-star"></i> Избранное
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${view == 'team'} ? 'active'" th:href="@{/notebook(view='team')}">Библиотека команды</a>
+            </li>
+        </ul>
+
+        <form method="get" th:action="@{/notebook}" class="row align-items-center" style="margin-bottom: 1rem;" th:if="${allTags != null and !allTags.empty}">
+            <input type="hidden" name="view" th:value="${view}"/>
+            <div class="col-auto">
+                <label for="tagFilterSelect">Фильтр по тегу:</label>
+            </div>
+            <div class="col-auto">
+                <select id="tagFilterSelect" name="tag" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">Все теги</option>
+                    <option th:each="t : ${allTags}" th:value="${t.name}" th:text="${t.name}"
+                            th:selected="${selectedTag != null and #strings.equalsIgnoreCase(selectedTag, t.name)}"></option>
+                </select>
+            </div>
+            <div class="col-auto" th:if="${selectedTag != null and !selectedTag.isEmpty()}">
+                <a th:href="@{/notebook(view=${view})}" class="btn btn-sm btn-outline-secondary">Сбросить</a>
+            </div>
+        </form>
+
+        <div class="row align-items-center" style="height: 100px;" th:if="${!notebook.empty}">
             <div class="col-3 text-center"><b>Название</b></div>
+            <div class="col-2 text-center"><b>Теги</b></div>
             <div class="col-1 text-center"><b>Копир.</b></div>
-            <div class="col-3 text-center"><b>Создатель</b></div>
-            <div class="col-2 text-center"><b>Важность</b></div>
-            <div class="col-2 text-center"><b>Изменить</b></div>
+            <div class="col-1 text-center"><b>Избр.</b></div>
+            <div class="col-2 text-center"><b>Создатель</b></div>
+            <div class="col-1 text-center"><b>Важность</b></div>
+            <div class="col-1 text-center"><b>Изменить</b></div>
             <div class="col-1 text-center"><b>Удалить</b></div>
+        </div>
+        <div class="row justify-content-center text-center" style="padding: 2rem 0;" th:if="${notebook.empty}">
+            <p class="text-muted" th:if="${view == 'favorites'}">Нет избранных заметок. Отметьте заметку звёздочкой, чтобы она появилась здесь.</p>
+            <p class="text-muted" th:if="${view == 'team'}">В библиотеке команды пока нет заметок.</p>
+            <p class="text-muted" th:if="${view == 'mine' or view == null}">Заметок пока нет. Нажмите «Добавить запись», чтобы создать первую.</p>
         </div>
         <div class="row align-items-center row-list" th:each="notebook : ${notebook}">
 
@@ -57,6 +115,10 @@
                 </ul>
             </li>
 
+            <div class="col-2 text-center">
+                <span class="app-tag-chip" th:each="t : ${notebook.tags}" th:text="${t.name}"></span>
+            </div>
+
             <div class="col-1 text-center">
                 <input type="hidden" th:value="*{notebook.text}" th:id="${notebook.id} + 'copy'">
                 <button class="btn btn-outline-primary" th:onclick="'copyText(\'' + ${notebook.id} + 'copy' + '\')'"><i
@@ -67,17 +129,23 @@
                 </form>
             </div>
 
-            <div class="col-3 text-center" th:text="${notebook.user.firstName} + ' ' + ${notebook.user.lastName}"></div>
-            <div class="col-2 text-center" th:text="${notebook.position}">
+            <div class="col-1 text-center">
+                <i th:class="${favoriteIds != null and favoriteIds.contains(notebook.id)} ? 'fa-solid fa-star app-favorite-active' : 'fa-regular fa-star'"
+                   style="cursor: pointer;"
+                   th:onclick="'toggleFavorite(' + ${notebook.id} + ', this)'"></i>
             </div>
-            <div class="col-2 text-center">
+
+            <div class="col-2 text-center" th:text="${notebook.user.firstName} + ' ' + ${notebook.user.lastName}"></div>
+            <div class="col-1 text-center" th:text="${notebook.position}">
+            </div>
+            <div class="col-1 text-center">
                 <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
                    th:href="@{/notebook/{id}/edit(id=${notebook.id})}"><i
                         class="fa-solid fa-pen-to-square"></i></a>
             </div>
             <div class="col-1 text-center">
                 <a class="nav-item" th:if="${authUser.getId() == notebook.user.getId()}"
-                   th:onclick="'document.getElementById(\'' + ${notebook.id}  + 'delete' + '\').submit()'"><i
+                   th:onclick="'confirmDelete(\'' + ${notebook.id}  + 'delete' + '\')'"><i
                         class="fa-solid fa-trash"></i></a>
             </div>
         </div>
@@ -88,16 +156,6 @@
 </div>
 
 <div class="row justify-content-end" th:if="${allNones == '1'}">
-<!--    <div class="col-1 align-items-end w-auto">-->
-<!--        <label>-->
-<!--            <select id="size" class="form-select form-select-sm">-->
-<!--                <option value="25">25</option>-->
-<!--                <option value="50">50</option>-->
-<!--                <option value="75">75</option>-->
-<!--                <option value="100">100</option>-->
-<!--            </select>-->
-<!--        </label>-->
-<!--    </div>-->
     <div class="col-1 align-items-end w-auto">
         <nav aria-label="Page navigation example">
             <ul class="pagination pagination-sm">

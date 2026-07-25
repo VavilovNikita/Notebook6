@@ -3,23 +3,18 @@
 <head>
   <title>Экспорт кода из репозитория</title>
   <meta charset="UTF-8" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/codeSaga.css}">
 </head>
 <body>
-<div class="header">
-  <div class="header-content">
-    <div class="logo">
-      <i>⚡</i> CodeSaga - Экспорт кода
-    </div>
-  </div>
-</div>
+<th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
 
 <div class="container">
   <div class="nav">
-    <a href="/" th:href="@{/codesaga/}">Главная</a>
-    <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
-    <a href="/export" th:href="@{/codesaga/export}">Экспорт кода</a>
-    <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+    <a th:href="@{/codesaga/}">Главная</a>
+    <a th:href="@{/codesaga/reviewHistory}">История запросов</a>
+    <a th:href="@{/codesaga/export}">Экспорт кода</a>
   </div>
 
   <div class="card">
@@ -54,13 +49,12 @@
 <script>
   function copyToClipboard() {
     const codeElement = document.getElementById("exportedCode");
-    const range = document.createRange();
-    range.selectNode(codeElement);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-    document.execCommand("copy");
-    window.getSelection().removeAllRanges();
-    alert("Код скопирован в буфер обмена!");
+    navigator.clipboard.writeText(codeElement.textContent).then(() => {
+      alert("Код скопирован в буфер обмена!");
+    }).catch(err => {
+      console.error('Unable to copy to clipboard', err);
+      alert("Не удалось скопировать код в буфер обмена");
+    });
   }
 </script>
 </body>

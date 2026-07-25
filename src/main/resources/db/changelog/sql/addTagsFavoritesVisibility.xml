@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="add-notebook-visibility" author="notebook6">
+        <addColumn tableName="notebook">
+            <column name="visibility" type="varchar(20)" defaultValue="PERSONAL">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="create-tag-table" author="notebook6">
+        <createTable tableName="tag">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-notebook_tags-table" author="notebook6">
+        <createTable tableName="notebook_tags">
+            <column name="notebook_id" type="integer">
+                <constraints nullable="false" referencedTableName="notebook" referencedColumnNames="id"
+                             foreignKeyName="fk_notebook_tags_notebook" deleteCascade="true"/>
+            </column>
+            <column name="tag_id" type="bigint">
+                <constraints nullable="false" referencedTableName="tag" referencedColumnNames="id"
+                             foreignKeyName="fk_notebook_tags_tag" deleteCascade="true"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="notebook_tags" columnNames="notebook_id, tag_id"
+                        constraintName="pk_notebook_tags"/>
+    </changeSet>
+
+    <changeSet id="create-favorite_note-table" author="notebook6">
+        <createTable tableName="favorite_note">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="integer">
+                <constraints nullable="false" referencedTableName="users" referencedColumnNames="id"
+                             foreignKeyName="fk_favorite_note_user" deleteCascade="true"/>
+            </column>
+            <column name="notebook_id" type="integer">
+                <constraints nullable="false" referencedTableName="notebook" referencedColumnNames="id"
+                             foreignKeyName="fk_favorite_note_notebook" deleteCascade="true"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="favorite_note" columnNames="user_id, notebook_id"
+                              constraintName="uq_favorite_note_user_notebook"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,169 @@
+/* Shared design tokens and navbar, reused by every module (notebook, codeSaga,
+   subEditor, wordsTranslator) so navigation looks and behaves the same everywhere. */
+:root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #e74c3c;
+    --light: #ecf0f1;
+    --dark: #2c3e50;
+    --success: #2ecc71;
+    --text: #333;
+    --text-light: #777;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+    --border-radius: 8px;
+}
+
+.app-navbar {
+    background: var(--primary);
+    box-shadow: var(--shadow);
+}
+
+.app-navbar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.app-navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-decoration: none;
+}
+
+.app-navbar-brand img {
+    height: 32px;
+    width: auto;
+}
+
+.app-navbar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
+.app-navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.app-navbar-links a {
+    color: rgba(255, 255, 255, 0.88);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.app-navbar-links a:hover {
+    background: var(--secondary);
+    color: #fff;
+}
+
+.app-navbar-links a.app-navbar-admin {
+    color: #ffd7d0;
+}
+
+.app-navbar-links a.app-navbar-admin:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+.app-navbar-dropdown {
+    position: relative;
+}
+
+.app-navbar-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 180px;
+    margin: 0;
+    padding: 0.4rem;
+    list-style: none;
+    background: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    z-index: 20;
+}
+
+.app-navbar-dropdown-menu a {
+    display: block;
+    color: var(--text);
+}
+
+.app-navbar-dropdown-menu a:hover {
+    background: var(--light);
+    color: var(--primary);
+}
+
+.app-navbar-dropdown:hover .app-navbar-dropdown-menu,
+.app-navbar-dropdown:focus-within .app-navbar-dropdown-menu {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .app-navbar-toggle {
+        display: block;
+    }
+
+    .app-navbar-links {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.2rem;
+    }
+
+    .app-navbar-links.open {
+        display: flex;
+    }
+
+    .app-navbar-links a {
+        display: block;
+        text-align: center;
+    }
+
+    .app-navbar-dropdown-menu {
+        display: block;
+        position: static;
+        box-shadow: none;
+        background: transparent;
+        padding: 0;
+    }
+
+    .app-navbar-dropdown-menu a {
+        color: rgba(255, 255, 255, 0.75);
+    }
+}
+
+@media (max-width: 480px) {
+    .app-navbar-brand span {
+        display: none;
+    }
+
+    .app-navbar-links a {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+}

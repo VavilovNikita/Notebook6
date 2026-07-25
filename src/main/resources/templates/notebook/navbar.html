@@ -5,59 +5,6 @@
     <title>Title</title>
 </head>
 <body>
-<div th:fragment="navbar" class="row align-items-center">
-    <div class="col-1"></div>
-    <div class="col-10 text-center">
-        <nav class="navbar navbar-expand-lg navbar-light">
-            <div class="container-fluid">
-                <img th:src="@{/images/notebook.png}" alt="NOTEBOOK"/>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 top-menu">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/notebook">Домой</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/notebook/new">Создать</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/notebook?allNotes=1">Все_записи</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/codesaga/">Code_Saga</a>
-                        </li>
-                        <li class="nav-item" th:if="${authUser.role.getRole() == 'ROLE_ADMIN'}">
-                            <a class="nav-link" href="/admin">Админ</a>
-                        </li>
-                        <li class="nav-item" th:if="${URL == '/notebook'}">
-                            <form class="form-inline" th:method="GET" th:action="@{/notebook/search}"
-                                  th:object="${search}">
-                                <div class="row">
-                                    <div class="col-7">
-                                        <input class="form-control mr-sm-2" type="search" placeholder="Поиск по записям"
-                                               aria-label="Search" th:field="*{text}">
-                                    </div>
-                                    <div class="col-5">
-                                        <button class="btn btn-outline-primary" type="submit">Найти</button>
-                                    </div>
-                                </div>
-                            </form>
-                    </ul>
-                    <div class="row">
-                        <div class="col">
-                            <!--/*/ <th:block th:insert="~{userDropdownMenu/dropDownMenu.html :: dropDownMenu}">
-    </th:block> /*/-->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </div>
-    <div class="col-1"></div>
-</div>
+<div th:fragment="navbar" th:replace="~{fragments/navbar :: navbar}"></div>
 </body>
 </html>

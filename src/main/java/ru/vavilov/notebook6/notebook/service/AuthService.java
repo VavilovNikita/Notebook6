@@ -22,4 +22,9 @@ public class AuthService {
         UserDetail userDetails = (UserDetail) authentication.getPrincipal();
         return userRepository.findById(userDetails.getUser().getId()).orElseGet(User::new);
     }
+
+    public boolean isAdmin() {
+        User user = getUser();
+        return user.getRole() != null && "ROLE_ADMIN".equals(user.getRole().getRole());
+    }
 }

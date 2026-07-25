@@ -1,14 +1,15 @@
 package ru.vavilov.notebook6.wordsTranslator.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.vavilov.notebook6.wordsTranslator.api.TranslateApi;
 import ru.vavilov.notebook6.wordsTranslator.model.Word;
 import ru.vavilov.notebook6.wordsTranslator.repository.WordRepositories;
 
-import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WordsService {
@@ -19,7 +20,7 @@ public class WordsService {
 
     public void translate(String word) {
         if (word == null || word.trim().isEmpty() || word.length() > MAX_WORD_SIZE) {
-            return;
+            throw new TranslationException("Слово пустое или слишком длинное");
         }
         String cleanWord = word.trim();
         try {
@@ -29,10 +30,14 @@ public class WordsService {
             }
             String translated = translateApi.translate(cleanWord);
             if (translated == null || translated.trim().isEmpty() || translated.length() > MAX_WORD_SIZE) {
-                return;
+                throw new TranslationException("Сервис перевода вернул пустой результат для слова: " + cleanWord);
             }
             wordRepositories.save(new Word(cleanWord, translated.trim()));
-        } catch (Exception ignored) {
+        } catch (TranslationException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Не удалось перевести слово '{}'", cleanWord, e);
+            throw new TranslationException("Не удалось перевести слово: " + cleanWord, e);
         }
     }
 
