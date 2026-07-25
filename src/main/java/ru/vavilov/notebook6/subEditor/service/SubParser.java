@@ -1,12 +1,16 @@
 package ru.vavilov.notebook6.subEditor.service;
 
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
 import ru.vavilov.notebook6.subEditor.model.Subtitle;
 import ru.vavilov.notebook6.subEditor.model.SubtitleEntry;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +85,10 @@ public class SubParser {
         List<Subtitle> entries = new ArrayList<>();
         List<SubtitleEntry> result = new ArrayList<>();
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "Windows-1251"));
+        byte[] fileBytes = inputStream.readAllBytes();
+        Charset charset = detectCharset(fileBytes);
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(fileBytes), charset));
         String line;
 
         StringBuilder currentText = new StringBuilder();
@@ -125,7 +132,7 @@ public class SubParser {
                 if (currentText.length() > 0) {
                     currentText.append("\n");
                 }
-                currentText.append(fixEncoding(line));
+                currentText.append(line);
             }
         }
 
@@ -192,24 +199,17 @@ public class SubParser {
         return ((hours * 3600L) + (minutes * 60L) + seconds) * 1000L + milliseconds;
     }
 
-    private static String fixEncoding(String text) {
-        try {
-            String[] encodings = {"windows-1251", "ISO-8859-5", "KOI8-R", "UTF-8"};
-
-            for (String encoding : encodings) {
-                try {
-                    byte[] bytes = text.getBytes("ISO-8859-1");
-                    String fixed = new String(bytes, encoding);
-
-                    if (fixed.matches(".*[А-Яа-я].*")) {
-                        return fixed;
-                    }
-                } catch (Exception e) {
-                }
-            }
-        } catch (Exception e) {
+    private static Charset detectCharset(byte[] bytes) {
+        CharsetDetector detector = new CharsetDetector();
+        detector.setText(bytes);
+        CharsetMatch match = detector.detect();
+        if (match == null) {
+            return java.nio.charset.StandardCharsets.UTF_8;
         }
-
-        return text;
+        try {
+            return Charset.forName(match.getName());
+        } catch (Exception e) {
+            return java.nio.charset.StandardCharsets.UTF_8;
+        }
     }
 }

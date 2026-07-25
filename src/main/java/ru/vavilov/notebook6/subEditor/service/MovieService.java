@@ -25,7 +25,7 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final DeepSeekService deepSeekService;
 
-    public Movie parseSubtitles(MultipartFile file) throws IOException {
+    public Movie parseSubtitles(MultipartFile file, String sessionId) throws IOException {
 
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename(), "Filename is required");
 
@@ -42,20 +42,17 @@ public class MovieService {
                     subtitles = SubParser.parseSRT(parseStream, "Русский");
                 }
             }
-            case SSA -> {
-
-            }
-            case VTT -> {
-
-            }
-            default -> throw new IOException("Unknown file type");
+            case SSA -> throw new IOException("Формат SSA пока не поддерживается, используйте ASS или SRT");
+            case VTT -> throw new IOException("Формат VTT пока не поддерживается, используйте ASS или SRT");
+            default -> throw new IOException("Неизвестный или неподдерживаемый тип файла субтитров");
         }
-        Movie existMovie = movieRepository.getMovieByName(originalFilename);
+        Movie existMovie = movieRepository.getMovieByNameAndSessionId(originalFilename, sessionId);
         if (existMovie != null) {
             return existMovie;
         } else {
             Movie movie = new Movie()
-                .setName(originalFilename);
+                .setName(originalFilename)
+                .setSessionId(sessionId);
 
             movie.addSubtitleEntries(subtitles);
 
@@ -69,8 +66,8 @@ public class MovieService {
         );
     }
 
-    public List<Movie> getAllMovie() {
-        return movieRepository.findAll();
+    public List<Movie> getAllMovie(String sessionId) {
+        return movieRepository.findAllBySessionId(sessionId);
     }
 
     public Movie translateAndSaveMovie(Long movieId, Long languageId) {

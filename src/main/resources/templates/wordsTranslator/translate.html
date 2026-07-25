@@ -23,8 +23,11 @@
                     body: formData
                 });
 
+                const message = await response.text();
                 if (!response.ok) {
-                    alert("Ошибка при отправке: " + response.status);
+                    alert("Ошибка перевода: " + message);
+                } else {
+                    alert(message);
                 }
 
             } catch (err) {

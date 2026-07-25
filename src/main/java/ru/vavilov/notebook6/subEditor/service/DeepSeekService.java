@@ -8,8 +8,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.vavilov.notebook6.codesage.api.DeepSeekApi;
+import ru.vavilov.notebook6.codesage.api.DeepSeekRequestFactory;
 import ru.vavilov.notebook6.subEditor.model.Language;
-import ru.vavilov.notebook6.subEditor.model.Movie;
 import ru.vavilov.notebook6.subEditor.model.SubtitleEntry;
 
 import java.util.ArrayList;
@@ -54,16 +54,7 @@ public class DeepSeekService {
             List<String> batchLines = textLines.subList(fromIndex, toIndex);
 
             try {
-                JSONObject request = new JSONObject();
-                request.put("model", model);
-                request.put("stream", stream);
-                request.put("max_tokens", 8000);
-
-                JSONArray messages = new JSONArray();
-
-                JSONObject systemMessage = new JSONObject();
-                systemMessage.put("role", systemRole);
-                systemMessage.put("content", "Translate Russian to " + language.getNameNative() +
+                String systemContent = "Translate Russian to " + language.getNameNative() +
                     ". You will receive a JSON array containing " + batchLines.size() + " strings.\n\n" +
                     "CRITICAL JSON ESCAPING RULES:\n" +
                     "1. Preserve original \\n, \\t, \\\", \\\\ exactly as is\n" +
@@ -77,9 +68,7 @@ public class DeepSeekService {
                     "• All escape sequences must be valid JSON escapes\n" +
                     "• The output must pass JSON.parse() validation\n\n" +
                     "INVALID EXAMPLE: \"text\\a\" (\\a is not a valid JSON escape)\n" +
-                    "VALID EXAMPLE: \"text with\\nnewline and \\\"quotes\\\"\"");
-                JSONObject userMessage = new JSONObject();
-                userMessage.put("role", userRole);
+                    "VALID EXAMPLE: \"text with\\nnewline and \\\"quotes\\\"\"";
 
                 JSONArray inputArray = new JSONArray(batchLines);
                 String userContent = String.format(
@@ -91,12 +80,8 @@ public class DeepSeekService {
                     inputArray.toString()
                 );
 
-                userMessage.put("content", userContent);
-
-                messages.put(systemMessage);
-                messages.put(userMessage);
-
-                request.put("messages", messages);
+                JSONObject request = DeepSeekRequestFactory.buildRequest(
+                    model, stream, systemRole, systemContent, userRole, userContent, 8000);
                 requests.add(request);
 
             } catch (JSONException e) {

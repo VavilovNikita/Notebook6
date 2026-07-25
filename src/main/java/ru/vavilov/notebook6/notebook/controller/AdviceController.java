@@ -31,6 +31,7 @@ public class AdviceController {
 
     @ExceptionHandler
     public String exception(HttpServletResponse response, Exception exception, Model model) {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("search", new SearchField());
         model.addAttribute("exception", exception);

@@ -23,8 +23,12 @@ public class Movie {
     @NotBlank(message = "Movie name cannot be empty")
     private String name;
 
+    @Column(name = "session_id")
+    private String sessionId;
+
     public SubtitleEntry getOneSubtitle() {
-        return subtitles != null || subtitles.get(0) != null ? subtitles.get(0) : new SubtitleEntry();
+        return subtitles != null && !subtitles.isEmpty() && subtitles.get(0) != null
+                ? subtitles.get(0) : new SubtitleEntry();
     }
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)

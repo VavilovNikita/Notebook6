@@ -1,5 +1,6 @@
 package ru.vavilov.notebook6.subEditor.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,14 +31,14 @@ public class SubtitleController {
     private SubtitleService subtitleService;
 
     @PostMapping("/upload")
-    public String uploadSubtitle(@RequestParam("file") MultipartFile file, Model model) {
+    public String uploadSubtitle(@RequestParam("file") MultipartFile file, Model model, HttpSession session) {
         if (file.isEmpty()) {
             model.addAttribute("error", "Файл пустой");
             return "subtitles/upload";
         }
 
         try {
-           Movie movie = movieService.parseSubtitles(file);
+           Movie movie = movieService.parseSubtitles(file, session.getId());
 
             model.addAttribute("movie", movie);
             model.addAttribute("subtitles", movie.getSubtitles());
@@ -74,8 +75,8 @@ public class SubtitleController {
     }
 
     @GetMapping("/movies")
-    public String getAllMovies(Model model) {
-        List<Movie> movies = movieService.getAllMovie();
+    public String getAllMovies(Model model, HttpSession session) {
+        List<Movie> movies = movieService.getAllMovie(session.getId());
         if (movies == null) movies = new ArrayList<>();
         model.addAttribute("movies", movies);
         return "subtitles/movies";
