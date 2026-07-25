@@ -57,7 +57,6 @@ public class NotebookService {
     public void saveNotebook(Notebook notebook, String tagNamesCsv) {
         User currentUser = authService.getUser();
         Optional<Notebook> existing = notebookRepository.findById(notebook.getId());
-        Visibility previousVisibility = Visibility.PERSONAL;
         if (existing.isPresent()) {
             Notebook existingNotebook = existing.get();
             if (!isOwner(existingNotebook, currentUser)) {
@@ -65,21 +64,11 @@ public class NotebookService {
             }
             notebook.setUser(existingNotebook.getUser());
             notebook.setCreatedAt(existingNotebook.getCreatedAt());
-            previousVisibility = existingNotebook.getVisibility();
         } else {
             notebook.setUser(currentUser);
             notebook.setCreatedAt(LocalDate.now());
         }
-
-        Visibility requestedVisibility = notebook.getVisibility() == null ? Visibility.PERSONAL : notebook.getVisibility();
-        // Publishing a note to the team library (PERSONAL/new -> TEAM) is admin-only.
-        // Keeping an already-TEAM note as TEAM, or moving a note back to PERSONAL, is always allowed
-        // for its owner - only the act of *newly publishing* requires the ADMIN role.
-        boolean isPublishingToTeam = requestedVisibility == Visibility.TEAM && previousVisibility != Visibility.TEAM;
-        if (isPublishingToTeam && !authService.isAdmin()) {
-            throw new AccessDeniedException("Публиковать заметки в общую библиотеку может только администратор");
-        }
-        notebook.setVisibility(requestedVisibility);
+        notebook.setVisibility(notebook.getVisibility() == null ? Visibility.PERSONAL : notebook.getVisibility());
         notebook.setTags(tagService.resolveOrCreate(tagNamesCsv));
         notebook.setUpdatedAt(LocalDate.now());
         notebookRepository.save(notebook);
