@@ -2,6 +2,7 @@ package ru.vavilov.notebook6.notebook.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,15 @@ public class AdviceController {
     @Autowired
     public AdviceController(AuthService authService) {
         this.authService = authService;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public String accessDenied(HttpServletResponse response, AccessDeniedException exception, Model model) {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        model.addAttribute("authUser", authService.getUser());
+        model.addAttribute("search", new SearchField());
+        model.addAttribute("exception", exception);
+        return "error/4xx";
     }
 
     @ExceptionHandler

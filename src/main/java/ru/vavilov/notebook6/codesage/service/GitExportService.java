@@ -8,16 +8,28 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class GitExportService {
 
+    private static final Set<String> ALLOWED_HOSTS = Set.of("github.com", "gitlab.com");
+
     public String exportCodeFromRepo(String repoUrl) {
+        try {
+            validateRepoUrl(repoUrl);
+        } catch (IllegalArgumentException e) {
+            log.warn("Отклонён запрос на экспорт репозитория: {}", e.getMessage());
+            return "Ошибка: " + e.getMessage();
+        }
         Path tempDir = null;
         try {
             tempDir = Files.createTempDirectory("git-clone-");
@@ -98,6 +110,25 @@ public class GitExportService {
         }
     }
 
+    private void validateRepoUrl(String repoUrl) {
+        if (repoUrl == null || repoUrl.isBlank()) {
+            throw new IllegalArgumentException("Ссылка на репозиторий не указана");
+        }
+        URL url;
+        try {
+            url = new URL(repoUrl);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Некорректная ссылка на репозиторий");
+        }
+        if (!"https".equalsIgnoreCase(url.getProtocol())) {
+            throw new IllegalArgumentException("Разрешены только https-ссылки");
+        }
+        String host = url.getHost() == null ? "" : url.getHost().toLowerCase(Locale.ROOT);
+        if (!ALLOWED_HOSTS.contains(host)) {
+            throw new IllegalArgumentException("Хост '" + host + "' не входит в список разрешённых (" + ALLOWED_HOSTS + ")");
+        }
+    }
+
     private void deleteDirectoryRecursively(Path path) throws IOException {
         if (Files.notExists(path)) return;
         Files.walk(path)
@@ -107,10 +138,16 @@ public class GitExportService {
     }
 
     private void unzip(File zipFile, File destDir) throws IOException {
+        String destDirCanonicalPath = destDir.getCanonicalPath();
         try (java.util.zip.ZipInputStream zipIn = new java.util.zip.ZipInputStream(Files.newInputStream(zipFile.toPath()))) {
             java.util.zip.ZipEntry entry;
             while ((entry = zipIn.getNextEntry()) != null) {
                 File outFile = new File(destDir, entry.getName());
+                String outFileCanonicalPath = outFile.getCanonicalPath();
+                if (!outFileCanonicalPath.startsWith(destDirCanonicalPath + File.separator)
+                        && !outFileCanonicalPath.equals(destDirCanonicalPath)) {
+                    throw new IOException("Обнаружена попытка Zip Slip: " + entry.getName());
+                }
 
                 if (entry.isDirectory()) {
                     if (!outFile.isDirectory() && !outFile.mkdirs()) {

@@ -3,6 +3,7 @@ package ru.vavilov.notebook6.notebook.controller;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -90,10 +91,13 @@ public class NotebookController {
     @GetMapping("/{id}/edit")
     public String editNote(Model model, @PathVariable("id") int id) {
         Notebook notebook = notebookService.findById(id);
+        if (notebook == null || notebook.getUser() == null
+                || notebook.getUser().getId() != authService.getUser().getId()) {
+            throw new AccessDeniedException("Нет прав на редактирование этой заметки");
+        }
         model.addAttribute("notebook", notebook);
         model.addAttribute("authUser", authService.getUser());
         model.addAttribute("search", new SearchField());
-        if (!notebook.getUser().equals(authService.getUser())) return "error/4xx";
         return "notebook/changeNotePage";
     }
 

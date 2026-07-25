@@ -22,6 +22,8 @@ public class WebSecurityConfig {
         http
             .csrf(csrf -> csrf.ignoringRequestMatchers("/translator/**"))
             .authorizeHttpRequests(request -> request
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/codesaga/export").authenticated()
                         .requestMatchers("/register",
                             "/error",
                             "/cam",
