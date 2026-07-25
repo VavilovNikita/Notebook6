@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "notebook")
@@ -31,6 +33,16 @@ public class Notebook{
     @Column(name = "updated_at")
     @Temporal(TemporalType.DATE)
     private LocalDate updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "visibility", nullable = false)
+    private Visibility visibility = Visibility.PERSONAL;
+
+    @ManyToMany
+    @JoinTable(name = "notebook_tags",
+            joinColumns = @JoinColumn(name = "notebook_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private Set<Tag> tags = new HashSet<>();
 
     public Notebook(int id, String head, String text) {
         this.id = id;
@@ -104,6 +116,22 @@ public class Notebook{
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override

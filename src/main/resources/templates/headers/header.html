@@ -6,6 +6,8 @@
 </head>
 <body>
 <div th:fragment="head">
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
     <link rel="shortcut icon" href="../../static/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../../css/common.css">
     <link rel="stylesheet" href="../../css/notebook.css">

@@ -28,6 +28,18 @@
                 </select>
             </label>
             <br/>
+            <input class="form-control" list="tagOptions" name="tagNames" th:value="${tagsCsv}"
+                   placeholder="Теги через запятую (например: возражения, скидки)"/>
+            <datalist id="tagOptions">
+                <option th:each="t : ${allTags}" th:value="${t.name}"></option>
+            </datalist>
+            <br/>
+            <label sec:authorize="hasRole('ADMIN')">Видимость
+                <select class="form-select" th:field="*{visibility}">
+                    <option value="PERSONAL">Личная</option>
+                    <option value="TEAM">Общая (библиотека команды)</option>
+                </select>
+            </label>
         </form>
     </div>
     <div class="col">

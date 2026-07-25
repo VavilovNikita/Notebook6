@@ -14,5 +14,6 @@ http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
     <include file="sql/addPosition.sql" relativeToChangelogFile="true"/>
     <include file="sql/addDataNew.sql" relativeToChangelogFile="true"/>
     <include file="sql/createHibernateManagedTables.xml" relativeToChangelogFile="true"/>
+    <include file="sql/addTagsFavoritesVisibility.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

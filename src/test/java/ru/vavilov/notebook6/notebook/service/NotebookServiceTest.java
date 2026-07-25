@@ -27,6 +27,8 @@ class NotebookServiceTest {
     private NotebookRepository notebookRepository;
     @Mock
     private AuthService authService;
+    @Mock
+    private TagService tagService;
 
     private NotebookService notebookService;
 
@@ -35,7 +37,7 @@ class NotebookServiceTest {
 
     @BeforeEach
     void setUp() {
-        notebookService = new NotebookService(notebookRepository, authService);
+        notebookService = new NotebookService(notebookRepository, authService, tagService);
         owner = new User();
         owner.setId(1);
         otherUser = new User();
@@ -48,7 +50,7 @@ class NotebookServiceTest {
         Notebook newNote = new Notebook();
         when(notebookRepository.findById(0)).thenReturn(Optional.empty());
 
-        notebookService.saveNotebook(newNote);
+        notebookService.saveNotebook(newNote, null);
 
         assertThat(newNote.getUser()).isEqualTo(owner);
         verify(notebookRepository).save(newNote);
@@ -65,7 +67,7 @@ class NotebookServiceTest {
         Notebook update = new Notebook();
         update.setId(5);
 
-        assertThrows(AccessDeniedException.class, () -> notebookService.saveNotebook(update));
+        assertThrows(AccessDeniedException.class, () -> notebookService.saveNotebook(update, null));
         verify(notebookRepository, never()).save(any());
     }
 
@@ -81,10 +83,38 @@ class NotebookServiceTest {
         update.setId(5);
         update.setTitle("new title");
 
-        notebookService.saveNotebook(update);
+        notebookService.saveNotebook(update, null);
 
         assertThat(update.getUser()).isEqualTo(owner);
         verify(notebookRepository).save(update);
+    }
+
+    @Test
+    void saveNotebook_throwsAccessDenied_whenNonAdminPublishesToTeam() {
+        when(authService.getUser()).thenReturn(owner);
+        when(authService.isAdmin()).thenReturn(false);
+        when(notebookRepository.findById(0)).thenReturn(Optional.empty());
+
+        Notebook newNote = new Notebook();
+        newNote.setVisibility(ru.vavilov.notebook6.notebook.entity.Visibility.TEAM);
+
+        assertThrows(AccessDeniedException.class, () -> notebookService.saveNotebook(newNote, null));
+        verify(notebookRepository, never()).save(any());
+    }
+
+    @Test
+    void saveNotebook_allowsAdminToPublishToTeam() {
+        when(authService.getUser()).thenReturn(owner);
+        when(authService.isAdmin()).thenReturn(true);
+        when(notebookRepository.findById(0)).thenReturn(Optional.empty());
+
+        Notebook newNote = new Notebook();
+        newNote.setVisibility(ru.vavilov.notebook6.notebook.entity.Visibility.TEAM);
+
+        notebookService.saveNotebook(newNote, null);
+
+        assertThat(newNote.getVisibility()).isEqualTo(ru.vavilov.notebook6.notebook.entity.Visibility.TEAM);
+        verify(notebookRepository).save(newNote);
     }
 
     @Test

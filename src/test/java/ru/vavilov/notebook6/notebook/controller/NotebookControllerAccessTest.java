@@ -12,8 +12,10 @@ import ru.vavilov.notebook6.config.WebSecurityConfig;
 import ru.vavilov.notebook6.notebook.entity.Notebook;
 import ru.vavilov.notebook6.notebook.entity.User;
 import ru.vavilov.notebook6.notebook.service.AuthService;
+import ru.vavilov.notebook6.notebook.service.FavoriteService;
 import ru.vavilov.notebook6.notebook.service.NotebookService;
 import ru.vavilov.notebook6.notebook.service.SearchService;
+import ru.vavilov.notebook6.notebook.service.TagService;
 import ru.vavilov.notebook6.notebook.service.UserDetailService;
 
 import static org.mockito.Mockito.doThrow;
@@ -37,6 +39,10 @@ class NotebookControllerAccessTest {
     private AuthService authService;
     @MockBean
     private SearchService searchService;
+    @MockBean
+    private TagService tagService;
+    @MockBean
+    private FavoriteService favoriteService;
     @MockBean
     private UserDetailService userDetailService;
 
