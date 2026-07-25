@@ -17,9 +17,14 @@
         </button>
         <ul class="app-navbar-links">
             <li><a th:href="@{/notebook}"><i class="fa-solid fa-note-sticky"></i> Заметки</a></li>
-            <li><a th:href="@{/codesaga/}"><i class="fa-solid fa-bolt"></i> CodeSaga</a></li>
-            <li><a th:href="@{/subeditor/upload}"><i class="fa-solid fa-film"></i> SubEditor</a></li>
-            <li><a th:href="@{/translator}"><i class="fa-solid fa-language"></i> Переводчик</a></li>
+            <li class="app-navbar-dropdown" sec:authorize="hasRole('ADMIN')">
+                <a href="#" onclick="return false;"><i class="fa-solid fa-toolbox"></i> Инструменты <i class="fa-solid fa-caret-down"></i></a>
+                <ul class="app-navbar-dropdown-menu">
+                    <li><a th:href="@{/codesaga/}"><i class="fa-solid fa-bolt"></i> CodeSaga</a></li>
+                    <li><a th:href="@{/subeditor/upload}"><i class="fa-solid fa-film"></i> SubEditor</a></li>
+                    <li><a th:href="@{/translator}"><i class="fa-solid fa-language"></i> Переводчик</a></li>
+                </ul>
+            </li>
             <li sec:authorize="hasRole('ADMIN')">
                 <a class="app-navbar-admin" th:href="@{/admin}"><i class="fa-solid fa-user-shield"></i> Админка</a>
             </li>

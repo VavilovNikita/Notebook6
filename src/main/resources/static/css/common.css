@@ -88,6 +88,40 @@
     color: #fff;
 }
 
+.app-navbar-dropdown {
+    position: relative;
+}
+
+.app-navbar-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 180px;
+    margin: 0;
+    padding: 0.4rem;
+    list-style: none;
+    background: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    z-index: 20;
+}
+
+.app-navbar-dropdown-menu a {
+    display: block;
+    color: var(--text);
+}
+
+.app-navbar-dropdown-menu a:hover {
+    background: var(--light);
+    color: var(--primary);
+}
+
+.app-navbar-dropdown:hover .app-navbar-dropdown-menu,
+.app-navbar-dropdown:focus-within .app-navbar-dropdown-menu {
+    display: block;
+}
+
 @media (max-width: 768px) {
     .app-navbar-toggle {
         display: block;
@@ -109,6 +143,18 @@
         display: block;
         text-align: center;
     }
+
+    .app-navbar-dropdown-menu {
+        display: block;
+        position: static;
+        box-shadow: none;
+        background: transparent;
+        padding: 0;
+    }
+
+    .app-navbar-dropdown-menu a {
+        color: rgba(255, 255, 255, 0.75);
+    }
 }
 
 @media (max-width: 480px) {
@@ -119,67 +165,5 @@
     .app-navbar-links a {
         font-size: 0.9rem;
         padding: 0.5rem;
-    }
-}
-
-/* "Other projects" panel on the login page */
-.projects-section {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--light);
-}
-
-.projects-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--primary);
-    margin-bottom: 1rem;
-}
-
-.projects-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.project-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-    width: 140px;
-    padding: 1rem;
-    text-decoration: none;
-    color: var(--text);
-    background: #fff;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-}
-
-.project-card:hover {
-    transform: translateY(-3px);
-    color: var(--text);
-}
-
-.project-icon {
-    font-size: 1.8rem;
-}
-
-.project-name {
-    font-weight: 600;
-    color: var(--primary);
-}
-
-.project-description {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    text-align: center;
-}
-
-@media (max-width: 480px) {
-    .project-card {
-        width: 100%;
     }
 }
