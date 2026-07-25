@@ -7,10 +7,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 import ru.vavilov.notebook6.notebook.entity.Notebook;
+import ru.vavilov.notebook6.notebook.entity.Tag;
 import ru.vavilov.notebook6.notebook.entity.User;
+import ru.vavilov.notebook6.notebook.entity.Visibility;
 import ru.vavilov.notebook6.notebook.repository.NotebookRepository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -96,7 +100,7 @@ class NotebookServiceTest {
         when(notebookRepository.findById(0)).thenReturn(Optional.empty());
 
         Notebook newNote = new Notebook();
-        newNote.setVisibility(ru.vavilov.notebook6.notebook.entity.Visibility.TEAM);
+        newNote.setVisibility(Visibility.TEAM);
 
         assertThrows(AccessDeniedException.class, () -> notebookService.saveNotebook(newNote, null));
         verify(notebookRepository, never()).save(any());
@@ -109,11 +113,11 @@ class NotebookServiceTest {
         when(notebookRepository.findById(0)).thenReturn(Optional.empty());
 
         Notebook newNote = new Notebook();
-        newNote.setVisibility(ru.vavilov.notebook6.notebook.entity.Visibility.TEAM);
+        newNote.setVisibility(Visibility.TEAM);
 
         notebookService.saveNotebook(newNote, null);
 
-        assertThat(newNote.getVisibility()).isEqualTo(ru.vavilov.notebook6.notebook.entity.Visibility.TEAM);
+        assertThat(newNote.getVisibility()).isEqualTo(Visibility.TEAM);
         verify(notebookRepository).save(newNote);
     }
 
@@ -140,5 +144,51 @@ class NotebookServiceTest {
         notebookService.deleteNotebook(7);
 
         verify(notebookRepository).deleteById(7);
+    }
+
+    @Test
+    void getMyNotes_filtersByTag() {
+        Notebook salesNote = new Notebook();
+        salesNote.setId(1);
+        salesNote.setTags(Set.of(new Tag("sales")));
+        Notebook supportNote = new Notebook();
+        supportNote.setId(2);
+        supportNote.setTags(Set.of(new Tag("support")));
+        owner.setNotes(List.of(salesNote, supportNote));
+        when(authService.getUser()).thenReturn(owner);
+
+        List<Notebook> filtered = notebookService.getMyNotes("sales");
+
+        assertThat(filtered).containsExactly(salesNote);
+    }
+
+    @Test
+    void getMyNotes_withoutTagFilter_returnsAll() {
+        Notebook salesNote = new Notebook();
+        salesNote.setId(1);
+        Notebook supportNote = new Notebook();
+        supportNote.setId(2);
+        owner.setNotes(List.of(salesNote, supportNote));
+        when(authService.getUser()).thenReturn(owner);
+
+        List<Notebook> all = notebookService.getMyNotes(null);
+
+        assertThat(all).containsExactly(salesNote, supportNote);
+    }
+
+    @Test
+    void getTeamLibrary_filtersByTag() {
+        Notebook salesNote = new Notebook();
+        salesNote.setId(1);
+        salesNote.setTags(Set.of(new Tag("sales")));
+        Notebook supportNote = new Notebook();
+        supportNote.setId(2);
+        supportNote.setTags(Set.of(new Tag("support")));
+        when(notebookRepository.findAllByVisibilityOrderByPositionDesc(Visibility.TEAM))
+                .thenReturn(List.of(salesNote, supportNote));
+
+        List<Notebook> filtered = notebookService.getTeamLibrary("support");
+
+        assertThat(filtered).containsExactly(supportNote);
     }
 }

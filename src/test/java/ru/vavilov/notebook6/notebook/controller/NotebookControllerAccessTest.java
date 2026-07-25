@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.vavilov.notebook6.config.WebSecurityConfig;
 import ru.vavilov.notebook6.notebook.entity.Notebook;
 import ru.vavilov.notebook6.notebook.entity.User;
+import ru.vavilov.notebook6.notebook.entity.Visibility;
 import ru.vavilov.notebook6.notebook.service.AuthService;
 import ru.vavilov.notebook6.notebook.service.FavoriteService;
 import ru.vavilov.notebook6.notebook.service.NotebookService;
@@ -70,5 +71,57 @@ class NotebookControllerAccessTest {
 
         mockMvc.perform(get("/notebook/9/edit"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void viewingSomeoneElsesPersonalNoteReturns403() throws Exception {
+        User currentUser = new User();
+        currentUser.setId(1);
+        User otherOwner = new User();
+        otherOwner.setId(2);
+        Notebook othersPersonalNote = new Notebook();
+        othersPersonalNote.setId(10);
+        othersPersonalNote.setUser(otherOwner);
+        othersPersonalNote.setVisibility(Visibility.PERSONAL);
+
+        when(authService.getUser()).thenReturn(currentUser);
+        when(notebookService.findById(10)).thenReturn(othersPersonalNote);
+
+        mockMvc.perform(get("/notebook/10"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void viewingSomeoneElsesTeamNoteSucceeds() throws Exception {
+        User currentUser = new User();
+        currentUser.setId(1);
+        User otherOwner = new User();
+        otherOwner.setId(2);
+        Notebook teamNote = new Notebook();
+        teamNote.setId(11);
+        teamNote.setUser(otherOwner);
+        teamNote.setVisibility(Visibility.TEAM);
+
+        when(authService.getUser()).thenReturn(currentUser);
+        when(notebookService.findById(11)).thenReturn(teamNote);
+
+        mockMvc.perform(get("/notebook/11"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void viewingOwnPersonalNoteSucceeds() throws Exception {
+        User currentUser = new User();
+        currentUser.setId(1);
+        Notebook ownNote = new Notebook();
+        ownNote.setId(12);
+        ownNote.setUser(currentUser);
+        ownNote.setVisibility(Visibility.PERSONAL);
+
+        when(authService.getUser()).thenReturn(currentUser);
+        when(notebookService.findById(12)).thenReturn(ownNote);
+
+        mockMvc.perform(get("/notebook/12"))
+                .andExpect(status().isOk());
     }
 }
