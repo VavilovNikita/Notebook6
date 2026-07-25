@@ -8,7 +8,7 @@ import ru.vavilov.notebook6.notebook.repository.UserRepository;
 
 
 @Service
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminService {
 
     private final UserRepository userRepository;
