@@ -3,6 +3,8 @@
 <head>
     <title>История запросов</title>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/codeSaga.css}">
     <style>
         /* Дополнительные стили для таблицы */
@@ -150,20 +152,13 @@
     </style>
 </head>
 <body>
-<div class="header">
-    <div class="header-content">
-        <div class="logo">
-            <i>⚡</i> CodeSaga - История
-        </div>
-    </div>
-</div>
+<th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
 
 <div class="container">
     <div class="nav">
-        <a href="/" th:href="@{/codesaga/}">Главная</a>
-        <a href="/reviewHistory" th:href="@{/codesaga/reviewHistory}">История запросов</a>
-        <a href="/export" th:href="@{/codesaga/export}">Экспорт кода</a>
-        <a href="/codesaga/export" th:href="@{/}">Notebook</a>
+        <a th:href="@{/codesaga/}">Главная</a>
+        <a th:href="@{/codesaga/reviewHistory}">История запросов</a>
+        <a th:href="@{/codesaga/export}">Экспорт кода</a>
     </div>
 
     <div class="card">
